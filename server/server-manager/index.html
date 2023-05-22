@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+
+    <head>
+        <title>Server Manager</title>
+        <link rel="icon" href="/images/logo-512px.png" />
+    </head>
+
+    <body theme="light" hidden>
+        <div id="upperPanel">
+            <div id="title">
+                <a href="/"><img src="/images/logo-512px.png" class="home" /></a>
+                <h1>Server Manager</h1>
+            </div>
+            <a href="../"><button>Retour</button></a>
+        </div>
+
+        <div id="content">
+            <div id="servers">
+                <div class="server" id="altv">
+                    <img src="images/altv-logo-100px.png" />
+                    <label class="txt">Alt:V Server</label>
+                    <a href="console/?server=altv" class="hide console">
+                        <label>Console</label>
+                        <span class="new-tab-icon"></span>
+                    </a>
+                </div>
+
+                <div class="server" id="mc-fk">
+                    <img src="images/minecraft-logo-100px.png" />
+                    <label class="txt">Fallen Kingdom 1.12.2</label>
+                    <a href="console/?server=mc-fk" class="hide console">
+                        <label>Console</label>
+                        <span class="new-tab-icon"></span>
+                    </a>
+                </div>
+
+                <div class="server" id="mc-lg">
+                    <img src="images/minecraft-logo-100px.png" />
+                    <label class="txt">Loup Garou 1.15.1</label>
+                    <a href="console/?server=mc-lg" class="hide console">
+                        <label>Console</label>
+                        <span class="new-tab-icon"></span>
+                    </a>
+                </div>
+            </div>
+
+            <div id="theme">
+                <label id="theme-label">Change Theme</label>
+                <input class="tgl tgl-light" id="theme-checkbox" type="checkbox" onchange="changeTheme()" />
+                <label class="tgl-btn" for="theme-checkbox"></label>
+            </div>
+        </div>
+    </body>
+
+    <script src="/js/endPath.js"></script>
+    <script src="/js/theme.js"></script>
+</html>
