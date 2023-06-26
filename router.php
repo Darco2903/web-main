@@ -2,9 +2,19 @@
 
 $uri = $_SERVER["REQUEST_URI"];
 $path = parse_url($uri, PHP_URL_PATH);
-if (substr($path, -1) == '/') {
-	$path .= 'index.html';
+if (substr($path, -1) != '/' && pathinfo($path, PATHINFO_EXTENSION) == '') {
+	header("Location: $path/");
+	return true;
 }
+
+// if (substr($path, -1) == '/') {
+// 	$path .= "index.html";
+// }
+
+
+// if (pathinfo($path, PATHINFO_EXTENSION) == '') {
+// 	$path .= '.html';
+// }
 
 function err404() {
 	header("HTTP/1.0 404 Not Found");
@@ -16,5 +26,3 @@ if (!file_exists("server/$path")) {
 }
 
 return false;
-
-?>
