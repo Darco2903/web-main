@@ -1,18 +1,27 @@
-export function hasCookie(name: string): boolean;
+declare const DOMAIN: string;
+declare const IS_MOBILE: boolean;
 
-export function getCookie(name: string): string;
+declare function hasCookie(name: string): boolean;
 
-export function setCookie(
+declare function getCookie(name: string): string;
+
+declare function setCookie(
     name: string,
     value: string,
-    options: {
-        path: string;
-        domain: string;
-        expires: number | string;
-        maxAge: number;
-        secure: boolean;
-        sameSite: "strict" | "lax";
+    options?: {
+        path?: string;
+        domain?: string;
+        expires?: number | string;
+        maxAge?: number;
+        secure?: boolean;
+        sameSite?: "strict" | "lax";
     }
 ): void;
 
-export function deleteCookie(name: string): void;
+declare function deleteCookie(
+    name: string,
+    options?: {
+        path?: string;
+        domain?: string;
+    }
+): void;

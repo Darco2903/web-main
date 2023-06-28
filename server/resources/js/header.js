@@ -11,48 +11,27 @@ const THEME = {
     },
 };
 
-const logoutButton = document.querySelector("#user-logout");
 const themeCheckbox = document.querySelector("#theme-input");
-const DOMAIN = new URL(document.baseURI).hostname;
-const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-// logoutButton.addEventListener("click", async () => {
-//     const res = await fetch("/", {
-//         method: "POST",
-//         headers: {
-//             "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({
-//             request: "logout",
-//         }),
-//     });
-//     if (res.status === 200) {
-//         window.location.reload();
-//     } else {
-//         alert("Error logging out!");
-//     }
-// });
 
 /**
  * Sets the theme of the page
- * @param {object} theme
- * @param {string} theme.backgroundColor
- * @param {string} theme.name
- * @param {string} theme.textColor
+ * @param {string} themeName
  */
-function seTheme(theme) {
-    themeCheckbox.checked = theme === THEME.dark;
-    setCookie("theme", theme.name, { domain: DOMAIN, path: "/" });
+function seTheme(themeName) {
+    const theme = THEME[themeName];
+    if (themeCheckbox) themeCheckbox.checked = theme === THEME.dark;
+    document.body.setAttribute("theme", theme.name);
+    setCookie("theme", theme.name, { domain: "." + DOMAIN, path: "/" });
 }
 
-themeCheckbox.addEventListener("change", () => {
-    const themeToSet = themeCheckbox.checked ? THEME.dark : THEME.light;
+themeCheckbox?.addEventListener("change", () => {
+    const themeToSet = themeCheckbox.checked ? THEME.dark.name : THEME.light.name;
     seTheme(themeToSet);
     console.log("Changing theme to", themeToSet.name);
 });
 
 window.addEventListener("load", () => {
-    const theme = hasCookie("theme") ? THEME[getCookie("theme")] : THEME.light;
+    const theme = hasCookie("theme") ? getCookie("theme") : THEME.light.name;
     seTheme(theme);
     console.log("Theme loaded!");
     document.body.removeAttribute("hidden");

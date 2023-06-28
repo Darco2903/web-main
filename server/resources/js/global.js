@@ -1,3 +1,6 @@
+const DOMAIN = new URL(document.baseURI).hostname;
+const IS_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
 function hasCookie(name) {
     return document.cookie.includes(name);
 }
@@ -13,13 +16,13 @@ function getCookie(name) {
  * Sets a cookie
  * @param {string} name
  * @param {string} value
- * @param {object} data
- * @param {string} data.path
- * @param {string} data.domain
- * @param {string} data.expires
- * @param {string} data.maxAge
- * @param {boolean} data.secure
- * @param {string} data.samesite
+ * @param {object} [data]
+ * @param {string} [data.path]
+ * @param {string} [data.domain]
+ * @param {string} [data.expires]
+ * @param {string} [data.maxAge]
+ * @param {boolean} [data.secure]
+ * @param {string} [data.samesite]
  * @returns {void}
  */
 function setCookie(name, value, data = {}) {
@@ -34,6 +37,16 @@ function setCookie(name, value, data = {}) {
     document.cookie = cookie;
 }
 
-function deleteCookie(name) {
-    document.cookie = `${name}=;max-age=0`;
+/**
+ * Deletes a cookie
+ * @param {string} name
+ * @param {object} [data]
+ * @param {string} [data.path]
+ * @param {string} [data.domain]
+ * @returns {void}
+ */
+function deleteCookie(name, data = {}) {
+    data.maxAge = 0;
+    data.expires = "Thu, 01 Jan 1970 00:00:00 UTC";
+    setCookie(name, "", data);
 }
