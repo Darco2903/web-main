@@ -1,122 +1,25 @@
-div#content {
-    margin: 50px 20px 0 20px;
+#redirect {
+    margin: 50px 20px;
 }
 
-#web-server {
-    margin-top: 50px;
-    margin-bottom: 100px;
-}
-
-div#servers {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-}
-
-div.category {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 30px;
-    flex-wrap: wrap;
-}
-
-body:has(#theme-input:checked) div.category > label {
-    color: var(--text-color-dark);
-}
-
-#game-server-status {
-    width: max-content;
-    margin-bottom: 50px;
-}
-
-.instance,
-.server {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 20px;
-    padding: 10px 15px 10px 10px;
-    border-radius: 10px;
-    user-select: none;
+#redirect a {
+    padding: 10px;
+    border-radius: 7px;
+    text-decoration: none;
     color: var(--text-color-light);
     background-color: var(--element-color-light);
     transition: background-color var(--transition-time) ease, color var(--transition-time) ease, filter var(--hover-time) ease;
 }
 
-.instance,
-.server {
-    text-decoration: none;
-    font-size: 15px;
-    font-size: 20px;
-    font-weight: bold;
-}
-
-.server * {
-    cursor: pointer;
-}
-.instance img,
-.server img {
-    width: 64px;
-}
-body:has(#theme-input:checked) .instance,
-body:has(#theme-input:checked) .server {
+body[theme="dark"] #redirect a {
     color: var(--text-color-dark);
     background-color: var(--element-color-dark);
 }
 
-.server:hover {
-    filter: drop-shadow(2px 2px 3px var(--hover-color-light)) brightness(1.01);
+#redirect a:hover {
+    filter: drop-shadow(2px 2px 3px var(--hover-color-dark)) brightness(1.03);
 }
 
-body:has(#theme-input:checked) .server:hover {
-    filter: drop-shadow(2px 2px 3px var(--hover-color-dark)) brightness(1.01);
+body[theme="dark"] #redirect a:hover {
+    filter: drop-shadow(2px 2px 3px var(--hover-color-dark)) brightness(1.03);
 }
-
-span.server-status {
-    --size: 16px;
-    width: var(--size);
-    height: var(--size);
-    border-radius: 50%;
-}
-
-span.server-status[status="online"] {
-    background-color: green;
-}
-
-span.server-status[status="loading"] {
-    background-color: orange;
-}
-
-span.server-status[status="offline"] {
-    background-color: red;
-}
-
-span.server-status[status="unknown"] {
-    background-color: gray;
-}
-
-body:has(#game-server-status .server-status[status="offline"]) #game-server #servers {
-    display: none;
-}
-
-body:has(#game-server-status .server-status[status="online"]) #game-server-status {
-    display: none;
-}
-
-/* span.new-tab-icon {
-    background-image: url(../images/icons/new-tab-black.svg);
-    background-size: contain;
-    background-repeat: no-repeat;
-    width: 1em;
-    height: 1em;
-    transition: background-image var(--transition-time) ease;
-} */
-
-/* body:has(#theme-input:checked) span.new-tab-icon {
-    background-image: url(../images/icons/new-tab-white.svg);
-} */
-
-/* span.new-tab-icon:hover {
-    filter: drop-shadow(2px 2px 3px var(--hover-color-light));
-} */
