@@ -18,6 +18,14 @@ async function POSTRequest(req, res) {
     }
 
     switch (req.url) {
+        case "/downloads":
+            const files = downloads.getDownloadableFiles();
+            res.writeHead(200, "OK", {
+                "Content-Type": "application/json",
+            });
+            res.end(JSON.stringify(files));
+            break;
+
         default:
             res.writeHead(404, "Not Found");
             res.end();
