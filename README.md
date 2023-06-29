@@ -2,10 +2,6 @@
 
 ## Description
 
-### Darco2903' Web Server
-
-Download page at /downloads
+### Darco2903' Main Web Server
 
 ## Installation
-
-

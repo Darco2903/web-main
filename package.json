@@ -1,0 +1,23 @@
+{
+    "name": "web-server",
+    "version": "1.0.0",
+    "description": "Main web server",
+    "main": "index.js",
+    "scripts": {
+        "start": "node ."
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Darco2903/web-server.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/Darco2903/web-server/issues"
+    },
+    "homepage": "https://github.com/Darco2903/web-server#readme",
+    "dependencies": {
+        "console-log-colors": "^0.4.0"
+    }
+}
