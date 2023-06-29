@@ -1,11 +1,2 @@
-*dev/
+node_modules/
 _*
-debugIPS
-server/config/
-server/downloads/storage/
-server/downloads/private/
-server/stream/
-
-server/altv-musicPlayer/
-server/js/upload.js
-server/php/upload.php
