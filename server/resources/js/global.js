@@ -1,4 +1,5 @@
-const DOMAIN = new URL(document.baseURI).hostname;
+const hostname = new URL(document.baseURI).hostname;
+const DOMAIN = !["localhost", "127.0.0.1"].includes(hostname) && hostname.match(/\./g).length > 1 ? hostname.replace(/^[^.]+\./g, "") : hostname;
 const IS_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
 function hasCookie(name) {
