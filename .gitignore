@@ -2,3 +2,4 @@ node_modules/
 _*
 config.json
 server/downloads/storage/
+server/altv/cdn/*.resource
