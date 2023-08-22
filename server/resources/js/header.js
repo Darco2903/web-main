@@ -12,6 +12,7 @@ function setTheme(theme) {
     if (themeCheckbox) themeCheckbox.checked = theme === THEME.dark;
     document.body.setAttribute("theme", theme);
     setCookie("theme", theme, {
+        path: "/",
         domain: "." + DOMAIN,
         maxAge: 60 * 60 * 24 * 365,
     });
