@@ -1,9 +1,5 @@
 declare const THEME: {
-    [key: string]: {
-        background: string;
-        name: string;
-        textColor: string;
-    };
+    [key: string]: string;
 };
 
-declare function seTheme(theme: string): void;
+declare function setTheme(theme: string): void;
