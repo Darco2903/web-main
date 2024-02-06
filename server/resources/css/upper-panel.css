@@ -1,0 +1,466 @@
+@import url(./user-gradient.css);
+
+:root {
+    --color-light: #fff;
+    --color-dark: #333;
+    --text-color-light: var(--color-dark);
+    --text-color-dark: var(--color-light);
+    --background-color-light: var(--color-light);
+    --background-color-dark: var(--color-dark);
+    --element-color-light: #eee;
+    --element-color-dark: #444;
+    --hover-color-light: #66666688;
+    --hover-color-dark: #00000088;
+    --theme-time: 0.4s;
+    --hover-time: 0.2s;
+    --blue-pink-gradient: rgba(0, 165, 255, 1) 0%, rgba(197, 0, 127, 1) 100%;
+
+    --icon-sun-yellow: url("/resources/images/icons/sun-yellow.png");
+    --icon-moon-cyan: url("/resources/images/icons/moon-cyan.png");
+    --icon-home-light: url("/resources/images/icons/home-black.png");
+    --icon-home-dark: url("/resources/images/icons/home-white.png");
+
+    --icon-main: url("/resources/images/icons/icon-128px.png");
+    --icon-gamepad-light: url("/resources/images/icons/gamepad-icon-light-128px.png");
+    --icon-gamepad-dark: url("/resources/images/icons/gamepad-icon-dark-128px.png");
+    --icon-trad: url("/resources/images/icons/trad-logo-128px.png");
+    --icon-korea: url("/resources/images/icons/korea-icon-128px.png");
+}
+
+body {
+    background-color: var(--background-color-light);
+    transition: background-color var(--theme-time) ease;
+}
+
+body[theme="dark"] {
+    background-color: var(--background-color-dark);
+}
+
+*::selection {
+    background-color: #66666644;
+}
+
+body[theme="dark"] *::selection {
+    background-color: #cccccc44;
+}
+
+/* Images Preload */
+
+body:after {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    z-index: -1;
+    content: var(--icon-sun-yellow) var(--icon-moon-cyan) var(--icon-main) var(--icon-gamepad-light) var(--icon-gamepad-dark) var(--icon-trad)
+        var(--icon-korea);
+}
+
+[preload],
+[preload] * {
+    -webkit-transition: none !important;
+    -moz-transition: none !important;
+    -ms-transition: none !important;
+    -o-transition: none !important;
+}
+
+/* ---------------------------------------------------- */
+
+#upper-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 5px 5px 30px -15px #000;
+    padding: 20px 30px;
+    border-radius: 10px;
+}
+
+body[mobile] #upper-panel {
+    padding: 0;
+    margin: 5px 10px;
+}
+
+.upper-panel-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+body[mobile] .upper-panel-row {
+    flex-direction: column;
+    gap: 20px;
+}
+
+.upper-panel-row:first-of-type {
+    justify-content: space-between;
+}
+
+body[mobile] .upper-panel-row:first-of-type > * {
+    justify-content: space-between;
+    width: 100%;
+}
+
+.upper-panel-row:has(nav) {
+    justify-content: center;
+}
+
+#upper-panel-left {
+    --icon-size: 13vw;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 3vw;
+}
+
+.site-icon {
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: var(--icon-size);
+    height: var(--icon-size);
+    max-width: 64px;
+    max-height: 64px;
+    transition: filter var(--hover-time) ease, background-image var(--theme-time) ease;
+}
+
+body[mobile] .site-icon {
+    width: 32px;
+    height: 32px;
+}
+
+.site-icon:hover {
+    filter: drop-shadow(2px 2px 5px var(--hover-color-light)) brightness(1.01);
+}
+
+body[theme="dark"] .site-icon:hover {
+    filter: drop-shadow(2px 2px 5px var(--hover-color-dark)) brightness(1.01);
+}
+
+#icon-main {
+    background-image: var(--icon-main);
+}
+
+#icon-manager {
+    background-image: var(--icon-gamepad-light);
+}
+
+body[theme="dark"] #icon-manager {
+    background-image: var(--icon-gamepad-dark);
+}
+
+#icon-lang {
+    background-image: var(--icon-trad);
+}
+
+#icon-korea {
+    background-image: var(--icon-korea);
+}
+
+#upper-panel-right {
+    display: flex;
+    align-items: center;
+    gap: 3vw;
+}
+
+/* User Account */
+
+#user-account a {
+    text-decoration: none;
+}
+
+#user-account-login {
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 12px;
+    cursor: pointer;
+    user-select: none;
+    color: #fff;
+    background-image: linear-gradient(135deg, var(--blue-pink-gradient));
+    transition: filter var(--hover-time) ease, animation var(--hover-time) ease;
+}
+
+body[mobile] #user-account-login {
+    font-size: 14px;
+}
+
+#user-account-login:hover {
+    filter: drop-shadow(2px 2px 3px var(--hover-color-light)) brightness(1.1);
+}
+
+body[theme="dark"] #user-account-login:hover {
+    filter: drop-shadow(2px 2px 3px var(--hover-color-dark)) brightness(1.1);
+}
+
+#user-account:has(#user-session[active]) .link:has(#user-account-login) {
+    display: none;
+}
+
+#user-session {
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+    position: relative;
+    padding: 5px;
+}
+
+#user-session::before {
+    content: "";
+    inset: 0;
+    position: absolute;
+    border: 5px solid transparent;
+    border-radius: 20px;
+    background: var(--user-gradient-anim) border-box;
+    animation: user-gradient 60s infinite ease-in-out;
+    -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+}
+
+body[mobile] #user-session::before {
+    border: 2px solid transparent;
+}
+
+#user-account-info {
+    --padding-width: 5%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: end;
+    gap: 10px;
+    position: relative;
+    max-width: 250px;
+    width: calc(100% - var(--padding-width) * 2);
+    border-radius: 15px 15px 0 0;
+    padding: 10px var(--padding-width);
+    cursor: pointer;
+    background-color: #fff;
+    transition: background-color var(--theme-time) ease;
+}
+
+body[theme="dark"] #user-account-info {
+    background-color: #333;
+}
+
+body[mobile] #user-account-info {
+    padding: 5px var(--padding-width);
+}
+
+#user-account-info * {
+    pointer-events: none;
+}
+
+#user-account-info *,
+#user-links * {
+    user-select: none;
+}
+
+#user-account-name {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    text-align: right;
+    transition: color var(--theme-time) ease;
+}
+
+body[theme="dark"] #user-account-name {
+    color: #eee;
+}
+
+body[mobile] #user-account-name {
+    font-size: 10px;
+}
+
+#user-account-icon {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 50%;
+    transition: filter var(--theme-time) ease;
+}
+
+body[theme="dark"] #user-account-icon[default] {
+    filter: invert(0.8);
+}
+
+body[mobile] #user-account-icon {
+    width: 32px;
+    height: 32px;
+}
+
+#user-account-icon:not([src]) {
+    opacity: 0;
+}
+
+#user-account:has(#user-links:not([active])) #user-account-info {
+    border-radius: 15px;
+}
+
+#user-links {
+    display: flex;
+    flex-direction: row;
+}
+
+#user-links:not([active]) {
+    display: none;
+}
+
+.link {
+    height: 22px;
+    width: 100%;
+}
+
+.link a {
+    position: relative;
+    padding: 4px 5px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #333;
+    background-color: #fff;
+    transition: background-color var(--theme-time) ease, color var(--theme-time) ease;
+}
+
+body[theme="dark"] .link a {
+    color: #eee;
+    background-color: #333;
+}
+
+body[mobile] .link a {
+    font-size: 8px;
+}
+
+#user-account-info:hover,
+.link a:hover {
+    background-color: #f8f8f8;
+    transition: background-color var(--hover-time) ease;
+}
+
+body[theme="dark"] #user-account-info:hover,
+body[theme="dark"] .link a:hover {
+    background-color: #2a2a2a;
+}
+
+#user-account-info:active,
+.link a:active {
+    background-color: #eaeaea;
+    transition: background-color 0.2s ease;
+}
+
+body[theme="dark"] #user-account-info:active,
+body[theme="dark"] .link a:active {
+    background-color: #222;
+}
+
+#user-account-my-account {
+    border-radius: 0 0 0 15px;
+}
+
+#user-account-logout {
+    border-radius: 0 0 15px 0;
+}
+
+#user-session:not([active]) {
+    display: none;
+}
+
+/* ---------------------------------------------------- */
+
+/* Theme checkbox */
+
+#theme-input {
+    display: none;
+}
+#theme-input,
+#theme-input:after,
+#theme-input:before,
+#theme-input *,
+#theme-input *:after,
+#theme-input *:before,
+#theme-input + #theme-input-btn {
+    box-sizing: border-box;
+}
+#theme-input::-moz-selection,
+#theme-input:after::-moz-selection,
+#theme-input:before::-moz-selection,
+#theme-input *::-moz-selection,
+#theme-input *:after::-moz-selection,
+#theme-input *:before::-moz-selection,
+#theme-input + #theme-input-button::-moz-selection {
+    background: none;
+}
+#theme-input::selection,
+#theme-input:after::selection,
+#theme-input:before::selection,
+#theme-input *::selection,
+#theme-input *:after::selection,
+#theme-input *:before::selection,
+#theme-input + #theme-input-button::selection {
+    background: none;
+}
+#theme-input + #theme-input-button {
+    --theme-input-width: 70px;
+    --theme-input-height: calc(var(--theme-input-width) / 2);
+    outline: 0;
+    display: block;
+    width: var(--theme-input-width);
+    height: var(--theme-input-height);
+    position: relative;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+#theme-input + #theme-input-button:after,
+#theme-input + #theme-input-button:before {
+    position: relative;
+    display: block;
+    content: "";
+    width: 50%;
+    height: 100%;
+}
+#theme-input + #theme-input-button:after {
+    left: 0;
+}
+#theme-input + #theme-input-button:before {
+    display: none;
+}
+#theme-input:checked + #theme-input-button:after {
+    left: 50%;
+}
+
+#theme-input + #theme-input-button {
+    border-radius: 2em;
+    padding: 2px;
+    background-color: var(--element-color-light);
+    transition: background-color var(--theme-time) ease, filter var(--hover-time) ease;
+}
+
+#theme-input + #theme-input-button:hover,
+#change-lang .input:hover {
+    filter: brightness(1.03);
+}
+
+#theme-input:checked + #theme-input-button:hover,
+body[theme="dark"] #change-lang .input:hover {
+    filter: brightness(1.1);
+}
+
+#theme-input:checked + #theme-input-button {
+    background: var(--element-color-dark);
+}
+
+#theme-input + #theme-input-button:after {
+    border-radius: 50%;
+    background-color: var(--element-color-light);
+    background-image: var(--icon-sun-yellow);
+    background-size: calc(var(--theme-input-height) - 10px);
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: background-color var(--theme-time) ease, background-image var(--theme-time) ease, left var(--theme-time) ease;
+}
+
+#theme-input:checked + #theme-input-button::after {
+    background-color: var(--element-color-dark);
+    background-image: var(--icon-moon-cyan);
+}
+
+/* ---------------------------------------------------- */

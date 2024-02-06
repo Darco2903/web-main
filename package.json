@@ -18,6 +18,10 @@
     },
     "homepage": "https://github.com/Darco2903/web-server#readme",
     "dependencies": {
-        "console-log-colors": "^0.4.0"
+        "console-log-colors": "^0.4.0",
+        "fluent-ffmpeg": "^2.1.2",
+        "formidable": "^3.5.1",
+        "websocket": "^1.0.34",
+        "ytdl-core": "^4.11.5"
     }
 }

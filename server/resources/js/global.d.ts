@@ -25,3 +25,5 @@ declare function deleteCookie(
         domain?: string;
     }
 ): void;
+
+declare function wait(ms: number): Promise<void>;

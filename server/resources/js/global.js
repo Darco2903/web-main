@@ -51,3 +51,17 @@ function deleteCookie(name, data = {}) {
     data.expires = "Thu, 01 Jan 1970 00:00:00 UTC";
     setCookie(name, "", data);
 }
+
+/**
+ * @param {number} ms
+ * @returns {Promise<void>}
+ */
+async function wait(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+window.addEventListener("load", () => {
+    if (IS_MOBILE) {
+        document.body.setAttribute("mobile", "");
+    }
+});

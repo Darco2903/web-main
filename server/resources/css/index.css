@@ -1,25 +1,56 @@
-#redirect {
-    margin: 50px 20px;
+body {
+    font-family: Arial, sans-serif;
+    user-select: none;
 }
 
-#redirect a {
-    padding: 10px;
+#content {
+    margin: 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+}
+
+.category {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.category-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    text-transform: uppercase;
+    padding: 10px 0;
+    border-bottom: 2px solid #ddd;
+    transition: color var(--theme-time) ease, border-color var(--theme-time) ease;
+}
+
+body[theme="dark"] .category-title {
+    color: #eee;
+    border-color: #555;
+}
+
+.category-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 100px;
+}
+
+.redirect {
+    padding: 15px 20px;
     border-radius: 7px;
     text-decoration: none;
-    color: var(--text-color-light);
-    background-color: var(--element-color-light);
-    transition: background-color var(--transition-time) ease, color var(--transition-time) ease, filter var(--hover-time) ease;
+    color: #fff;
+    background-color: #0af;
+    transition: filter var(--hover-time) ease;
 }
 
-body[theme="dark"] #redirect a {
-    color: var(--text-color-dark);
-    background-color: var(--element-color-dark);
+.redirect:hover {
+    filter: drop-shadow(3px 3px 3px var(--hover-color-light)) brightness(1.01);
 }
 
-#redirect a:hover {
-    filter: drop-shadow(2px 2px 3px var(--hover-color-dark)) brightness(1.03);
-}
-
-body[theme="dark"] #redirect a:hover {
-    filter: drop-shadow(2px 2px 3px var(--hover-color-dark)) brightness(1.03);
+body[theme="dark"] .redirect:hover {
+    filter: drop-shadow(3px 3px 3px var(--hover-color-dark)) brightness(1.01);
 }

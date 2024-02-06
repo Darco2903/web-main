@@ -1,5 +1,10 @@
 node_modules/
-_*
+*_
+*_.*
 config.json
 server/downloads/storage/
 server/altv/cdn/*.resource
+server/altv/music-converter/output/
+server/games/battleship/
+
+
