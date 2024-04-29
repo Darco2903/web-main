@@ -134,7 +134,7 @@ function urlParse(url) {
  */
 async function proxyRequest(req, res) {
     const url = proxy.parseUrl(req);
-    if (proxy.enabled) {
+    if (!proxy.enabled) {
         printLog(colors.red("Proxy disabled"), colors.cyan(url));
         res.writeHead(503, "Service Unavailable");
     } else if (proxy.isAllowed(url)) {
