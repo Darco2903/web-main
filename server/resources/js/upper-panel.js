@@ -7,6 +7,7 @@ const UPPER_PANEL_PATH = "/resources/html/upper-panel.html";
 const USER_ICON_PATH = "/user/resources/images/profile/";
 const USER_DEFAULT_ICON = "default";
 
+/** @type {HTMLInputElement} */
 let themeCheckbox;
 let userSession;
 let userLinks;
@@ -14,16 +15,7 @@ let userLinks;
 window.addEventListener("load", async () => {
     await loadUpperPanel();
 
-    themeCheckbox = document.querySelector("#theme-input");
-    themeCheckbox.addEventListener("change", () => {
-        const themeToSet = themeCheckbox.checked ? THEME.dark : THEME.light;
-        setTheme(themeToSet);
-        console.log("Changing theme to", themeToSet);
-    });
-
-    const theme = hasCookie("theme") ? getCookie("theme") : THEME.light;
-    setTheme(theme);
-    console.log("Theme loaded!");
+    loadTheme();
 
     document.body.removeAttribute("hidden");
 
@@ -140,11 +132,20 @@ function initLoginButton() {
 function setTheme(theme) {
     themeCheckbox.checked = theme === THEME.dark;
     document.body.setAttribute("theme", theme);
-    setCookie("theme", theme, {
-        path: "/",
-        domain: "." + DOMAIN,
-        maxAge: 60 * 60 * 24 * 365,
+    window.localStorage.setItem("theme", theme);
+}
+
+function loadTheme() {
+    themeCheckbox = document.querySelector("#theme-input");
+    themeCheckbox.addEventListener("change", () => {
+        const themeToSet = themeCheckbox.checked ? THEME.dark : THEME.light;
+        setTheme(themeToSet);
+        console.log("Changing theme to", themeToSet);
     });
+
+    const theme = window.localStorage.getItem("theme") || THEME.light;
+    setTheme(theme);
+    console.log("Theme loaded!");
 }
 
 /**
