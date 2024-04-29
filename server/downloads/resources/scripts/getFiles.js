@@ -1,7 +1,10 @@
 const fs = require("fs");
 const path = require("path");
 
-const { SERVER_PATH } = require("../../../../config.json");
+const { SERVER_PATH } = require("../../../../config/server.json");
+const { PATH: DOWNLOAD_PATH } = require("../../../../config/download.json");
+
+const downloadPath = path.join(SERVER_PATH, DOWNLOAD_PATH);
 
 /**
  * @param {import("http").IncomingMessage} req
@@ -9,24 +12,24 @@ const { SERVER_PATH } = require("../../../../config.json");
  * @param {object} query
  */
 async function exec(req, res, query) {
-    const p = "/downloads/storage";
-    const files = fs.readdirSync(SERVER_PATH + p);
-    const filesData = [];
-    files.forEach((file) => {
-        const filePath = path.join(SERVER_PATH, p, file);
-        const stat = fs.statSync(filePath);
-        if (stat.isFile()) {
-            filesData.push({
-                name: file,
-                path: path.join(p, file),
-                size: stat.size,
-            });
-        }
-    });
-    res.writeHead(200, {
-        "Content-Type": "application/json",
-    });
-    res.write(JSON.stringify(filesData));
+    const files = await fs.promises.readdir(downloadPath);
+    const promises = files
+        .map(async (file) => {
+            const filePath = path.join(downloadPath, file);
+            const stat = await fs.promises.stat(filePath);
+            if (stat.isFile()) {
+                return {
+                    name: file,
+                    path: path.join(DOWNLOAD_PATH, file),
+                    size: stat.size,
+                };
+            }
+        })
+        .filter((file) => file);
+
+    const filesData = await Promise.all(promises);
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(filesData));
 }
 
 module.exports = exec;

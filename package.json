@@ -1,26 +1,26 @@
 {
-    "name": "web-server",
-    "version": "1.0.0",
-    "description": "Main web server",
-    "main": "index.js",
-    "scripts": {
-        "start": "node ."
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/Darco2903/web-server.git"
-    },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/Darco2903/web-server/issues"
-    },
-    "homepage": "https://github.com/Darco2903/web-server#readme",
-    "dependencies": {
-        "console-log-colors": "^0.4.0",
-        "fluent-ffmpeg": "^2.1.2",
-        "formidable": "^3.5.1",
-        "websocket": "^1.0.34"
-    }
+  "name": "web-server",
+  "version": "1.0.0",
+  "description": "Main Web Server",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Darco2903/web-server.git"
+  },
+  "keywords": [],
+  "author": "Darco2903",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Darco2903/web-server/issues"
+  },
+  "homepage": "https://github.com/Darco2903/web-server#readme",
+  "dependencies": {
+    "console-log-colors": "^0.4.0",
+    "formidable": "^3.5.1",
+    "request": "^2.88.2",
+    "websocket": "^1.0.34"
+  }
 }

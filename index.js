@@ -4,7 +4,7 @@ const { color } = require("console-log-colors");
 
 const utils = require("./utils.js");
 
-const { listen, port, SERVER_PATH } = require("./config.json");
+const { listen, port, SERVER_PATH, WSAllowedOrigins } = require("./config/server.json");
 
 async function handleRequest(req, res) {
     try {
@@ -13,7 +13,7 @@ async function handleRequest(req, res) {
 
         switch (req.method) {
             case "GET":
-                utils.GETRequestHandler(req, res);
+                await utils.GETRequestHandler(req, res);
                 break;
 
             case "POST":
@@ -21,7 +21,7 @@ async function handleRequest(req, res) {
                 break;
 
             case "HEAD":
-                utils.HEADRequestHandler(req, res);
+                await utils.HEADRequestHandler(req, res);
                 break;
 
             default:
@@ -59,29 +59,44 @@ const wsServer = new WebSocketServer({
     autoAcceptConnections: false,
 });
 
-function originIsAllowed(origin) {
-    switch (origin) {
-        case "http://localhost:8080":
-        case "https://localhost:8080":
-        case "http://127.0.0.1:8080":
-        case "https://127.0.0.1:8080":
-        case "https://darco2903.fr":
-        case "http://dev.local.darco2903.fr:8080":
-            return true;
-    }
-    return false;
-}
-
-wsServer.on("request", (req) => {
-    if (!originIsAllowed(req.origin)) {
+wsServer.on("request", async (req) => {
+    if (!WSAllowedOrigins.includes(req.origin)) {
         req.reject();
-        utils.printLog(color.green(req.remoteAddress), color.yellow("WebSocket"), color.cyan(req.resourceURL.pathname), color.red("Rejected"));
+        utils.printLog(
+            color.green(req.remoteAddress),
+            color.yellow("WebSocket"),
+            color.cyan(req.resourceURL.pathname),
+            color.red("Rejected: Origin not allowed")
+        );
         return;
     }
-    utils.printLog(color.green(req.remoteAddress), color.yellow("WebSocket"), color.cyan(req.resourceURL.pathname), color.green("Accepted"));
+
+    // if not echo-protocol
+    if (req.requestedProtocols[0] !== "echo-protocol") {
+        req.reject();
+        utils.printLog(
+            color.green(req.remoteAddress),
+            color.yellow("WebSocket"),
+            color.cyan(req.resourceURL.pathname),
+            color.red("Rejected: Protocol not allowed")
+        );
+        return;
+    }
+
+    const path = SERVER_PATH + req.resource;
+    if (!(await utils.exists(path))) {
+        req.reject();
+        utils.printLog(
+            color.green(req.remoteAddress),
+            color.yellow("WebSocket"),
+            color.cyan(req.resourceURL.pathname),
+            color.red("Rejected: Path not found")
+        );
+        return;
+    }
 
     const connection = req.accept("echo-protocol", req.origin);
-    const path = SERVER_PATH + req.resource;
+    utils.printLog(color.green(req.remoteAddress), color.yellow("WebSocket"), color.cyan(req.resourceURL.pathname), color.green("Accepted"));
 
     const handleConnection = require(path);
     handleConnection(req, connection);
@@ -91,7 +106,7 @@ wsServer.on("request", (req) => {
             color.yellow("WebSocket"),
             color.cyan(req.resourceURL.pathname),
             color.green("Received Message"),
-            message.utf8Data
+            message.utf8Data.length > 100 ? message.utf8Data.substring(0, 100) + "..." : message.utf8Data
         );
     });
 });

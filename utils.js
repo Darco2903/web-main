@@ -2,9 +2,9 @@ const fs = require("fs");
 const http = require("http");
 const path = require("path");
 const formidable = require("formidable");
-const { color } = require("console-log-colors");
+const colors = require("console-log-colors");
 
-const { SERVER_PATH } = require("./config.json");
+const { authServer, SERVER_PATH } = require("./config/server.json");
 
 const args = process.argv.slice(2);
 const DEBUG = args.includes("--debug");
@@ -13,56 +13,52 @@ const AUTH_SERVER_ERROR = new Error("Auth server not found");
 AUTH_SERVER_ERROR.code = "AUTH_SERVER_ERROR";
 AUTH_SERVER_ERROR.message = "Auth server is not reachable";
 
-http.IncomingMessage.prototype.getBody = function () {
+http.IncomingMessage.prototype.getBody = async () => {
     return new Promise((resolve, reject) => {
         let body = "";
-        this.on("data", (chunk) => {
-            body += chunk;
-        });
-        this.on("end", () => {
-            resolve(body);
-        });
-        this.on("error", (error) => {
-            reject(error);
-        });
+        this.on("data", (chunk) => (body += chunk));
+        this.on("end", () => resolve(body));
+        this.on("error", (error) => reject(error));
     });
 };
 
-http.IncomingMessage.prototype.getCookies = function () {
+http.IncomingMessage.prototype.getCookies = () => {
     return Object.fromEntries(
-        this.headers.cookie?.split("; ").map((cookie) => {
+        this.headers?.cookie?.split("; ").map((cookie) => {
             const [key, value] = cookie.split("=");
             return [key, value];
         }) ?? []
     );
 };
 
+function printLog(...message) {
+    const date = new Date(Date.now()).toLocaleString("fr-FR");
+    console.log(colors.blue(`[${date}]`), message.join(" "));
+}
+
 function printDebug(...message) {
-    message.unshift(color.yellow("[DEBUG]"));
+    message.unshift(colors.yellow("[DEBUG]"));
     printLog(...message);
 }
 
-function printLog(...message) {
-    const date = new Date(Date.now()).toLocaleString("fr-FR");
-    console.log(color.blue(`[${date}]`), message.join(" "));
-}
-
 function printObject(obj) {
-    printLog(color.yellow("Object:"));
+    printLog(colors.yellow("Object:"));
     Object.entries(obj).forEach(([key, value]) => {
         if (key === "files") {
             if (value) value = value.map((file) => file.originalFilename);
             else return;
         }
-        console.log(`${color.blue("-".repeat(21))} ${color.cyan(key)} : ${color.magenta(JSON.stringify(value))}`);
+        value = JSON.stringify(value);
+        if (value.length > 100) value = value.slice(0, 100) + "...";
+        console.log(`${colors.blue("-".repeat(21))} ${colors.cyan(key)} : ${colors.magenta(value)}`);
     });
 }
 
-function getPathPermission(reqPath) {
-    return Object.keys(restrictedPath)
-        .filter((path) => reqPath.startsWith(path))
-        .map((path) => restrictedPath[path])
-        .reduce((highest, current) => (current > highest ? current : highest), 0);
+async function exists(filePath) {
+    return fs.promises
+        .access(filePath, fs.constants.F_OK)
+        .then(() => true)
+        .catch(() => false);
 }
 
 function determineContentType(filePath) {
@@ -121,11 +117,20 @@ function determineContentType(filePath) {
 }
 
 /**
+ * @param {string} url
+ * @returns {{ pathname: string, search: string }}
+ */
+function urlParse(url) {
+    const [pathname, search] = url.split("?");
+    return { pathname, search };
+}
+
+/**
  * @param {http.IncomingMessage} req
  * @param {http.ServerResponse} res
  */
-function GETRequestHandler(req, res) {
-    const url = new URL(req.url, "http://host.com");
+async function GETRequestHandler(req, res) {
+    const url = urlParse(req.url);
     let filePath = path.join(SERVER_PATH, decodeURIComponent(url.pathname));
 
     if (filePath.endsWith("/") || filePath.endsWith("\\")) {
@@ -136,17 +141,42 @@ function GETRequestHandler(req, res) {
         filePath += ".html";
     }
 
-    if (!fs.existsSync(filePath)) {
+    if (!(await exists(filePath))) {
         res.writeHead(404, "Not Found");
         res.end();
         return;
     }
 
-    const file = fs.readFileSync(filePath);
-    const cache = !(DEV_MODE || req.headers.host.includes("127.0.0.1"));
+    const stats = await fs.promises.stat(filePath);
+    const fileSize = stats.size;
     res.setHeader("Content-Type", determineContentType(filePath));
-    res.setHeader("Cache-Control", cache ? "public, max-age=600" : "no-cache, no-store, must-revalidate");
-    res.end(file);
+    res.setHeader("Content-Length", fileSize);
+
+    if (fileSize < 1024 * 1024) {
+        const data = await fs.promises.readFile(filePath);
+        res.writeHead(200, "OK");
+        res.end(data);
+    } else {
+        await new Promise((resolve, reject) => {
+            const stream = fs
+                .createReadStream(filePath)
+                .on("open", () => {
+                    res.writeHead(200, "OK");
+                    stream.pipe(res);
+                })
+                .on("end", () => {
+                    res.end();
+                    resolve();
+                })
+                .on("error", (error) => {
+                    res.end();
+                    reject(error);
+                });
+            res.on("close", () => {
+                stream.close();
+            });
+        });
+    }
 }
 
 /**
@@ -179,7 +209,7 @@ async function POSTRequestHandler(req, res) {
  * @param {http.ServerResponse} res
  * @returns {Promise<void>}
  */
-function HEADRequestHandler(req, res) {
+async function HEADRequestHandler(req, res) {
     const url = new URL(req.url, "http://host.com");
     let filePath = path.join(SERVER_PATH, decodeURIComponent(url.pathname));
 
@@ -191,14 +221,23 @@ function HEADRequestHandler(req, res) {
         filePath += ".html";
     }
 
-    if (!fs.existsSync(filePath)) {
+    if (!(await exists(filePath))) {
         res.writeHead(404, "Not Found");
         res.end();
         return;
     }
+
+    const stats = await fs.promises.stat(filePath);
     res.setHeader("Content-Type", determineContentType(filePath));
-    res.setHeader("Content-Length", fs.statSync(filePath).size);
+    res.setHeader("Content-Length", stats.size);
     res.end();
+}
+
+function getPathPermission(reqPath) {
+    return Object.keys(restrictedPath)
+        .filter((path) => reqPath.startsWith(path))
+        .map((path) => restrictedPath[path])
+        .reduce((highest, current) => (current > highest ? current : highest), 0);
 }
 
 async function isAuthenticated(req) {
@@ -230,26 +269,13 @@ async function hasPermission(req, role) {
     }
 }
 
-Array.prototype.shuffle = function () {
-    const arr = Array.from(this);
-    let currentIndex = arr.length;
-    let randomIndex;
-
-    while (currentIndex != 0) {
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex--;
-        [arr[currentIndex], arr[randomIndex]] = [arr[randomIndex], arr[currentIndex]];
-    }
-    return arr;
-};
-
 module.exports = {
     DEBUG,
     DEV_MODE,
-    printDebug: DEBUG ? printDebug : () => {},
     printLog,
+    printDebug: DEBUG ? printDebug : () => {},
     printObject,
-    determineContentType,
+    exists,
     GETRequestHandler,
     POSTRequestHandler,
     HEADRequestHandler,
