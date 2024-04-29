@@ -2,6 +2,17 @@
     --arrow-icon: url("https://img.icons8.com/pastel-glyph/256/444444/back.png");
 }
 
+/* Images Preload */
+
+body:after {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    z-index: -1;
+    content: var(--arrow-icon);
+}
+
 div#files-content {
     margin: 50px 100px;
     display: flex;
