@@ -27,8 +27,6 @@ window.addEventListener("load", async () => {
 
     document.body.removeAttribute("hidden");
 
-    if (hasCookie("session_active")) await initUserSession();
-    else if (!IS_MOBILE) initLoginButton();
 });
 
 async function loadUpperPanel() {

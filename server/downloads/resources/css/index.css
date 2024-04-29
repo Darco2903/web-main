@@ -1,3 +1,7 @@
+:root {
+    --arrow-icon: url("https://img.icons8.com/pastel-glyph/256/444444/back.png");
+}
+
 div#files-content {
     margin: 50px 100px;
     display: flex;
@@ -18,7 +22,7 @@ div#files-content {
     text-align: center;
     border-radius: 7px;
     background-color: var(--element-color-light);
-    transition: background-color var(--transition-time) ease;
+    transition: background-color var(--theme-time) ease;
 }
 
 body[theme="dark"] .file {
@@ -28,9 +32,29 @@ body[theme="dark"] .file {
 .file > a {
     text-decoration: none;
     color: var(--text-color-light);
-    transition: color var(--transition-time) ease;
+    transition: color var(--theme-time) ease;
 }
 
 body[theme="dark"] .file > a {
     color: var(--text-color-dark);
+}
+
+#back {
+    display: block;
+    width: 48px;
+    height: 48px;
+    position: relative;
+    top: 20px;
+    left: 20px;
+    border-radius: 7px;
+    background-image: var(--arrow-icon);
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: var(--element-color-light);
+    transition: background-color var(--theme-time) ease, filter var(--theme-time) ease;
+}
+
+body[theme="dark"] #back {
+    filter: invert(0.75);
 }

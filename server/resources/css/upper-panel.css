@@ -3,8 +3,8 @@
 :root {
     --color-light: #fff;
     --color-dark: #333;
-    --text-color-light: var(--color-dark);
-    --text-color-dark: var(--color-light);
+    --text-color-light: #333;
+    --text-color-dark: #eee;
     --background-color-light: var(--color-light);
     --background-color-dark: var(--color-dark);
     --element-color-light: #eee;
