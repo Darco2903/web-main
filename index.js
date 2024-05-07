@@ -3,6 +3,7 @@ const WebSocketServer = require("websocket").server;
 const { color } = require("console-log-colors");
 
 const utils = require("./utils.js");
+const proxy = require("./utils/proxy.js");
 
 const { listen, port, SERVER_PATH, WSAllowedOrigins } = require("./config/server.json");
 
@@ -115,6 +116,11 @@ wsServer.on("request", async (req) => {
     utils.printLog(color.magenta("Starting server..."));
     if (utils.DEV_MODE) utils.printLog(color.magenta.magenta("----- DEV MODE -----"));
     utils.printDebug(color.magenta("Debug mode enabled"));
+
+    utils.printLog(
+        color.cyan("Proxy Server"),
+        proxy.enabled ? color.green("enabled") : proxy.configOk ? color.yellow("Disabled") : color.red("Error")
+    );
 
     server.listen(port, listen, () => {
         utils.printLog(`Server is listening ${color.green(listen)}:${color.yellow(port)}`);
