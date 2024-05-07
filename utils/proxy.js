@@ -8,7 +8,7 @@ try {
     configOk = config && config.path && config.allowed;
 } catch (e) {}
 
-const pathLength = config?.path.length + 1;
+const pathLength = config?.path?.length + 1;
 
 /**
  * Check if the url is allowed
