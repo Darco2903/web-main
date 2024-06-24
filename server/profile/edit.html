@@ -1,0 +1,85 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="/resources/css/global.css" />
+        <link rel="stylesheet" href="./resources/css/edit/index.css" />
+
+        <link rel="icon" href="/resources/images/icons/icon-128px.png" />
+        <title>Edit Profile</title>
+    </head>
+
+    <body hidden>
+        <div id="upper-panel"></div>
+
+        <div id="content">
+            <div id="user-data">
+                <div class="data-section" id="image-section">
+                    <div class="data-edit">
+                        <div id="user-image-content">
+                            <div id="user-image-container">
+                                <img id="user-image" />
+                                <div id="user-image-default"></div>
+                            </div>
+                            <div id="image-input-container">
+                                <div id="image-input-div">
+                                    <div id="drag-drop">Drag & Drop</div>
+                                    <label id="image-input-but" for="image-input">Upload</label>
+                                    <input type="file" name="profile-pic" id="image-input" accept="image/*" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="image-options">
+                            <div id="image-round-border-container">
+                                <div id="image-round-border-label">Round Border</div>
+                                <div id="image-round-border">
+                                    <input type="checkbox" id="image-round-border-input" />
+                                    <label for="image-round-border-input">
+                                        <div id="image-round-border-box"></div>
+                                    </label>
+                                </div>
+                            </div>
+                            <button class="but-option" id="image-remove">Remove</button>
+                            <button class="but-option on-edit" id="image-cancel">Cancel</button>
+                            <button class="but-option on-edit" id="image-save">Save</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="data-section" id="username-section">
+                    <div class="data-edit">
+                        <div class="username-content">
+                            <input type="text" id="username-input" placeholder="Username" />
+                        </div>
+
+                        <div class="on-edit" id="username-options">
+                            <button class="but-option" id="username-cancel">Cancel</button>
+                            <button class="but-option" id="username-save">Save</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- <div class="data-section" id="email-password">
+                    <div class="data-edit">
+                        <input type="text" id="email-input" placeholder="Email" />
+                        <input type="password" id="new-password" placeholder="New Password" />
+                        <input type="password" id="confirm-new-password" placeholder="Confirm New Password" />
+                    </div>
+
+                    <input type="password" id="current-password" placeholder="Current Password" />
+                </div> -->
+            </div>
+
+            <!-- <div id="buttons">
+                <button id="save">Save</button>
+                <button id="cancel">Cancel</button>
+            </div> -->
+        </div>
+    </body>
+
+    <script src="/resources/js/global.js"></script>
+    <script src="/resources/js/upper-panel.js" type="module"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
+    <script src="./resources/js/edit/libgif.js"></script> -->
+
+    <script src="./resources/js/edit/index.js" type="module"></script>
+</html>

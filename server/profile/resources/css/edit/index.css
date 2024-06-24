@@ -1,0 +1,230 @@
+@import url("./round-border-checkbox.css");
+
+body {
+    background-color: #2d2b35;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px 8px;
+    display: inline-block;
+    border: 2px solid #222245;
+    box-sizing: border-box;
+    outline: none;
+    color: #222;
+    font-size: 16px;
+    transition: border var(--theme-time) ease, background-color var(--theme-time) ease, color var(--theme-time) ease;
+}
+
+input[type="text"]::placeholder,
+input[type="password"]::placeholder {
+    color: #555;
+    transition: color var(--theme-time) ease;
+}
+
+body[theme="dark"] {
+    input[type="text"],
+    input[type="password"] {
+        background-color: #25254d;
+        border: 2px solid #eee;
+        color: #eee;
+    }
+    input[type="text"]::placeholder,
+    input[type="password"]::placeholder {
+        color: #bbb;
+    }
+}
+
+#content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+}
+
+#user-data {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 80px;
+}
+
+.data-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+
+.data-edit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    width: 100%;
+}
+
+#user-image-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 60px;
+}
+
+#user-image-container {
+    width: 100px;
+    height: 100px;
+    outline: 4px solid #222245;
+    outline-offset: -1px;
+    /* border-radius: 5%; */
+    overflow: hidden;
+    transition: outline var(--theme-time) ease, border-radius 0.2s ease;
+}
+
+#image-section[round-border] #user-image-container {
+    border-radius: 50%;
+}
+
+body[theme="dark"] #user-image-container {
+    outline: 4px solid #eee;
+}
+
+#user-image {
+    width: 100%;
+    height: 100%;
+}
+
+#user-image:not([src]) {
+    display: none;
+}
+
+#user-image-default {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-image: var(--user-default-light);
+    background-size: cover;
+    transition: background-image var(--theme-time);
+}
+
+#user-image-container:has(#user-image[src]) #user-image-default {
+    display: none;
+}
+
+body[theme="dark"] #user-image-default {
+    background-image: var(--user-default-dark);
+}
+
+#image-input-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 96px;
+    height: 96px;
+    border: 2px dashed #222245;
+    transition: background-color 0.3s ease, border var(--theme-time) ease;
+}
+
+body[theme="dark"] #image-input-container {
+    border: 2px dashed #eee;
+}
+
+#image-input-container[drag-over] {
+    background-color: #222245bb;
+}
+
+#image-input-div {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    height: 65%;
+}
+
+#drag-drop {
+    font-size: 14px;
+    user-select: none;
+    color: #222245;
+    transition: color 0.3s ease;
+}
+
+body[theme="dark"] #drag-drop {
+    color: #eee;
+}
+
+#image-input-container[drag-over] #drag-drop {
+    color: #fff;
+}
+
+#image-input-but {
+    padding: 8px;
+    border: 2px solid #56568f;
+    background-color: #1e1e3f;
+    color: #fff;
+    user-select: none;
+}
+
+#image-input-but:hover {
+    cursor: pointer;
+}
+
+#image-input {
+    display: none;
+}
+
+#image-options {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 30px;
+}
+
+#image-round-border-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+}
+
+#image-round-border-label {
+    user-select: none;
+    color: var(--text-color-light);
+    transition: color var(--theme-time) ease;
+}
+
+body[theme="dark"] #image-round-border-label {
+    color: var(--text-color-dark);
+}
+
+.data-section {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.data-section[disabled],
+button:disabled {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.on-edit {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.data-section:not([edited]) .on-edit {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.but-option {
+    padding: 8px;
+    border: 2px solid #56568f;
+    background-color: #1e1e3f;
+    color: #fff;
+    user-select: none;
+    cursor: pointer;
+}

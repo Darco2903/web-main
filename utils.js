@@ -4,18 +4,24 @@ const path = require("path");
 const formidable = require("formidable");
 const colors = require("console-log-colors");
 
+const AuthAPI = require("auth-api");
+
 const proxy = require("./utils/proxy.js");
 
-const { authServer, SERVER_PATH } = require("./config/server.json");
+const { SERVER_PATH } = require("./config/server.json");
+const restrictedPath = require("./config/restrictedPath.json");
 
 const args = process.argv.slice(2);
 const DEBUG = args.includes("--debug");
 const DEV_MODE = args.includes("--dev");
-const AUTH_SERVER_ERROR = new Error("Auth server not found");
-AUTH_SERVER_ERROR.code = "AUTH_SERVER_ERROR";
-AUTH_SERVER_ERROR.message = "Auth server is not reachable";
 
-http.IncomingMessage.prototype.getBody = async () => {
+const AUTH_CACHE_TIMEOUT = 1000;
+const authCache = new Map();
+
+const PERMISSION_CACHE_TIMEOUT = 1000;
+const permissionCache = new Map();
+
+http.IncomingMessage.prototype.getBody = async function () {
     return new Promise((resolve, reject) => {
         let body = "";
         this.on("data", (chunk) => (body += chunk));
@@ -24,7 +30,7 @@ http.IncomingMessage.prototype.getBody = async () => {
     });
 };
 
-http.IncomingMessage.prototype.getCookies = () => {
+http.IncomingMessage.prototype.getCookies = function () {
     return Object.fromEntries(
         this.headers?.cookie?.split("; ").map((cookie) => {
             const [key, value] = cookie.split("=");
@@ -54,6 +60,41 @@ function printObject(obj) {
         if (value.length > 100) value = value.slice(0, 100) + "...";
         console.log(`${colors.blue("-".repeat(21))} ${colors.cyan(key)} : ${colors.magenta(value)}`);
     });
+}
+
+function getHost(req) {
+    return req.headers.host;
+}
+
+function getDomain(host) {
+    const removePort = host.split(":")[0];
+    const domain = removePort.split(".").slice(-2).join(".");
+    return domain;
+}
+
+function isIp(host) {
+    const removePort = host.split(":")[0];
+    const split = removePort.split(".");
+    return (
+        split.length === 4 &&
+        split.every((part) => {
+            if (isNaN(part)) return false;
+            const num = parseInt(part);
+            return num >= 0 && num <= 255;
+        })
+    );
+}
+
+function createCookie(name, value, { path, domain, maxAge, expires, secure, samesite, httpOnly }) {
+    let cookie = `${name}=${value}`;
+    if (path) cookie += `;path=${path}`;
+    if (domain) cookie += `;domain=${domain}`;
+    if (maxAge) cookie += `;max-age=${maxAge}`;
+    if (expires) cookie += `;expires=${expires.toUTCString()}`;
+    if (secure) cookie += `;secure`;
+    if (samesite) cookie += `;samesite=${samesite}`;
+    if (httpOnly) cookie += `;HttpOnly`;
+    return cookie;
 }
 
 async function exists(filePath) {
@@ -165,20 +206,27 @@ async function GETRequestHandler(req, res) {
         filePath += "index";
     }
 
-    if (!path.extname(filePath) && !filePath.endsWith(".")) {
-        filePath += ".html";
-    }
-
     if (!(await exists(filePath))) {
-        res.writeHead(404, "Not Found");
-        res.end();
-        return;
+        if (!path.extname(filePath) && !filePath.endsWith(".")) {
+            filePath += ".html";
+        }
+
+        if (!(await exists(filePath))) {
+            res.writeHead(404, "Not Found");
+            res.end();
+            return;
+        }
     }
 
     const stats = await fs.promises.stat(filePath);
     const fileSize = stats.size;
+    // const cache = !(DEV_MODE || req.headers.host.includes("127.0.0.1"));
     res.setHeader("Content-Type", determineContentType(filePath));
     res.setHeader("Content-Length", fileSize);
+    // res.setHeader("Cache-Control", cache ? "public, max-age=600" : "no-cache, no-store, must-revalidate");
+    // cache but check for updates
+    // res.setHeader("Cache-Control", cache ? "public, max-age=600, must-revalidate" : "no-cache, no-store, must-revalidate");
+    // res.end(file);
 
     if (fileSize < 1024 * 1024) {
         const data = await fs.promises.readFile(filePath);
@@ -268,33 +316,56 @@ function getPathPermission(reqPath) {
         .reduce((highest, current) => (current > highest ? current : highest), 0);
 }
 
-async function isAuthenticated(req) {
-    try {
-        const response = await fetch(`http://${authServer}/auth/auth.js`, {
-            method: "POST",
-            headers: {
-                Cookie: req.headers["cookie"],
-            },
-        });
-        return response.status === 200;
-    } catch (error) {
-        throw AUTH_SERVER_ERROR;
-    }
+function cacheAuth(sessionId, isAuth) {
+    console.log("Caching auth", sessionId, isAuth);
+    authCache.set(sessionId, isAuth);
+    setTimeout(() => authCache.delete(sessionId), AUTH_CACHE_TIMEOUT);
 }
 
-async function hasPermission(req, role) {
-    try {
-        const response = await fetch(`http://${authServer}/auth/perm.js`, {
-            method: "POST",
-            headers: {
-                Cookie: req.headers["cookie"],
-            },
-            body: new URLSearchParams({ role }),
-        });
-        return response.status === 200;
-    } catch (error) {
-        throw AUTH_SERVER_ERROR;
+/**
+ * @param {http.IncomingMessage} req
+ */
+async function isAuthenticated(req) {
+    const { session_id } = req.getCookies();
+    // console.log("Session ID", session_id);
+    if (!session_id) return false;
+    if (authCache.has(session_id)) {
+        console.log("Using cached auth", session_id);
+        return authCache.get(session_id);
     }
+    const { result, error } = await AuthAPI.auth(session_id);
+    cacheAuth(session_id, result);
+    return result;
+}
+
+function cachePermissionKey(sessionId, level) {
+    return `${sessionId}-${level}`;
+}
+
+function cachePermission(sessionId, level, hasPerm) {
+    console.log("Caching permission", sessionId, level, hasPerm);
+    permissionCache.set(`${sessionId}-${level}`, hasPerm);
+    setTimeout(() => permissionCache.delete(`${sessionId}-${level}`), PERMISSION_CACHE_TIMEOUT);
+}
+
+/**
+ * @param {http.IncomingMessage} req
+ * @param {number} level
+ */
+async function hasPermission(req, level) {
+    const { session_id } = req.getCookies();
+    if (!session_id) return false;
+    const permKey = cachePermissionKey(session_id, level);
+    if (permissionCache.has(permKey)) {
+        console.log("Using cached permission", session_id, level);
+        return permissionCache.get(permKey);
+    }
+
+    // console.log(session_id, level);
+    const { result, error } = await AuthAPI.permission(session_id, level);
+    // console.log(result);
+    cachePermission(session_id, level, result);
+    return result;
 }
 
 module.exports = {
@@ -303,8 +374,15 @@ module.exports = {
     printLog,
     printDebug: DEBUG ? printDebug : () => {},
     printObject,
+    getHost,
+    getDomain,
+    isIp,
+    createCookie,
     exists,
     GETRequestHandler,
     POSTRequestHandler,
     HEADRequestHandler,
+    getPathPermission,
+    hasPermission,
+    isAuthenticated,
 };

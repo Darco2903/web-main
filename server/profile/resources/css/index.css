@@ -1,0 +1,93 @@
+body:not([own-profile]) #edit-profile {
+    display: none;
+}
+
+#content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+}
+
+#profile {
+    display: flex;
+    flex-direction: row;
+    gap: 80px;
+    align-items: center;
+}
+
+#user-image-container {
+    width: 100px;
+    height: 100px;
+    outline: 4px solid #222245;
+    outline-offset: -1px;
+    overflow: hidden;
+    transition: outline var(--theme-time) ease;
+}
+
+#user-image-container[round-border] {
+    border-radius: 50%;
+}
+
+body[theme="dark"] #user-image-container {
+    outline: 4px solid #eee;
+}
+
+#user-image {
+    width: 100%;
+    height: 100%;
+}
+
+#user-image:not([src]) {
+    display: none;
+}
+
+#user-image-default {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-image: var(--user-default-light);
+    background-size: cover;
+    transition: background-image var(--theme-time);
+}
+
+#user-image-container:has(#user-image[src]) #user-image-default {
+    display: none;
+}
+
+body[theme="dark"] #user-image-default {
+    background-image: var(--user-default-dark);
+}
+
+#user-name {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--text-color-light);
+    transition: color var(--theme-time) ease;
+}
+
+body[theme="dark"] #user-name {
+    color: var(--text-color-dark);
+}
+
+#edit-profile {
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: var(--background-color-dark);
+    color: var(--text-color-dark);
+    text-decoration: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color var(--theme-time) ease, color var(--theme-time) ease, filter var(--hover-time) ease;
+}
+
+body[theme="dark"] #edit-profile {
+    background-color: var(--background-color-light);
+    color: var(--text-color-light);
+}
+
+#edit-profile:hover {
+    filter: drop-shadow(2px 2px 3px var(--hover-color-light));
+}

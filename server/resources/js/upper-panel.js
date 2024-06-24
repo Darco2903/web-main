@@ -1,81 +1,106 @@
+import AuthAPI from "./utils/AuthApi.js";
+
+import data from "../data.json" with { type: "json" };
+
 const THEME = {
     dark: "dark",
     light: "light",
 };
 
 const UPPER_PANEL_PATH = "/resources/html/upper-panel.html";
-const USER_ICON_PATH = "/user/resources/images/profile/";
-const USER_DEFAULT_ICON = "default";
 
 /** @type {HTMLInputElement} */
 let themeCheckbox;
-let userSession;
-let userLinks;
+
+async function refreshSession() {
+    const { result, session } = await AuthAPI.session();
+    // console.log("Session", session);
+    if (!result) return;
+
+    const now = new Date();
+    // const expires = new Date(res.session.expires_at);
+    // const created = new Date(res.session.created_at);
+    const updated = new Date(session.updated_at);
+    const lastUpdated = (now - updated) / 1000;
+    // console.log(`Expires at: ${expires.toLocaleTimeString("fr")}`);
+    console.log(`Session updated: ${Math.round(lastUpdated)} seconds ago`);
+    if (lastUpdated > data.sessionRefresh) {
+        console.log("Refreshing session");
+        AuthAPI.refresh();
+    }
+}
 
 window.addEventListener("load", async () => {
     await loadUpperPanel();
 
     loadTheme();
 
-    document.body.removeAttribute("hidden");
+    const css = document.querySelector("[href='/resources/css/upper-panel/index.css']");
+    css.onload = () => {
+        document.body.removeAttribute("hidden");
+        // console.log("CSS loaded");
+    };
+    // console.log("Page loaded");
 
+    const isAuth = await AuthAPI.auth().then((res) => res.result);
+    console.log("Auth", isAuth);
+
+    if (isAuth) {
+        await refreshSession();
+        await initUserSession();
+    } else if (!IS_MOBILE) initLoginButton();
 });
 
 async function loadUpperPanel() {
     const upperPanel = document.querySelector("#upper-panel");
-    if (!upperPanel) {
-        throw new Error("upper-panel not found");
-    } else if (upperPanel.hasChildNodes()) {
-        console.warn("upper-panel already exists");
-    } else if (!document.querySelector('link[href$="upper-panel.css"]')) {
-        throw new Error("upper-panel.css not found");
-    } else {
-        const elementString = await fetch(UPPER_PANEL_PATH).then((res) => res.text());
-        const upperPanelContent = new DOMParser().parseFromString(elementString, "text/html").body.firstChild;
-        upperPanel.replaceWith(upperPanelContent);
-    }
+    const elementString = await fetch(UPPER_PANEL_PATH).then((res) => res.text());
+    const upperPanelContent = new DOMParser().parseFromString(elementString, "text/html").body.firstChild;
+    upperPanel.replaceWith(upperPanelContent);
+    document.querySelector("#main-site").href = data.WebServer;
 }
 
-async function initUserSession() {
-    userSession = document.querySelector("#user-session");
-    userLinks = document.querySelector("#user-links");
-    const userIcon = document.querySelector("#user-account-icon");
-    const userAccountInfo = document.querySelector("#user-account-info");
+/**
+ * @param {HTMLImageElement} userIcon
+ * @param {string} src
+ * @returns  {Promise<void>}
+ */
+async function loadImage(userIcon, src) {
+    userIcon.src = src;
+    return new Promise((resolve, reject) => {
+        userIcon.addEventListener("load", resolve);
+        userIcon.addEventListener("error", reject);
+    });
+}
+
+export async function initUserSession() {
+    const userAccount = document.querySelector("#user-account");
+    const userSession = document.querySelector("#user-session");
+    // const userLinks = document.querySelector("#user-links");
+    const userImageContainer = document.querySelector("#userbox-image-container");
+    const userIcon = document.querySelector("#userbox-image");
+    // const userAccountInfo = document.querySelector("#user-account-info");
     const userName = document.querySelector("#user-account-name");
+    // const myAccountButton = document.querySelector("#user-account-my-account");
     const logoutButton = document.querySelector("#user-account-logout");
 
-    const redirectUrl = new URL(`http://${AUTH_SERVER}/logout`);
-    redirectUrl.searchParams.append("redirect", window.location.href);
-    logoutButton.setAttribute("href", redirectUrl.href);
-    userSession.toggleAttribute("active");
-    userLinks.toggleAttribute("active");
-    userSession.style.width = userAccountInfo.offsetWidth + 1 + "px";
-    userLinks.toggleAttribute("active");
-    userIcon.crossOrigin = "anonymous";
-    userIcon.src = getUserIconPath(getCookie("user_id"));
-    userSession.style.setProperty("display", "none");
+    userAccount.toggleAttribute("session-active", true);
 
-    if (getCookie("user_role") >= 3) {
-        document.querySelector("#admin-link")?.toggleAttribute("active");
-    }
+    const userId = getCookie("user_id");
+    // console.log("User ID", userId);
+    const { user } = await AuthAPI.user.id(userId);
+    // console.log(user);
 
-    userSession.addEventListener("click", () => {
-        userLinks.toggleAttribute("active");
-    });
+    const logoutURL = new URL(data.authServer + "/logout");
+    logoutURL.searchParams.append("redirect", data.WebServer);
+    logoutButton.setAttribute("href", logoutURL.href);
 
-    return new Promise((resolve, reject) => {
-        const timeout = setTimeout(reject, 2000);
-        userIcon.addEventListener("load", () => {
-            clearTimeout(timeout);
-            resolve();
-        });
-        userIcon.addEventListener("error", () => {
-            userIcon.removeAttribute("src");
-            clearTimeout(timeout);
-            reject();
-        });
-    })
-        .then(() => {
+    userName.textContent = user.name;
+    userImageContainer.toggleAttribute("round-border", user.round_border);
+
+    const img = await AuthAPI.user.picture.profile.get(userId);
+    if (img.size > 0) {
+        const src = URL.createObjectURL(img);
+        await loadImage(userIcon, src).then(() => {
             const border = 0.01;
             const topLeft = getAverageRGB(userIcon, userIcon.naturalWidth * border, userIcon.naturalHeight * border);
             const bottomRight = getAverageRGB(userIcon, userIcon.naturalWidth * (1 - border), userIcon.naturalHeight * (1 - border));
@@ -83,17 +108,16 @@ async function initUserSession() {
             const color2 = rgbToHex(bottomRight);
             document.documentElement.style.setProperty("--user-gradient-color-1", color1);
             document.documentElement.style.setProperty("--user-gradient-color-2", color2);
-        })
-        .catch(() => {
-            userIcon.removeAttribute("crossorigin");
-            userIcon.setAttribute("default", "");
-            userIcon.src = getUserIconPath();
-        })
-        .finally(() => {
-            userName.textContent = hasCookie("user_name") ? getCookie("user_name") : "User";
-            userSession.removeAttribute("preload");
-            userSession.style.removeProperty("display");
         });
+    } else {
+        userIcon.removeAttribute("src");
+        document.documentElement.style.setProperty("--user-gradient-color-1", "var(--default-gradient-color)");
+        document.documentElement.style.setProperty("--user-gradient-color-2", "var(--default-gradient-color)");
+        // userIcon.removeAttribute("crossorigin");
+        // userIcon.setAttribute("default", "");
+    }
+
+    userSession.removeAttribute("loading");
 }
 
 function initLoginButton() {
@@ -105,9 +129,9 @@ function initLoginButton() {
     const setStyle = (i) => loginButton.style.setProperty("background-image", `linear-gradient(${calcDeg(i)}deg, var(--blue-pink-gradient))`);
     const timeout = () => new Promise((resolve) => setTimeout(resolve, 10));
 
-    // const redirectUrl = new URL(`http://${AUTH_SERVER}/login`);
-    // redirectUrl.searchParams.append("redirect", window.location.href);
-    // loginButton.setAttribute("href", redirectUrl.href);
+    const redirectUrl = new URL(data.authServer + "/login");
+    redirectUrl.searchParams.append("redirect", window.location.href);
+    loginButton.setAttribute("href", redirectUrl.href);
     loginButton.addEventListener("mouseenter", async () => {
         hovering = true;
         for (; i < 100 && hovering; i++) {
@@ -132,6 +156,13 @@ function initLoginButton() {
 function setTheme(theme) {
     themeCheckbox.checked = theme === THEME.dark;
     document.body.setAttribute("theme", theme);
+}
+
+/**
+ * Saves the theme in the local storage
+ * @param {string} theme
+ */
+function saveTheme(theme) {
     window.localStorage.setItem("theme", theme);
 }
 
@@ -140,20 +171,16 @@ function loadTheme() {
     themeCheckbox.addEventListener("change", () => {
         const themeToSet = themeCheckbox.checked ? THEME.dark : THEME.light;
         setTheme(themeToSet);
+        saveTheme(themeToSet);
         console.log("Changing theme to", themeToSet);
     });
 
-    const theme = window.localStorage.getItem("theme") || THEME.light;
+    let theme = window.localStorage.getItem("theme");
+    if (!theme) {
+        theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? THEME.dark : THEME.light;
+    }
     setTheme(theme);
     console.log("Theme loaded!");
-}
-
-/**
- * @param id {number}
- * @returns {string}
- */
-function getUserIconPath(id = USER_DEFAULT_ICON) {
-    return `http://${AUTH_SERVER}${USER_ICON_PATH}user-${id}.png`;
 }
 
 /**

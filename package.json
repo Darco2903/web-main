@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Darco2903/web-server#readme",
   "dependencies": {
+    "auth-api": "file:../../npm/auth-api",
     "console-log-colors": "^0.4.0",
     "formidable": "^3.5.1",
     "request": "^2.88.2",

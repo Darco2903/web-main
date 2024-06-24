@@ -1,0 +1,74 @@
+import data from "../../data.json" with { type: "json" };
+
+const API_ORIGIN = data.authServer + "/api/v1";
+
+async function rawFetch(url, options = {}) {
+    return fetch(url, {
+        ...options,
+        credentials: "include",
+    });
+}
+
+async function apiFetch(url, options) {
+    return rawFetch(url, options).then((res) => {
+        if (res.status !== 504) return res.json();
+        else return { result: false, error: "Gateway Timeout" };
+    });
+}
+
+async function sendRequestGET(endPoint, data) {
+    const url = new URL(API_ORIGIN + endPoint);
+    if (data) Object.entries(data).forEach(([key, value = ""]) => url.searchParams.append(key, value));
+    return apiFetch(url);
+}
+
+function createFormData(data = {}) {
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value = ""]) => formData.append(key, value));
+    return formData;
+}
+
+async function sendRequestPOST(endPoint, data) {
+    return apiFetch(API_ORIGIN + endPoint, {
+        method: "POST",
+        body: createFormData(data),
+    });
+}
+
+async function sendRequestPUT(endPoint, data) {
+    return apiFetch(API_ORIGIN + endPoint, {
+        method: "PUT",
+        body: createFormData(data),
+    });
+}
+
+async function sendRequestDELETE(endPoint, data) {
+    return apiFetch(API_ORIGIN + endPoint, {
+        method: "DELETE",
+        body: createFormData(data),
+    });
+}
+
+const AuthAPI = {
+    auth: () => sendRequestGET("/auth"),
+    login: (identifier, password) => sendRequestPOST("/login", { identifier, password }),
+    permission: (session_id, level) => sendRequestGET("/permission", { session_id, level }),
+    refresh: () => sendRequestGET("/refresh"),
+    session: () => sendRequestGET("/session"),
+
+    user: {
+        id: (user_id) => sendRequestGET("/user/id/" + user_id),
+        session: (session_id) => sendRequestGET("/user/session/" + session_id),
+        username: (username) => sendRequestPUT("/user/username", { username }),
+
+        picture: {
+            profile: {
+                get: (user_id) => rawFetch(API_ORIGIN + "/user/picture/profile/" + user_id).then((res) => res.blob()),
+                update: (file, roundBorder) => sendRequestPUT("/user/picture/profile", { file, roundBorder }),
+                delete: (roundBorder) => sendRequestDELETE("/user/picture/profile", { roundBorder }),
+            },
+        },
+    },
+};
+
+export default AuthAPI;

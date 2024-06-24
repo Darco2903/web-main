@@ -1,16 +1,68 @@
 const http = require("http");
-const WebSocketServer = require("websocket").server;
-const { color } = require("console-log-colors");
+const colors = require("console-log-colors");
+const { server: WebSocketServer } = require("websocket");
 
 const utils = require("./utils.js");
 const proxy = require("./utils/proxy.js");
 
-const { listen, port, SERVER_PATH, WSAllowedOrigins } = require("./config/server.json");
+const { listen, port, SERVER_PATH, WSAllowedOrigins, authServerHost, CLOUDFRONT_ID, authorizeNonCloudfront } = require("./config/server.json");
 
+/**
+ * @param {http.IncomingMessage} req
+ * @param {http.ServerResponse} res
+ */
 async function handleRequest(req, res) {
     try {
         const remote = `${req.socket.remoteAddress}:${req.socket.remotePort}`;
-        utils.printLog(color.green(remote), color.yellow(req.method), color.cyan(req.url));
+
+        const cloudfrontID = req.headers["cloudfront-id"];
+        if (!authorizeNonCloudfront && cloudfrontID !== CLOUDFRONT_ID) {
+            utils.printLog(
+                colors.green(remote),
+                colors.yellow(res.statusCode),
+                colors.cyan(req.url),
+                colors.magenta("Refused: non-CloudFront request")
+            );
+            res.writeHead(403, "Forbidden");
+            res.end("Forbidden");
+            return;
+        }
+
+        const permRequired = utils.getPathPermission(req.url);
+        if (!utils.DEV_MODE && permRequired > 0) {
+            const authenticated = await utils.isAuthenticated(req).catch((err) => err);
+
+            if (authenticated?.code === "AUTH_API_ERROR") {
+                utils.printLog(
+                    colors.green(remote),
+                    colors.yellow(res.statusCode),
+                    colors.magenta("Unauthorized: auth server error"),
+                    colors.red(authenticated.message)
+                );
+                res.writeHead(503, "Service Unavailable");
+                res.end("Service Unavailable");
+                return;
+            } else if (authenticated === false) {
+                const authUrl = new URL("login", `http://${authServerHost}`);
+                const redirectUrl = new URL(req.url, `http://${req.headers.host}`);
+                authUrl.searchParams.set("redirect", redirectUrl.href);
+                res.writeHead(302, {
+                    Location: authUrl.href,
+                });
+                res.end();
+                utils.printLog(colors.green(remote), colors.yellow(res.statusCode), colors.magenta("Unauthorized: not authenticated"));
+                return;
+            } else if (!(await utils.hasPermission(req, permRequired))) {
+                res.statusCode = 403;
+                res.end("Forbidden");
+                utils.printLog(colors.green(remote), colors.yellow(res.statusCode), colors.magenta("Unauthorized: not enough permissions"));
+                return;
+            } else {
+                utils.printLog(colors.green(remote), colors.yellow(req.method), colors.cyan(req.url), colors.magenta("Authorized"));
+            }
+        } else {
+            utils.printLog(colors.green(remote), colors.yellow(req.method), colors.cyan(req.url));
+        }
 
         switch (req.method) {
             case "GET":
@@ -30,27 +82,13 @@ async function handleRequest(req, res) {
                 res.end("Method Not Allowed");
                 break;
         }
-        utils.printLog(color.green(remote), color.yellow(res.statusCode));
+        utils.printLog(colors.green(remote), colors.yellow(res.statusCode));
     } catch (error) {
-        utils.printLog(color.red(error.message));
+        utils.printLog(colors.red(error.message));
         utils.printDebug(error.stack, error.code);
 
-        switch (error.code) {
-            case "AUTH_SERVER_ERROR":
-                res.writeHead(503, "Service Unavailable");
-                res.end(error.message);
-                break;
-
-            case "UNKNOWN_CATEGORY":
-                res.writeHead(404, "Not Found");
-                res.end(error.message);
-                break;
-
-            default:
-                res.writeHead(500, "Internal Server Error");
-                res.end("Internal Server Error");
-                break;
-        }
+        res.writeHead(500, "Internal Server Error");
+        res.end("Internal Server Error");
     }
 }
 
@@ -64,10 +102,10 @@ wsServer.on("request", async (req) => {
     if (!WSAllowedOrigins.includes(req.origin)) {
         req.reject();
         utils.printLog(
-            color.green(req.remoteAddress),
-            color.yellow("WebSocket"),
-            color.cyan(req.resourceURL.pathname),
-            color.red("Rejected: Origin not allowed")
+            colors.green(req.remoteAddress),
+            colors.yellow("WebSocket"),
+            colors.cyan(req.resourceURL.pathname),
+            colors.red("Rejected: Origin not allowed")
         );
         return;
     }
@@ -76,10 +114,10 @@ wsServer.on("request", async (req) => {
     if (req.requestedProtocols[0] !== "echo-protocol") {
         req.reject();
         utils.printLog(
-            color.green(req.remoteAddress),
-            color.yellow("WebSocket"),
-            color.cyan(req.resourceURL.pathname),
-            color.red("Rejected: Protocol not allowed")
+            colors.green(req.remoteAddress),
+            colors.yellow("WebSocket"),
+            colors.cyan(req.resourceURL.pathname),
+            colors.red("Rejected: Protocol not allowed")
         );
         return;
     }
@@ -88,41 +126,41 @@ wsServer.on("request", async (req) => {
     if (!(await utils.exists(path))) {
         req.reject();
         utils.printLog(
-            color.green(req.remoteAddress),
-            color.yellow("WebSocket"),
-            color.cyan(req.resourceURL.pathname),
-            color.red("Rejected: Path not found")
+            colors.green(req.remoteAddress),
+            colors.yellow("WebSocket"),
+            colors.cyan(req.resourceURL.pathname),
+            colors.red("Rejected: Path not found")
         );
         return;
     }
 
     const connection = req.accept("echo-protocol", req.origin);
-    utils.printLog(color.green(req.remoteAddress), color.yellow("WebSocket"), color.cyan(req.resourceURL.pathname), color.green("Accepted"));
+    utils.printLog(colors.green(req.remoteAddress), colors.yellow("WebSocket"), colors.cyan(req.resourceURL.pathname), colors.green("Accepted"));
 
     const handleConnection = require(path);
     handleConnection(req, connection);
     connection.addListener("message", (message) => {
         utils.printLog(
-            color.green(req.remoteAddress),
-            color.yellow("WebSocket"),
-            color.cyan(req.resourceURL.pathname),
-            color.green("Received Message"),
+            colors.green(req.remoteAddress),
+            colors.yellow("WebSocket"),
+            colors.cyan(req.resourceURL.pathname),
+            colors.green("Received Message"),
             message.utf8Data.length > 100 ? message.utf8Data.substring(0, 100) + "..." : message.utf8Data
         );
     });
 });
 
 (async () => {
-    utils.printLog(color.magenta("Starting server..."));
-    if (utils.DEV_MODE) utils.printLog(color.magenta.magenta("----- DEV MODE -----"));
-    utils.printDebug(color.magenta("Debug mode enabled"));
+    utils.printLog(colors.magenta("Starting server..."));
+    if (utils.DEV_MODE) utils.printLog(colors.magenta.magenta("----- DEV MODE -----"));
+    utils.printDebug(colors.magenta("Debug mode enabled"));
 
     utils.printLog(
-        color.cyan("Proxy Server"),
-        proxy.enabled ? color.green("enabled") : proxy.configOk ? color.yellow("Disabled") : color.red("Error")
+        colors.cyan("Proxy Server"),
+        proxy.enabled ? colors.green("Enabled") : proxy.configOk ? colors.yellow("Disabled") : colors.red("Error")
     );
 
     server.listen(port, listen, () => {
-        utils.printLog(`Server is listening ${color.green(listen)}:${color.yellow(port)}`);
+        utils.printLog(`Server is listening ${colors.green(listen)}:${colors.yellow(port)}`);
     });
 })();

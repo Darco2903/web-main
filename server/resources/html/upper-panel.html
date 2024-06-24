@@ -1,28 +1,42 @@
 <div id="upper-panel">
+    <link rel="stylesheet" type="text/css" href="/resources/css/upper-panel/index.css" />
+
     <div class="upper-panel-row" id="panel-first-row">
         <div id="upper-panel-left">
-            <a href="https://darco2903.fr">
-                <div class="site-icon" id="icon-main"></div>
+            <!-- <a href="https://darco2903.fr"> -->
+            <div class="site-icon" id="icon-main">
+                <a id="main-site"></a>
+            </div>
+            <!-- <a href="https://manager.darco2903.fr">
+                <div class="site-icon" id="icon-manager"></div>
             </a>
+            <a href="https://lang.darco2903.fr">
+                <div class="site-icon" id="icon-lang"></div>
+            </a>
+            <a href="https://korea.darco2903.fr">
+                <div class="site-icon" id="icon-korea"></div>
+            </a> -->
         </div>
 
         <div id="upper-panel-right">
-            <div id="user-account" hidden>
-                <div class="link">
-                    <a id="user-account-login">Se connecter</a>
-                </div>
+            <div id="user-account">
+                <a id="user-account-login">Se connecter</a>
 
-                <div id="user-session" preload>
-                    <div id="user-account-info">
-                        <label id="user-account-name"></label>
-                        <img id="user-account-icon" />
-                    </div>
-
-                    <div id="user-links">
-                        <div class="link">
-                            <a id="user-account-my-account" href="/account/me">Mon compte</a>
+                <div id="user-session" loading>
+                    <div id="user-session-container">
+                        <div id="user-account-info">
+                            <!-- <div id="user-account-icon-container">
+                                <img id="user-account-icon" />
+                            </div> -->
+                            <div id="userbox-image-container">
+                                <img id="userbox-image" />
+                                <div id="userbox-image-default"></div>
+                            </div>
+                            <label id="user-account-name">User</label>
                         </div>
-                        <div class="link">
+
+                        <div id="user-links">
+                            <a id="user-account-my-account" href="/profile/me">Mon Profil</a>
                             <a id="user-account-logout">Déconnexion</a>
                         </div>
                     </div>

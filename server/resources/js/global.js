@@ -52,6 +52,10 @@ function deleteCookie(name, data = {}) {
     setCookie(name, "", data);
 }
 
+String.prototype.capitalizeFirstLetter = function () {
+    return this[0].toUpperCase() + this.slice(1);
+};
+
 /**
  * @param {number} ms
  * @returns {Promise<void>}
@@ -60,8 +64,10 @@ async function wait(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-window.addEventListener("load", () => {
-    if (IS_MOBILE) {
-        document.body.setAttribute("mobile", "");
-    }
+window.addEventListener("load", async () => {
+    document.body.toggleAttribute("mobile", IS_MOBILE);
+
+    // set the language
+    const lang = navigator.language.split("-")[0];
+    document.documentElement.lang = lang;
 });
