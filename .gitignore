@@ -9,4 +9,5 @@ server/resources/data.json
 server/downloads/storage/
 server/games/
 
+# DEV
 server/cs2/
