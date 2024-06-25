@@ -48,7 +48,7 @@ window.addEventListener("load", async () => {
     if (isAuth) {
         await refreshSession();
         await initUserSession();
-    } else if (!IS_MOBILE) initLoginButton();
+    } else initLoginButton();
 });
 
 async function loadUpperPanel() {
@@ -75,6 +75,7 @@ async function loadImage(userIcon, src) {
 export async function initUserSession() {
     const userAccount = document.querySelector("#user-account");
     const userSession = document.querySelector("#user-session");
+    const userSessionContainer = document.querySelector("#user-session-container");
     // const userLinks = document.querySelector("#user-links");
     const userImageContainer = document.querySelector("#userbox-image-container");
     const userIcon = document.querySelector("#userbox-image");
@@ -117,11 +118,28 @@ export async function initUserSession() {
         // userIcon.setAttribute("default", "");
     }
 
+    window.addEventListener("touchstart", (e) => {
+        // const toggle = (e.target === userSessionContainer || userSessionContainer.contains(e.target)) && !userSession.hasAttribute("active");
+        const toggle = (e.target === userSessionContainer || userSessionContainer.contains(e.target));
+        userSession.toggleAttribute("active", toggle);
+    });
+
     userSession.removeAttribute("loading");
 }
 
 function initLoginButton() {
     const loginButton = document.querySelector("#user-account-login");
+    const redirectUrl = new URL(data.authServer + "/login");
+    redirectUrl.searchParams.append("redirect", window.location.href);
+    loginButton.setAttribute("href", redirectUrl.href);
+
+    if (IS_MOBILE) {
+        loginButton.addEventListener("touchstart", () => {
+            window.location.href = loginButton.href;
+        });
+        return;
+    }
+
     let i = 0;
     const angle = 60;
     let hovering = false;
@@ -129,9 +147,6 @@ function initLoginButton() {
     const setStyle = (i) => loginButton.style.setProperty("background-image", `linear-gradient(${calcDeg(i)}deg, var(--blue-pink-gradient))`);
     const timeout = () => new Promise((resolve) => setTimeout(resolve, 10));
 
-    const redirectUrl = new URL(data.authServer + "/login");
-    redirectUrl.searchParams.append("redirect", window.location.href);
-    loginButton.setAttribute("href", redirectUrl.href);
     loginButton.addEventListener("mouseenter", async () => {
         hovering = true;
         for (; i < 100 && hovering; i++) {

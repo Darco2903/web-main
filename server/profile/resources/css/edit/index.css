@@ -2,6 +2,8 @@
 
 body {
     background-color: #2d2b35;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 input[type="text"],
@@ -73,6 +75,10 @@ body[theme="dark"] {
     gap: 60px;
 }
 
+body[mobile] #user-image-content {
+    gap: 3em;
+}
+
 #user-image-container {
     width: 100px;
     height: 100px;
@@ -81,6 +87,11 @@ body[theme="dark"] {
     /* border-radius: 5%; */
     overflow: hidden;
     transition: outline var(--theme-time) ease, border-radius 0.2s ease;
+}
+
+body[mobile] #user-image-container {
+    width: 6em;
+    height: 6em;
 }
 
 #image-section[round-border] #user-image-container {
@@ -126,6 +137,11 @@ body[theme="dark"] #user-image-default {
     height: 96px;
     border: 2px dashed #222245;
     transition: background-color 0.3s ease, border var(--theme-time) ease;
+}
+
+body[mobile] #image-input-container {
+    width: 6em;
+    height: 6em;
 }
 
 body[theme="dark"] #image-input-container {
@@ -189,10 +205,19 @@ body[theme="dark"] #drag-drop {
     gap: 15px;
 }
 
+body[mobile] #image-round-border-container {
+    flex-direction: column;
+    gap: 0.8em;
+}
+
 #image-round-border-label {
     user-select: none;
     color: var(--text-color-light);
     transition: color var(--theme-time) ease;
+}
+
+body[mobile] #image-round-border-label {
+    font-size: 0.8em;
 }
 
 body[theme="dark"] #image-round-border-label {

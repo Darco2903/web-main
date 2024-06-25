@@ -17,6 +17,10 @@ body:not([own-profile]) #edit-profile {
     align-items: center;
 }
 
+body[mobile] #profile {
+    gap: 1em;
+}
+
 #user-image-container {
     width: 100px;
     height: 100px;
@@ -24,6 +28,11 @@ body:not([own-profile]) #edit-profile {
     outline-offset: -1px;
     overflow: hidden;
     transition: outline var(--theme-time) ease;
+}
+
+body[mobile] #user-image-container {
+    width: 60px;
+    height: 60px;
 }
 
 #user-image-container[round-border] {
@@ -68,6 +77,10 @@ body[theme="dark"] #user-image-default {
     transition: color var(--theme-time) ease;
 }
 
+body[mobile] #user-name {
+    font-size: 18px;
+}
+
 body[theme="dark"] #user-name {
     color: var(--text-color-dark);
 }
@@ -81,6 +94,11 @@ body[theme="dark"] #user-name {
     cursor: pointer;
     font-weight: bold;
     transition: background-color var(--theme-time) ease, color var(--theme-time) ease, filter var(--hover-time) ease;
+}
+
+body[mobile] #edit-profile {
+    padding: 0.5em 1em;
+    font-size: 0.6em;
 }
 
 body[theme="dark"] #edit-profile {

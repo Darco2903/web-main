@@ -95,6 +95,10 @@ body[theme="dark"] #user-session-container {
     transition: outline var(--theme-time) ease, border-radius 0.2s ease;
 }
 
+body[mobile] #userbox-image-container {
+    --size: 32px;
+}
+
 #userbox-image-container[round-border] {
     border-radius: 50%;
 }
@@ -142,6 +146,12 @@ body[theme="dark"] #userbox-image-default {
     transition: color var(--theme-time) ease;
 }
 
+body[mobile] #user-account-name {
+    /* display: none; */
+    width: 60px;
+    font-size: 10px;
+}
+
 body[theme="dark"] #user-account-name {
     color: var(--text-color-dark);
 }
@@ -153,6 +163,10 @@ body[theme="dark"] #user-account-name {
 #user-links {
     display: flex;
     flex-direction: row;
+}
+
+body[mobile] #user-session:not([active]) #user-links {
+    display: none;
 }
 
 #user-links a:not(:last-child) {
@@ -175,6 +189,12 @@ body[theme="dark"] #user-account-name {
     position: relative;
     color: var(--text-color-light);
     transition: color var(--theme-time) ease, background-color var(--theme-time) ease;
+}
+
+body[mobile] #user-links a {
+    width: 80px;
+    padding: 5px 2px;
+    font-size: 10px;
 }
 
 body[theme="dark"] #user-links a {

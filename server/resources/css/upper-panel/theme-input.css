@@ -1,3 +1,24 @@
+:root {
+    --icon-sun-yellow: url("/resources/images/icons/sun-yellow.png");
+    --icon-moon-cyan: url("/resources/images/icons/moon-cyan.png");
+    /* --icon-home-light: url("/resources/images/icons/home-black.png");
+    --icon-home-dark: url("/resources/images/icons/home-white.png"); */
+}
+
+/* Images Preload */
+
+body:after {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    z-index: -1;
+    content: var(--icon-sun-yellow) var(--icon-moon-cyan);
+}
+
+#change-theme {
+}
+
 /* Theme checkbox */
 
 #theme-input {
@@ -44,6 +65,11 @@
     -ms-user-select: none;
     user-select: none;
 }
+
+body[mobile] #theme-input + #theme-input-button {
+    --theme-input-width: 50px;
+}
+
 #theme-input + #theme-input-button:after,
 #theme-input + #theme-input-button:before {
     position: relative;
@@ -91,6 +117,10 @@ body[theme="dark"] #change-lang .input:hover {
     background-position: center;
     background-repeat: no-repeat;
     transition: background-color var(--theme-time) ease, background-image var(--theme-time) ease, left var(--theme-time) ease;
+}
+
+body[mobile] #theme-input + #theme-input-button:after {
+    background-size: calc(var(--theme-input-height) - 5px);
 }
 
 #theme-input:checked + #theme-input-button::after {

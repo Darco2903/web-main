@@ -16,16 +16,11 @@
     --hover-time: 0.1s;
     --blue-pink-gradient: #00a6ff 0%, #c5007f 100%;
 
-    --icon-sun-yellow: url("/resources/images/icons/sun-yellow.png");
-    --icon-moon-cyan: url("/resources/images/icons/moon-cyan.png");
-    /* --icon-home-light: url("/resources/images/icons/home-black.png");
-    --icon-home-dark: url("/resources/images/icons/home-white.png"); */
-
     --icon-main: url("/resources/images/icons/icon-128px.png");
-    --icon-gamepad-light: url("/resources/images/icons/gamepad-icon-light-128px.png");
-    --icon-gamepad-dark: url("/resources/images/icons/gamepad-icon-dark-128px.png");
-    --icon-trad: url("/resources/images/icons/trad-logo-128px.png");
-    --icon-korea: url("/resources/images/icons/korea-icon-128px.png");
+    /* --icon-gamepad-light: url("/resources/images/icons/gamepad-icon-light-128px.png"); */
+    /* --icon-gamepad-dark: url("/resources/images/icons/gamepad-icon-dark-128px.png"); */
+    /* --icon-trad: url("/resources/images/icons/trad-logo-128px.png"); */
+    /* --icon-korea: url("/resources/images/icons/korea-icon-128px.png"); */
 }
 
 /* Images Preload */
@@ -36,7 +31,7 @@ body:after {
     height: 0;
     overflow: hidden;
     z-index: -1;
-    content: var(--icon-sun-yellow) var(--icon-moon-cyan) var(--icon-main);
+    content: var(--icon-main);
     /* var(--icon-gamepad-light)  */
     /* var(--icon-gamepad-dark)  */
     /* var(--icon-trad) */
@@ -91,8 +86,8 @@ body[mobile] #upper-panel {
 }
 
 body[mobile] .upper-panel-row {
-    flex-direction: column;
-    gap: 20px;
+    /* flex-direction: column; */
+    /* gap: 20px; */
 }
 
 .upper-panel-row:first-of-type {
@@ -100,8 +95,8 @@ body[mobile] .upper-panel-row {
 }
 
 body[mobile] .upper-panel-row:first-of-type > * {
-    justify-content: space-between;
-    width: 100%;
+    /* justify-content: space-between;
+    width: 100%; */
 }
 
 .upper-panel-row:has(nav) {
