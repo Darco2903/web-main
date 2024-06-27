@@ -1,5 +1,5 @@
 const http = require("http");
-const colors = require("console-log-colors");
+const { colors } = require("logger");
 const { server: WebSocketServer } = require("websocket");
 
 const utils = require("./utils.js");
@@ -17,7 +17,7 @@ async function handleRequest(req, res) {
 
         const cloudfrontID = req.headers["cloudfront-id"];
         if (!authorizeNonCloudfront && cloudfrontID !== CLOUDFRONT_ID) {
-            utils.printLog(
+            await utils.printLog(
                 colors.green(remote),
                 colors.yellow(res.statusCode),
                 colors.cyan(req.url),
@@ -33,7 +33,7 @@ async function handleRequest(req, res) {
             const authenticated = await utils.isAuthenticated(req).catch((err) => err);
 
             if (authenticated?.code === "AUTH_API_ERROR") {
-                utils.printLog(
+                await utils.printLog(
                     colors.green(remote),
                     colors.yellow(res.statusCode),
                     colors.magenta("Unauthorized: auth server error"),
@@ -50,18 +50,18 @@ async function handleRequest(req, res) {
                     Location: authUrl.href,
                 });
                 res.end();
-                utils.printLog(colors.green(remote), colors.yellow(res.statusCode), colors.magenta("Unauthorized: not authenticated"));
+                await utils.printLog(colors.green(remote), colors.yellow(res.statusCode), colors.magenta("Unauthorized: not authenticated"));
                 return;
             } else if (!(await utils.hasPermission(req, permRequired))) {
                 res.statusCode = 403;
                 res.end("Forbidden");
-                utils.printLog(colors.green(remote), colors.yellow(res.statusCode), colors.magenta("Unauthorized: not enough permissions"));
+                await utils.printLog(colors.green(remote), colors.yellow(res.statusCode), colors.magenta("Unauthorized: not enough permissions"));
                 return;
             } else {
-                utils.printLog(colors.green(remote), colors.yellow(req.method), colors.cyan(req.url), colors.magenta("Authorized"));
+                await utils.printLog(colors.green(remote), colors.yellow(req.method), colors.cyan(req.url), colors.magenta("Authorized"));
             }
         } else {
-            utils.printLog(colors.green(remote), colors.yellow(req.method), colors.cyan(req.url));
+            await utils.printLog(colors.green(remote), colors.yellow(req.method), colors.cyan(req.url));
         }
 
         switch (req.method) {
@@ -82,10 +82,10 @@ async function handleRequest(req, res) {
                 res.end("Method Not Allowed");
                 break;
         }
-        utils.printLog(colors.green(remote), colors.yellow(res.statusCode));
+        await utils.printLog(colors.green(remote), colors.yellow(res.statusCode));
     } catch (error) {
-        utils.printLog(colors.red(error.message));
-        utils.printDebug(error.stack, error.code);
+        await utils.printLog(colors.red(error.message));
+        await utils.printDebug(error.stack, error.code);
 
         res.writeHead(500, "Internal Server Error");
         res.end("Internal Server Error");
@@ -101,7 +101,7 @@ const wsServer = new WebSocketServer({
 wsServer.on("request", async (req) => {
     if (!WSAllowedOrigins.includes(req.origin)) {
         req.reject();
-        utils.printLog(
+        await utils.printLog(
             colors.green(req.remoteAddress),
             colors.yellow("WebSocket"),
             colors.cyan(req.resourceURL.pathname),
@@ -113,7 +113,7 @@ wsServer.on("request", async (req) => {
     // if not echo-protocol
     if (req.requestedProtocols[0] !== "echo-protocol") {
         req.reject();
-        utils.printLog(
+        await utils.printLog(
             colors.green(req.remoteAddress),
             colors.yellow("WebSocket"),
             colors.cyan(req.resourceURL.pathname),
@@ -125,7 +125,7 @@ wsServer.on("request", async (req) => {
     const path = SERVER_PATH + req.resource;
     if (!(await utils.exists(path))) {
         req.reject();
-        utils.printLog(
+        await utils.printLog(
             colors.green(req.remoteAddress),
             colors.yellow("WebSocket"),
             colors.cyan(req.resourceURL.pathname),
@@ -135,12 +135,17 @@ wsServer.on("request", async (req) => {
     }
 
     const connection = req.accept("echo-protocol", req.origin);
-    utils.printLog(colors.green(req.remoteAddress), colors.yellow("WebSocket"), colors.cyan(req.resourceURL.pathname), colors.green("Accepted"));
+    await utils.printLog(
+        colors.green(req.remoteAddress),
+        colors.yellow("WebSocket"),
+        colors.cyan(req.resourceURL.pathname),
+        colors.green("Accepted")
+    );
 
     const handleConnection = require(path);
     handleConnection(req, connection);
-    connection.addListener("message", (message) => {
-        utils.printLog(
+    connection.addListener("message", async (message) => {
+        await utils.printLog(
             colors.green(req.remoteAddress),
             colors.yellow("WebSocket"),
             colors.cyan(req.resourceURL.pathname),
@@ -151,16 +156,20 @@ wsServer.on("request", async (req) => {
 });
 
 (async () => {
-    utils.printLog(colors.magenta("Starting server..."));
-    if (utils.DEV_MODE) utils.printLog(colors.magenta.magenta("----- DEV MODE -----"));
-    utils.printDebug(colors.magenta("Debug mode enabled"));
+    await utils.printLog(colors.magenta("Starting server..."));
+    if (utils.DEV_MODE) await utils.printLog(colors.magenta.magenta("------- DEV MODE -------"));
+    await utils.printDebug("Debug mode enabled");
+    await utils.printLog(colors.gray("-".repeat(24)));
+    await utils.printDebug("Connecting to database...");
+    await db.connect();
+    await utils.printLog(colors.green("Connected to database"));
 
-    utils.printLog(
+    await utils.printLog(
         colors.cyan("Proxy Server"),
         proxy.enabled ? colors.green("Enabled") : proxy.configOk ? colors.yellow("Disabled") : colors.red("Error")
     );
 
-    server.listen(port, listen, () => {
-        utils.printLog(`Server is listening ${colors.green(listen)}:${colors.yellow(port)}`);
+    server.listen(port, listen, async () => {
+        await utils.printLog(`Server is listening ${colors.green(listen)}:${colors.yellow(port)}`);
     });
 })();

@@ -10,9 +10,9 @@ declare module "http" {
 export const DEBUG: boolean;
 export const DEV_MODE: boolean;
 
-export function printLog(...message: any[]): void;
-export function printDebug(...message: any[]): void;
-export function printObject(any): void;
+export async function printLog(...message: any[]): Promise<void>;
+export async function printDebug(...message: any[]): Promise<void>;
+export async function printObject(obj: Object): Promise<void>;
 
 export function getHost(req: http.IncomingMessage): string;
 export function getDomain(host: string): string;

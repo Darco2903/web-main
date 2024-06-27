@@ -2,11 +2,10 @@ const fs = require("fs");
 const http = require("http");
 const path = require("path");
 const formidable = require("formidable");
-const colors = require("console-log-colors");
-
 const AuthAPI = require("auth-api");
 
 const proxy = require("./utils/proxy.js");
+const { colors, setDebugMode, setDevMode, logInfo, logDebug } = require("logger");
 
 const { SERVER_PATH } = require("./config/server.json");
 const restrictedPath = require("./config/restrictedPath.json");
@@ -14,6 +13,9 @@ const restrictedPath = require("./config/restrictedPath.json");
 const args = process.argv.slice(2);
 const DEBUG = args.includes("--debug");
 const DEV_MODE = args.includes("--dev");
+
+setDebugMode(DEBUG);
+setDevMode(DEV_MODE);
 
 const AUTH_CACHE_TIMEOUT = 1000;
 const authCache = new Map();
@@ -39,27 +41,18 @@ http.IncomingMessage.prototype.getCookies = function () {
     );
 };
 
-function printLog(...message) {
-    const date = new Date(Date.now()).toLocaleString("fr-FR");
-    console.log(colors.blue(`[${date}]`), message.join(" "));
-}
-
-function printDebug(...message) {
-    message.unshift(colors.yellow("[DEBUG]"));
-    printLog(...message);
-}
-
-function printObject(obj) {
-    printLog(colors.yellow("Object:"));
-    Object.entries(obj).forEach(([key, value]) => {
+async function printObject(obj) {
+    await logInfo(colors.yellow("Object:"));
+    const entries = Object.entries(obj);
+    for (const [key, value] of entries) {
         if (key === "files") {
             if (value) value = value.map((file) => file.originalFilename);
             else return;
         }
         value = JSON.stringify(value);
         if (value.length > 100) value = value.slice(0, 100) + "...";
-        console.log(`${colors.blue("-".repeat(21))} ${colors.cyan(key)} : ${colors.magenta(value)}`);
-    });
+        await logInfo(`${colors.blue("-".repeat(21))} ${colors.cyan(key)} : ${colors.magenta(value)}`);
+    }
 }
 
 function getHost(req) {
@@ -317,7 +310,7 @@ function getPathPermission(reqPath) {
 }
 
 function cacheAuth(sessionId, isAuth) {
-    console.log("Caching auth", sessionId, isAuth);
+    // console.log("Caching auth", sessionId, isAuth);
     authCache.set(sessionId, isAuth);
     setTimeout(() => authCache.delete(sessionId), AUTH_CACHE_TIMEOUT);
 }
@@ -330,7 +323,7 @@ async function isAuthenticated(req) {
     // console.log("Session ID", session_id);
     if (!session_id) return false;
     if (authCache.has(session_id)) {
-        console.log("Using cached auth", session_id);
+        // console.log("Using cached auth", session_id);
         return authCache.get(session_id);
     }
     const { result, error } = await AuthAPI.auth(session_id);
@@ -343,7 +336,7 @@ function cachePermissionKey(sessionId, level) {
 }
 
 function cachePermission(sessionId, level, hasPerm) {
-    console.log("Caching permission", sessionId, level, hasPerm);
+    // console.log("Caching permission", sessionId, level, hasPerm);
     permissionCache.set(`${sessionId}-${level}`, hasPerm);
     setTimeout(() => permissionCache.delete(`${sessionId}-${level}`), PERMISSION_CACHE_TIMEOUT);
 }
@@ -357,12 +350,12 @@ async function hasPermission(req, level) {
     if (!session_id) return false;
     const permKey = cachePermissionKey(session_id, level);
     if (permissionCache.has(permKey)) {
-        console.log("Using cached permission", session_id, level);
+        // console.log("Using cached permission", session_id, level);
         return permissionCache.get(permKey);
     }
 
     // console.log(session_id, level);
-    const { result, error } = await AuthAPI.permission(session_id, level);
+    const { result, error } = await AuthAPI.hasPermission(session_id, level);
     // console.log(result);
     cachePermission(session_id, level, result);
     return result;
@@ -371,8 +364,8 @@ async function hasPermission(req, level) {
 module.exports = {
     DEBUG,
     DEV_MODE,
-    printLog,
-    printDebug: DEBUG ? printDebug : () => {},
+    printLog: logInfo,
+    printDebug: DEBUG ? logDebug : () => {},
     printObject,
     getHost,
     getDomain,
