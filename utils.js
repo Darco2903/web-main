@@ -42,14 +42,14 @@ http.IncomingMessage.prototype.getCookies = function () {
 async function printObject(obj) {
     await logInfo(colors.yellow("Object:"));
     const entries = Object.entries(obj);
-    for (const [key, value] of entries) {
+    for (let [key, value] of entries) {
         if (key === "files") {
             if (value) value = value.map((file) => file.originalFilename);
             else return;
         }
-        let data = JSON.stringify(value);
-        if (data.length > 100) data = data.slice(0, 100) + "...";
-        await logInfo(`${colors.blue("-".repeat(21))} ${colors.cyan(key)} : ${colors.magenta(data)}`);
+        value = JSON.stringify(value);
+        if (value.length > 100) value = value.slice(0, 100) + "...";
+        await logInfo(`${colors.blue("-".repeat(21))} ${colors.cyan(key)} : ${colors.magenta(value)}`);
     }
 }
 
