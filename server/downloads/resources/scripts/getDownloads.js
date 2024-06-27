@@ -12,7 +12,7 @@ async function exec(req, res, query) {
     let dl = [];
     const { session_id } = req.getCookies();
     let { result, level } = await AuthAPI.permission(session_id);
-    console.log("result", result, "level", level);
+    // console.log("result", result, "level", level);
     if (!result) level = 0;
 
     dl = await db.find("downloads", {
