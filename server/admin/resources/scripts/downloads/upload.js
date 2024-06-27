@@ -40,20 +40,20 @@ async function upload(req, res, { files, filename, level }) {
     // console.log("File", file);
 
     if (!file) {
-        console.log("No file");
+        // console.log("No file");
         sendError(res, 400, "NO_FILE");
         return;
     }
 
     if (isNaN(level)) {
-        console.log("No level");
+        // console.log("No level");
         sendError(res, 400, "NO_LEVEL");
         return;
     }
 
     const from = file.filepath;
     if (!(await utils.exists(from))) {
-        console.log("File not found");
+        // console.log("File not found");
         sendError(res, 404, "FILE_NOT_FOUND");
         return;
     }
@@ -71,14 +71,6 @@ async function upload(req, res, { files, filename, level }) {
             await fs.promises.unlink(from);
         });
 
-        console.log("inserting", {
-            id,
-            name: filename,
-            level,
-            path: to,
-            size: file.size,
-        });
-
         await db.insert("downloads", {
             id,
             name: filename,
@@ -86,10 +78,13 @@ async function upload(req, res, { files, filename, level }) {
             path: to,
             size: file.size,
         });
+
+        await utils.printLog("Uploaded", filename);
         res.writeHead(200, { "Content-Type": "text/plain" });
         res.end(id);
     } catch (error) {
-        console.error("Error", error);
+        await utils.printDebug(error);
+        await utils.printLog("Error", error.message);
         sendError(res, 500, "INTERNAL_ERROR");
 
         // cleanup
