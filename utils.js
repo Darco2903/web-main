@@ -238,7 +238,7 @@ async function POSTRequestHandler(req, res) {
         query[key] = params.getAll(key);
     });
     query.files = files.file;
-    if (keys.length !== 0) printObject(query);
+    if (keys.length !== 0) await printObject(query);
     const exec = require(path);
     const response = await exec(req, res, query);
     if (!res.closed) res.end(response);
@@ -258,7 +258,7 @@ async function PUTRequestHandler(req, res) {
     const params = new URLSearchParams(rawParams);
     const query = Object.fromEntries(params.entries());
     query.files = files.file;
-    if (rawParams) printObject(query);
+    if (rawParams) await printObject(query);
     const exec = require(pathname);
     const response = await exec(req, res, query);
     if (!res.closed) res.end(response);

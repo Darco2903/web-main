@@ -8,7 +8,7 @@ const utils = require("./utils");
 const proxy = require("./utils/proxy");
 const downloadHandler = require("./utils/downloadHandler");
 
-const { listen, port, SERVER_PATH, WSAllowedOrigins, authServerHost, CLOUDFRONT_ID, authorizeNonCloudfront } = require("./config/server.json");
+const { listen, port, SERVER_PATH, WSAllowedOrigins, authServerOrigin, CLOUDFRONT_ID, authorizeNonCloudfront } = require("./config/server.json");
 
 /**
  * @param {http.IncomingMessage} req
@@ -46,7 +46,7 @@ async function handleRequest(req, res) {
                 res.end("Service Unavailable");
                 return;
             } else if (authenticated === false) {
-                const authUrl = new URL("login", `http://${authServerHost}`);
+                const authUrl = new URL("login", authServerOrigin);
                 const redirectUrl = new URL(req.url, `http://${req.headers.host}`);
                 authUrl.searchParams.set("redirect", redirectUrl.href);
                 res.writeHead(302, {
