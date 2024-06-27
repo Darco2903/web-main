@@ -47,9 +47,9 @@ async function printObject(obj) {
             if (value) value = value.map((file) => file.originalFilename);
             else return;
         }
-        value = JSON.stringify(value);
-        if (value.length > 100) value = value.slice(0, 100) + "...";
-        await logInfo(`${colors.blue("-".repeat(21))} ${colors.cyan(key)} : ${colors.magenta(value)}`);
+        let data = JSON.stringify(value);
+        if (data.length > 100) data = data.slice(0, 100) + "...";
+        await logInfo(`${colors.blue("-".repeat(21))} ${colors.cyan(key)} : ${colors.magenta(data)}`);
     }
 }
 
