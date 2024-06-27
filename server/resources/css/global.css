@@ -1,3 +1,32 @@
+:root {
+    --color-light: #fff;
+    --color-dark: #333;
+    --text-color-light: #333;
+    --text-color-dark: #eee;
+    --background-color-light: #fcf6fd;
+    --background-color-dark: #2d2b35;
+    --element-color-light: #eee;
+    --element-color-dark: #444;
+    --hover-color-light: #66666688;
+    --hover-color-dark: #00000088;
+    --blue-pink-gradient: #00a6ff 0%, #c5007f 100%;
+
+    --theme-time: 0.4s;
+    --hover-time: 0.1s;
+
+    --text-color: var(--text-color-light);
+    --background-color: var(--background-color-light);
+    --element-color: var(--element-color-light);
+    --hover-color: var(--hover-color-light);
+}
+
+:root:has([theme="dark"]) {
+    --text-color: var(--text-color-dark);
+    --background-color: var(--background-color-dark);
+    --element-color: var(--element-color-dark);
+    --hover-color: var(--hover-color-dark);
+}
+
 body {
     font-family: sans-serif;
 }

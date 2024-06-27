@@ -2,20 +2,6 @@
 @import url(./user-box.css);
 
 :root {
-    --color-light: #fff;
-    --color-dark: #333;
-    --text-color-light: #333;
-    --text-color-dark: #eee;
-    --background-color-light: #fcf6fd;
-    --background-color-dark: #2d2b35;
-    --element-color-light: #eee;
-    --element-color-dark: #444;
-    --hover-color-light: #66666688;
-    --hover-color-dark: #00000088;
-    --theme-time: 0.4s;
-    --hover-time: 0.1s;
-    --blue-pink-gradient: #00a6ff 0%, #c5007f 100%;
-
     --icon-main: url("/resources/images/icons/icon-128px.png");
     /* --icon-gamepad-light: url("/resources/images/icons/gamepad-icon-light-128px.png"); */
     /* --icon-gamepad-dark: url("/resources/images/icons/gamepad-icon-dark-128px.png"); */

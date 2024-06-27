@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <link rel="stylesheet" href="/resources/css/global.css" />
+        <link rel="stylesheet" href="./resources/css/downloads/index.css" />
+
+        <link rel="icon" href="../resources/images/icons/icon-128px.png" />
+        <title>Admin - Downloads</title>
+    </head>
+
+    <body hidden>
+        <div id="upper-panel"></div>
+
+        <div class="flex column" id="content">
+            <div id="dl-list-loading" class="loading"></div>
+
+            <div class="flex column align" id="dl-add">
+                <div class="flex row align" id="dl-add-container">
+                    <div id="dl-input-container">
+                        <div id="dl-drag-drop">Drag & Drop</div>
+                        <label id="dl-input-but" for="dl-input">Upload</label>
+                        <input type="file" id="dl-input" />
+                    </div>
+
+                    <div class="flex column" id="dl-file-info">
+                        <div class="dl-info-label" id="dl-file-name" data-label="Name"></div>
+                        <div class="dl-info-label" id="dl-file-size" data-label="Size"></div>
+                    </div>
+
+                    <div class="flex column" id="dl-file-options">
+                        <div class="flex row align" id="dl-file-options-name">
+                            <label class="dl-file-option-label" for="dl-level">Name:</label>
+                            <input type="text" id="dl-name" placeholder="Name" />
+                        </div>
+
+                        <div class="flex row align" id="dl-file-options-level">
+                            <label class="dl-file-option-label" for="dl-level">Level:</label>
+                            <input type="number" id="dl-level" placeholder="Level" min="0" max="255" value="10" />
+                        </div>
+                    </div>
+
+                    <button class="user-but txt" id="dl-upload">Upload</button>
+                </div>
+
+                <div class="flex row align" id="dl-progress-container">
+                    <progress id="dl-progress" value="0" max="100"></progress>
+                    <div id="dl-progress-info">0</div>
+                </div>
+            </div>
+
+            <div class="flex row align" id="tools">
+                <div id="search-container">
+                    <!-- <label for="search">Search:</label> -->
+                    <input id="search" type="text" placeholder="Search" />
+                </div>
+                <button class="user-but icon" id="refresh"></button>
+            </div>
+
+            <div id="dl-list-container">
+                <table id="dl-list">
+                    <thead>
+                        <tr>
+                            <th><div>Name</div></th>
+                            <th><div>Path</div></th>
+                            <th><div>Level</div></th>
+                            <th><div>Size</div></th>
+                            <th><div>Creation Date</div></th>
+                            <th><div>Update Date</div></th>
+                            <th><div>Actions</div></th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="dl-list-content"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="clones" hidden></div>
+    </body>
+
+    <script src="/resources/js/global.js"></script>
+    <script src="/resources/js/upper-panel.js" type="module"></script>
+    <script src="./resources/js/downloads/index.js" type="module"></script>
+</html>

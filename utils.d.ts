@@ -35,6 +35,7 @@ export async function exists(filePath: string): Promise<boolean>;
 
 export async function GETRequestHandler(req: http.IncomingMessage, res: http.ServerResponse): Promise<void>;
 export async function POSTRequestHandler(req: http.IncomingMessage, res: http.ServerResponse, query: object): Promise<void>;
+export async function PUTRequestHandler(req: http.IncomingMessage, res: http.ServerResponse, query: object): Promise<void>;
 export async function HEADRequestHandler(req: http.IncomingMessage, res: http.ServerResponse): Promise<void>;
 
 export function getPathPermission(reqPath: string): number;

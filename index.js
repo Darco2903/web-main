@@ -2,8 +2,11 @@ const http = require("http");
 const { colors } = require("logger");
 const { server: WebSocketServer } = require("websocket");
 
+const { db } = require("./database/index");
+
 const utils = require("./utils");
 const proxy = require("./utils/proxy");
+const downloadHandler = require("./utils/downloadHandler");
 
 const { listen, port, SERVER_PATH, WSAllowedOrigins, authServerHost, CLOUDFRONT_ID, authorizeNonCloudfront } = require("./config/server.json");
 
@@ -67,11 +70,16 @@ async function handleRequest(req, res) {
         switch (req.method) {
             case "GET":
                 if (proxy.configOk && proxy.isRequest(req)) await proxy.proxyRequest(req, res);
+                else if (req.url.startsWith("/download/")) await downloadHandler(req, res);
                 else await utils.GETRequestHandler(req, res);
                 break;
 
             case "POST":
                 await utils.POSTRequestHandler(req, res);
+                break;
+
+            case "PUT":
+                await utils.PUTRequestHandler(req, res);
                 break;
 
             case "HEAD":

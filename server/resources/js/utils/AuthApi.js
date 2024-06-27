@@ -1,6 +1,8 @@
 import data from "../../data.json" with { type: "json" };
 
-const API_ORIGIN = data.authServer + "/api/v1";
+const API_ORIGIN = data.authServer;
+const API_PATH = "/api/v1";
+const API_URL = API_ORIGIN + API_PATH;
 
 async function rawFetch(url, options = {}) {
     return fetch(url, {
@@ -17,7 +19,7 @@ async function apiFetch(url, options) {
 }
 
 async function sendRequestGET(endPoint, data) {
-    const url = new URL(API_ORIGIN + endPoint);
+    const url = new URL(API_URL + endPoint);
     if (data) Object.entries(data).forEach(([key, value = ""]) => url.searchParams.append(key, value));
     return apiFetch(url);
 }
@@ -29,21 +31,21 @@ function createFormData(data = {}) {
 }
 
 async function sendRequestPOST(endPoint, data) {
-    return apiFetch(API_ORIGIN + endPoint, {
+    return apiFetch(API_URL + endPoint, {
         method: "POST",
         body: createFormData(data),
     });
 }
 
 async function sendRequestPUT(endPoint, data) {
-    return apiFetch(API_ORIGIN + endPoint, {
+    return apiFetch(API_URL + endPoint, {
         method: "PUT",
         body: createFormData(data),
     });
 }
 
 async function sendRequestDELETE(endPoint, data) {
-    return apiFetch(API_ORIGIN + endPoint, {
+    return apiFetch(API_URL + endPoint, {
         method: "DELETE",
         body: createFormData(data),
     });
@@ -52,18 +54,19 @@ async function sendRequestDELETE(endPoint, data) {
 const AuthAPI = {
     auth: () => sendRequestGET("/auth"),
     login: (identifier, password) => sendRequestPOST("/login", { identifier, password }),
-    permission: (session_id, level) => sendRequestGET("/permission", { session_id, level }),
+    permission: () => sendRequestGET("/permission/"),
+    hasPermission: (session_id, level) => sendRequestPOST("/permission", { session_id, level }),
     refresh: () => sendRequestGET("/refresh"),
     session: () => sendRequestGET("/session"),
 
     user: {
-        id: (user_id) => sendRequestGET("/user/id/" + user_id),
-        session: (session_id) => sendRequestGET("/user/session/" + session_id),
+        id: (user_id = "") => sendRequestGET("/user/id/" + user_id),
+        session: (session_id = "") => sendRequestGET("/user/session/" + session_id),
         username: (username) => sendRequestPUT("/user/username", { username }),
 
         picture: {
             profile: {
-                get: (user_id) => rawFetch(API_ORIGIN + "/user/picture/profile/" + user_id).then((res) => res.blob()),
+                get: (user_id = "") => rawFetch(API_URL + "/user/picture/profile/" + user_id).then((res) => res.blob()),
                 update: (file, roundBorder) => sendRequestPUT("/user/picture/profile", { file, roundBorder }),
                 delete: (roundBorder) => sendRequestDELETE("/user/picture/profile", { roundBorder }),
             },

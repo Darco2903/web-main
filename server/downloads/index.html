@@ -16,19 +16,32 @@
         <div id="upper-panel"></div>
 
         <div id="content">
-            <a id="back" href=".."></a>
+            <div id="dl-list-loading" class="loading"></div>
 
-            <div id="files-content"></div>
+            <a class="user-but icon" id="back" href=".."></a>
+
+            <div class="flex row align" id="tools">
+                <div class="flex row align" id="search-container">
+                    <label for="search">Search:</label>
+                    <input id="search" type="text" placeholder="Search" />
+                </div>
+                <button class="user-but icon" id="refresh"></button>
+            </div>
+
+            <div id="dl-list-container">
+                <div id="dl-list"></div>
+            </div>
         </div>
     </body>
 
     <div id="clones" hidden>
-        <div class="file">
-            <a href="" target="_blank"></a>
+        <div class="file flex column align">
+            <div class="download-icon icon" type="archive"></div>
+            <div class="download-name">File Name</div>
         </div>
     </div>
 
     <script src="/resources/js/global.js"></script>
     <script src="/resources/js/upper-panel.js" type="module"></script>
-    <script src="./resources/js/index.js"></script>
+    <script src="./resources/js/index.js" type="module"></script>
 </html>

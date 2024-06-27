@@ -64,6 +64,28 @@ async function wait(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+async function waitForAnim(elem, { animName, iter = 1 } = {}) {
+    return new Promise((resolve) => {
+        const iterHandler = (e) => {
+            if (!animName || e.animationName === animName) {
+                iter--;
+                if (iter <= 0) {
+                    resolve();
+                }
+            }
+        };
+        elem.addEventListener("animationiteration", iterHandler);
+        elem.addEventListener(
+            "animationend",
+            (e) => {
+                elem.removeEventListener("animationiteration", iterHandler);
+                resolve();
+            },
+            { once: true }
+        );
+    });
+}
+
 window.addEventListener("load", async () => {
     document.body.toggleAttribute("mobile", IS_MOBILE);
 

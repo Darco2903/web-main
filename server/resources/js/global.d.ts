@@ -27,3 +27,5 @@ declare function deleteCookie(
 ): void;
 
 declare function wait(ms: number): Promise<void>;
+
+declare async function waitForAnim(elem: HTMLElement, options?: { animName?: string; iter?: number }): Promise<void>;

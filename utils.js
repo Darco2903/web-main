@@ -250,6 +250,26 @@ async function POSTRequestHandler(req, res) {
  * @param {http.ServerResponse} res
  * @returns {Promise<void>}
  */
+async function PUTRequestHandler(req, res) {
+    const form = new formidable.IncomingForm();
+    const [_, files] = await form.parse(req);
+    let [pathname, rawParams] = req.url.split("?");
+    pathname = SERVER_PATH + pathname;
+    const params = new URLSearchParams(rawParams);
+    const query = Object.fromEntries(params.entries());
+    query.files = files.file;
+    if (rawParams) printObject(query);
+    const exec = require(pathname);
+    const response = await exec(req, res, query);
+    if (!res.closed) res.end(response);
+    return Promise.resolve();
+}
+
+/**
+ * @param {http.IncomingMessage} req
+ * @param {http.ServerResponse} res
+ * @returns {Promise<void>}
+ */
 async function HEADRequestHandler(req, res) {
     const url = new URL(req.url, "http://host.com");
     let filePath = path.join(SERVER_PATH, decodeURIComponent(url.pathname));
@@ -346,6 +366,7 @@ module.exports = {
     exists,
     GETRequestHandler,
     POSTRequestHandler,
+    PUTRequestHandler,
     HEADRequestHandler,
     getPathPermission,
     hasPermission,

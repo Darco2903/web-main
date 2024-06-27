@@ -19,8 +19,10 @@
   "homepage": "https://github.com/Darco2903/web-server#readme",
   "dependencies": {
     "auth-api": "file:../../npm/auth-api",
+    "darco2903-db": "file:../../npm/darco2903-db",
     "formidable": "^3.5.1",
     "logger": "file:../../npm/logger",
+    "mysql": "^2.18.1",
     "request": "^2.88.2",
     "websocket": "^1.0.34"
   }

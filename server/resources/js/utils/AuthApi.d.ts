@@ -13,7 +13,8 @@ const AuthAPI: {
             session_id?: string;
         }
     >;
-    permission(session_id: string, level: number): Promise<BaseResponse>;
+    permission(): Promise<BaseResponse & { level: number }>;
+    hasPermission(session_id: string, level: number): Promise<BaseResponse>;
     refresh(): Promise<BaseResponse>;
     session(): Promise<
         BaseResponse & {
