@@ -11,13 +11,9 @@ const { db } = require("../../../../database/index");
 async function exec(req, res, query) {
     let dl = [];
     const { session_id } = req.getCookies();
-    const { result, level } = await AuthAPI.permission(session_id);
-
-    if (!result) {
-        res.writeHead(403);
-        res.end();
-        return;
-    }
+    let { result, level } = await AuthAPI.permission(session_id);
+    console.log("result", result, "level", level);
+    if (!result) level = 0;
 
     dl = await db.find("downloads", {
         where: { level: orm.LessThanOrEqual(level) },
