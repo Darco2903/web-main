@@ -2,8 +2,8 @@ const http = require("http");
 const { colors } = require("logger");
 const { server: WebSocketServer } = require("websocket");
 
-const utils = require("./utils.js");
-const proxy = require("./utils/proxy.js");
+const utils = require("./utils");
+const proxy = require("./utils/proxy");
 
 const { listen, port, SERVER_PATH, WSAllowedOrigins, authServerHost, CLOUDFRONT_ID, authorizeNonCloudfront } = require("./config/server.json");
 
@@ -66,7 +66,8 @@ async function handleRequest(req, res) {
 
         switch (req.method) {
             case "GET":
-                await utils.GETRequestHandler(req, res);
+                if (proxy.configOk && proxy.isRequest(req)) await proxy.proxyRequest(req, res);
+                else await utils.GETRequestHandler(req, res);
                 break;
 
             case "POST":

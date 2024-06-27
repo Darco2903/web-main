@@ -38,3 +38,10 @@ export function parseUrl(req: http.IncomingMessage): string;
  * @param url The URL to proxy.
  */
 export async function proxy(req: http.IncomingMessage, res: http.ServerResponse, url: string): Promise<void>;
+
+/**
+ * Proxy the request
+ * @param req The request to proxy.
+ * @param res The response to proxy.
+ */
+export async function proxyRequest(req: http.IncomingMessage, res: http.ServerResponse): Promise<void>;

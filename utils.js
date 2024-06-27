@@ -3,8 +3,6 @@ const http = require("http");
 const path = require("path");
 const formidable = require("formidable");
 const AuthAPI = require("auth-api");
-
-const proxy = require("./utils/proxy.js");
 const { colors, setDebugMode, setDevMode, logInfo, logDebug } = require("logger");
 
 const { SERVER_PATH } = require("./config/server.json");
@@ -164,34 +162,8 @@ function urlParse(url) {
 /**
  * @param {http.IncomingMessage} req
  * @param {http.ServerResponse} res
- * @returns {Promise<void>}
- */
-async function proxyRequest(req, res) {
-    const url = proxy.parseUrl(req);
-    if (!proxy.enabled) {
-        printLog(colors.red("Proxy disabled"), colors.cyan(url));
-        res.writeHead(503, "Service Unavailable");
-    } else if (proxy.isAllowed(url)) {
-        printLog(colors.green("Proxy to"), colors.cyan(url));
-        await proxy.proxy(req, res, url).catch((error) => {
-            printLog(colors.red("Error proxying to"), colors.cyan(url));
-            printDebug(error);
-            res.writeHead(502, "Bad Gateway");
-        });
-    } else {
-        printLog(colors.red("Unauthorized access to"), colors.cyan(url));
-        res.writeHead(403, "Forbidden");
-    }
-    res.end();
-}
-
-/**
- * @param {http.IncomingMessage} req
- * @param {http.ServerResponse} res
  */
 async function GETRequestHandler(req, res) {
-    if (proxy.configOk && proxy.isRequest(req)) return proxyRequest(req, res);
-
     const url = urlParse(req.url);
     let filePath = path.join(SERVER_PATH, decodeURIComponent(url.pathname));
 
