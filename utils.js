@@ -338,6 +338,7 @@ function cachePermission(sessionId, level, hasPerm) {
  * @param {number} level
  */
 async function hasPermission(req, level) {
+    if (level === 0) return true;
     const { session_id } = req.getCookies();
     if (!session_id) return false;
     const permKey = cachePermissionKey(session_id, level);
