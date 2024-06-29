@@ -1,4 +1,5 @@
 const request = require("request");
+const { colors } = require("logger");
 
 const { printLog, printDebug } = require("../utils");
 
@@ -11,6 +12,7 @@ try {
 } catch (e) {}
 
 const pathLength = config?.path?.length + 1;
+const enabled = config?.enabled ?? false;
 
 /**
  * Check if the url is allowed
@@ -80,7 +82,7 @@ async function proxyRequest(req, res) {
 module.exports = {
     isAllowed,
     configOk,
-    enabled: config?.enabled ?? false,
+    enabled,
     isRequest,
     parseUrl,
     proxy,
