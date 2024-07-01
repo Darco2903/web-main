@@ -170,8 +170,11 @@ wsServer.on("request", async (req) => {
     await utils.printDebug("Debug mode enabled");
     await utils.printLog(colors.gray("-".repeat(24)));
     await utils.printDebug("Connecting to database...");
-    await db.connect();
     await utils.printLog(colors.green("Connected to database"));
+    await db.connect().catch((err) => {
+        utils.printLog(colors.red("Error connecting to database =>"), colors.magenta(err.message));
+        process.exit(1);
+    });
 
     await utils.printLog(
         colors.cyan("Proxy Server"),
