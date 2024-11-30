@@ -5,8 +5,6 @@ const { io } = require("./index");
 
 const downloads = require("./handler/downloads/index");
 
-const filetransfert = require("./handler/filetransfert/index");
-
 const SOCKET_ADDR_PAD = 28;
 
 io.use(async (socket, next) => {
