@@ -1,13 +1,11 @@
 const request = require("request");
-const { colors } = require("logger");
-
-const { printLog, printDebug } = require("../utils");
+const { colors, logInfo, logDebug } = require("logger");
 
 let config;
 let configOk = false;
 
 try {
-    config = require("../config/proxy.json");
+    config = require("../../config/proxy.json");
     configOk = config && config.path && config.allowed;
 } catch (e) {}
 
@@ -63,17 +61,17 @@ async function proxy(req, res, url) {
 async function proxyRequest(req, res) {
     const url = parseUrl(req);
     if (!enabled) {
-        printLog(colors.red("Proxy disabled"), colors.cyan(url));
+        logInfo(colors.red("Proxy disabled"), colors.cyan(url));
         res.writeHead(503, "Service Unavailable");
     } else if (isAllowed(url)) {
-        printLog(colors.green("Proxy to"), colors.cyan(url));
+        logInfo(colors.green("Proxy to"), colors.cyan(url));
         await proxy(req, res, url).catch((error) => {
-            printLog(colors.red("Error proxying to"), colors.cyan(url));
-            printDebug(error);
+            logInfo(colors.red("Error proxying to"), colors.cyan(url));
+
             res.writeHead(502, "Bad Gateway");
         });
     } else {
-        printLog(colors.red("Unauthorized access to"), colors.cyan(url));
+        logInfo(colors.red("Unauthorized access to"), colors.cyan(url));
         res.writeHead(403, "Forbidden");
     }
     res.end();

@@ -1,48 +1,48 @@
 const fs = require("fs");
-const path = require("path");
+const { logDebug } = require("logger");
 
-const { db } = require("../database/index");
-const utils = require("../utils");
+const { exists } = require("../../../../utils");
+const { hasPermission } = require("../../../utils");
+const { db } = require("../../../../../database/index");
+
+function sendError(res, code, message) {
+    res.writeHead(code, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ error: message }));
+}
+
+async function findDownload(id) {
+    return db.findOne("downloads", { where: { id } });
+}
 
 /**
  * @param {import("http").IncomingMessage} req
  * @param {import("http").ServerResponse} res
+ * @param {string} id
  */
-async function handler(req, res) {
-    const id = req.url.split("/").pop();
-    // console.log("Download id", id);
-
-    const download = await db.findOne("downloads", { where: { id } });
-    // console.log("Download", download);
+async function GET(req, res, id) {
+    const download = await findDownload(id);
     if (!download) {
-        res.statusCode = 404;
-        res.end("Not found");
+        sendError(res, 404, "Not found");
         return;
     }
 
-    // check perms
-    const authorized = await utils.hasPermission(req, download.level);
-    // console.log("Authorized", authorized);
+    const authorized = await hasPermission(req, download.level);
     if (!authorized) {
-        res.statusCode = 403;
-        res.end("Forbidden");
+        sendError(res, 403, "Forbidden");
         return;
     }
 
-    const filePath = path.join(".", download.path);
-    // console.log("File path", filePath);
-    const exists = await utils.exists(filePath);
-    // console.log("File exists", exists);
+    const filePath = download.path;
+    const fileExists = await exists(filePath);
+    logDebug("File exists", fileExists, filePath);
 
-    if (!exists) {
-        res.statusCode = 404;
-        res.end("Not found");
+    if (!fileExists) {
+        sendError(res, 404, "Not found");
         return;
     }
 
     const fileSize = download.size;
     const range = req.headers.range;
-    // console.log("Range", range);
 
     if (range && false) {
         const parts = range.replace(/bytes=/, "").split("-");
@@ -67,4 +67,6 @@ async function handler(req, res) {
     }
 }
 
-module.exports = handler;
+module.exports = {
+    GET,
+};

@@ -5,7 +5,7 @@ jsconfig.json
 *_.*
 
 config/
-logs/*.log
+logs/*
 server/resources/data.json
 server/downloads/storage/
 server/games/
