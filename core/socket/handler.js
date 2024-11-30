@@ -5,8 +5,6 @@ const { io } = require("./index");
 
 const downloads = require("./handler/downloads/index");
 
-const filetransfert = require("./handler/filetransfert/index");
-
 io.use(async (socket, next) => {
     // console.log("Middleware");
 
