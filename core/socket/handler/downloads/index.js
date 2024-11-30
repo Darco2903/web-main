@@ -8,6 +8,7 @@ const { getCallback, socketHandler } = require("../../utils");
 async function findDL(level) {
     return db.find("downloads", {
         where: { level: orm.LessThanOrEqual(level) },
+        select: ["id", "name", "size"],
     });
 }
 
