@@ -9,6 +9,7 @@ const DEBUG = args.includes("--debug");
 const DEV_MODE = args.includes("--dev");
 
 const ADDR_PAD = 28;
+const METHOD_PAD = 6;
 
 function getLocalIp(name) {
     const nets = networkInterfaces();
@@ -60,6 +61,10 @@ function padAddr(addr) {
     return addr.padEnd(ADDR_PAD);
 }
 
+function padMethod(method) {
+    return method.padEnd(METHOD_PAD);
+}
+
 module.exports = {
     DEBUG,
     DEV_MODE,
@@ -69,4 +74,5 @@ module.exports = {
     exists,
     wait,
     padAddr,
+    padMethod,
 };

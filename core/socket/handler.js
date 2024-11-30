@@ -2,10 +2,11 @@ const AuthApi = require("auth-api");
 const { colors, logInfo, logError } = require("logger");
 
 const { io } = require("./index");
-const { padAddr } = require("../utils");
+const { padAddr, padMethod } = require("../utils");
 
 const downloads = require("./handler/downloads/index");
 
+const PAD_METHOD = padMethod("SOCKET");
 
 io.use(async (socket, next) => {
     // console.log("Middleware");
@@ -39,7 +40,7 @@ io.use(async (socket, next) => {
     const paddedSocketAddr = padAddr(socket.handshake.address);
     const socketPath = socket.handshake.query.path;
 
-    logInfo(colors.green(paddedSocketAddr), colors.yellow("SOCKET"), colors.cyan(socketPath), colors.green("CONNECTED"));
+    logInfo(colors.green(paddedSocketAddr), colors.yellow(PAD_METHOD), colors.cyan(socketPath), colors.green("CONNECTED"));
 
     if (socketPath === "/downloads/") {
         downloads(socket);
@@ -50,6 +51,6 @@ io.use(async (socket, next) => {
     }
 
     socket.on("disconnect", () => {
-        logInfo(colors.green(paddedSocketAddr), colors.yellow("SOCKET"), colors.cyan(socketPath), colors.red("DISCONNECTED"));
+        logInfo(colors.green(paddedSocketAddr), colors.yellow(PAD_METHOD), colors.cyan(socketPath), colors.red("DISCONNECTED"));
     });
 });

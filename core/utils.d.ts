@@ -13,11 +13,12 @@ export const DEV_MODE: boolean;
 
 export function getLocalIp(name?: "Wi-Fi" | "Ethernet"): string;
 
-export async function printObject(obj: Object): Promise<void>;
+export function printObject(obj: Object): Promise<void>;
 
 export function createCookie(name: string, value: string, options: CookieOptions): string;
 
-export async function exists(filePath: string): Promise<boolean>;
-export async function wait(ms: number): Promise<void>;
+export function exists(filePath: string): Promise<boolean>;
+export function wait(ms: number): Promise<void>;
 
 export function padAddr(addr: string): string;
+export function padMethod(addr: string): string;

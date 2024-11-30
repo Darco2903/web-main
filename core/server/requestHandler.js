@@ -1,6 +1,6 @@
 const { colors, logInfo, logDebug } = require("logger");
 
-const { padAddr } = require("../utils");
+const { padAddr, padMethod } = require("../utils");
 const utils = require("./utils");
 
 const { handleAPIRequest } = require("./api/handler");
@@ -30,6 +30,7 @@ async function handleRequest(req, res) {
     try {
         const remote = `${req.socket.remoteAddress}:${req.socket.remotePort}`;
         const padRemote = padAddr(remote);
+        const method = padMethod(req.method);
 
         const cloudfrontID = req.headers["cloudfront-id"];
         if (!authorizeNonCloudfront && cloudfrontID !== CLOUDFRONT_ID) {
@@ -45,7 +46,7 @@ async function handleRequest(req, res) {
         }
 
         if (utils.isAPIRequest(req)) {
-            await logInfo(colors.green(padRemote), colors.yellow(req.method), colors.cyan(req.url), colors.magenta("API request"));
+            await logInfo(colors.green(padRemote), colors.yellow(method), colors.cyan(req.url), colors.magenta("API request"));
             await handleAPIRequest(req, res);
             return;
         }
@@ -80,10 +81,10 @@ async function handleRequest(req, res) {
                 await logInfo(colors.green(padRemote), colors.yellow(res.statusCode), colors.magenta("Unauthorized: not enough permissions"));
                 return;
             } else {
-                await logInfo(colors.green(padRemote), colors.yellow(req.method), colors.cyan(req.url), colors.magenta("Authorized"));
+                await logInfo(colors.green(padRemote), colors.yellow(method), colors.cyan(req.url), colors.magenta("Authorized"));
             }
         } else {
-            await logInfo(colors.green(padRemote), colors.yellow(req.method), colors.cyan(req.url));
+            await logInfo(colors.green(padRemote), colors.yellow(method), colors.cyan(req.url));
         }
 
         if (proxy.configOk && proxy.isRequest(req)) {
