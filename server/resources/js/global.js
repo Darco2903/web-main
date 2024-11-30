@@ -56,18 +56,17 @@ String.prototype.capitalizeFirstLetter = function () {
     return this[0].toUpperCase() + this.slice(1);
 };
 
-/**
- * @param {number} ms
- * @returns {Promise<void>}
- */
 async function wait(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+/**
+ * @param {HTMLElement} elem
+ */
 async function waitForAnim(elem, { animName, iter = 1 } = {}) {
     return new Promise((resolve) => {
         const iterHandler = (e) => {
-            if (!animName || e.animationName === animName) {
+            if (!animName || animName === e.animationName) {
                 iter--;
                 if (iter <= 0) {
                     resolve();
@@ -83,6 +82,19 @@ async function waitForAnim(elem, { animName, iter = 1 } = {}) {
             },
             { once: true }
         );
+    });
+}
+
+/**
+ * @param {HTMLElement} elem
+ */
+async function waitForTransition(elem, { propertyName } = {}) {
+    return new Promise((resolve) => {
+        elem.addEventListener("transitionend", (e) => {
+            if (!propertyName || propertyName === e.propertyName) {
+                resolve();
+            }
+        });
     });
 }
 

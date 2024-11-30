@@ -1,11 +1,11 @@
-declare const DOMAIN: string;
-declare const IS_MOBILE: boolean;
+const DOMAIN: string;
+const IS_MOBILE: boolean;
 
-declare function hasCookie(name: string): boolean;
+function hasCookie(name: string): boolean;
 
-declare function getCookie(name: string): string;
+function getCookie(name: string): string;
 
-declare function setCookie(
+function setCookie(
     name: string,
     value: string,
     options?: {
@@ -18,7 +18,7 @@ declare function setCookie(
     }
 ): void;
 
-declare function deleteCookie(
+function deleteCookie(
     name: string,
     options?: {
         path?: string;
@@ -26,6 +26,7 @@ declare function deleteCookie(
     }
 ): void;
 
-declare function wait(ms: number): Promise<void>;
+function wait(ms: number): Promise<void>;
 
-declare async function waitForAnim(elem: HTMLElement, options?: { animName?: string; iter?: number }): Promise<void>;
+async function waitForAnim(elem: HTMLElement, options?: { animName?: string; iter?: number }): Promise<void>;
+async function waitForTransition(elem: HTMLElement, options?: { propertyName?: string }): Promise<void>;

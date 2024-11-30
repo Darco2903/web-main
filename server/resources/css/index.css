@@ -1,3 +1,8 @@
+:root {
+    /* --transfert-icon: url("https://img.icons8.com/sf-regular-filled/64/eeeeee/data-in-both-directions.png"); */
+    /* --transfert-icon: url("https://img.icons8.com/sf-black-filled/64/eeeeee/data-in-both-directions.png"); */
+}
+
 body {
     font-family: Arial, sans-serif;
     user-select: none;
@@ -39,6 +44,7 @@ body[theme="dark"] .category-title {
 }
 
 .redirect {
+    position: relative;
     padding: 15px 20px;
     border-radius: 7px;
     text-decoration: none;
@@ -54,3 +60,21 @@ body[theme="dark"] .category-title {
 body[theme="dark"] .redirect:hover {
     filter: drop-shadow(3px 3px 3px var(--hover-color-dark)) brightness(1.01);
 }
+
+.redirect-name {
+}
+
+.redirect-icon {
+    position: absolute;
+}
+
+/* #filetransfert .redirect-icon {
+    top: 75%;
+    right: 0;
+    transform: translate(-50%, -50%);
+    background-image: var(--transfert-icon);
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 24px;
+    height: 24px;
+} */
