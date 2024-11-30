@@ -1,4 +1,5 @@
 node_modules/
+.vscode/
 *.code-workspace
 jsconfig.json
 *_
@@ -12,3 +13,7 @@ server/games/
 
 # DEV
 server/cs2/
+server/filetransfer_rtc/
+TEMP_*
+TODO
+*test.*
