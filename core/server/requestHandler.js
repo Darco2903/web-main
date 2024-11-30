@@ -113,7 +113,7 @@ async function handleRequest(req, res) {
                 res.end("Method Not Allowed");
                 break;
         }
-        await logInfo(colors.green(remote), colors.yellow(res.statusCode));
+        await logInfo(colors.green(padRemote), colors.yellow(res.statusCode));
     } catch (error) {
         await logInfo(colors.red(error.message));
         await logDebug(error.stack, error.code);
