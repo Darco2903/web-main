@@ -2,10 +2,10 @@ const AuthApi = require("auth-api");
 const { colors, logInfo, logError } = require("logger");
 
 const { io } = require("./index");
+const { padAddr } = require("../utils");
 
 const downloads = require("./handler/downloads/index");
 
-const SOCKET_ADDR_PAD = 28;
 
 io.use(async (socket, next) => {
     // console.log("Middleware");
@@ -36,7 +36,7 @@ io.use(async (socket, next) => {
 
     next();
 }).on("connection", async (socket) => {
-    const paddedSocketAddr = socket.handshake.address.padEnd(SOCKET_ADDR_PAD);
+    const paddedSocketAddr = padAddr(socket.handshake.address);
     const socketPath = socket.handshake.query.path;
 
     logInfo(colors.green(paddedSocketAddr), colors.yellow("SOCKET"), colors.cyan(socketPath), colors.green("CONNECTED"));

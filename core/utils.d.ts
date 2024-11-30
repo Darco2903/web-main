@@ -19,3 +19,5 @@ export function createCookie(name: string, value: string, options: CookieOptions
 
 export async function exists(filePath: string): Promise<boolean>;
 export async function wait(ms: number): Promise<void>;
+
+export function padAddr(addr: string): string;

@@ -8,6 +8,8 @@ const args = process.argv.slice(2);
 const DEBUG = args.includes("--debug");
 const DEV_MODE = args.includes("--dev");
 
+const ADDR_PAD = 28;
+
 function getLocalIp(name) {
     const nets = networkInterfaces();
     const info = name ? nets[name] : nets["Ethernet"] || nets["Wi-Fi"];
@@ -54,6 +56,10 @@ async function wait(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function padAddr(addr) {
+    return addr.padEnd(ADDR_PAD);
+}
+
 module.exports = {
     DEBUG,
     DEV_MODE,
@@ -62,4 +68,5 @@ module.exports = {
     createCookie,
     exists,
     wait,
+    padAddr,
 };

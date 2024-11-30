@@ -1,6 +1,8 @@
 const { colors, logInfo, logDebug } = require("logger");
 
+const { padAddr } = require("../utils");
 const utils = require("./utils");
+
 const { handleAPIRequest } = require("./api/handler");
 const proxy = require("./proxy");
 
@@ -27,11 +29,12 @@ const {
 async function handleRequest(req, res) {
     try {
         const remote = `${req.socket.remoteAddress}:${req.socket.remotePort}`;
+        const padRemote = padAddr(remote);
 
         const cloudfrontID = req.headers["cloudfront-id"];
         if (!authorizeNonCloudfront && cloudfrontID !== CLOUDFRONT_ID) {
             await logInfo(
-                colors.green(remote),
+                colors.green(padRemote),
                 colors.yellow(res.statusCode),
                 colors.cyan(req.url),
                 colors.magenta("Refused: non-CloudFront request")
@@ -40,9 +43,9 @@ async function handleRequest(req, res) {
             res.end("Forbidden");
             return;
         }
-        
+
         if (utils.isAPIRequest(req)) {
-            await logInfo(colors.green(remote), colors.yellow(req.method), colors.cyan(req.url), colors.magenta("API request"));
+            await logInfo(colors.green(padRemote), colors.yellow(req.method), colors.cyan(req.url), colors.magenta("API request"));
             await handleAPIRequest(req, res);
             return;
         }
@@ -53,7 +56,7 @@ async function handleRequest(req, res) {
 
             if (authenticated?.code === "AUTH_API_ERROR") {
                 await logInfo(
-                    colors.green(remote),
+                    colors.green(padRemote),
                     colors.yellow(res.statusCode),
                     colors.magenta("Unauthorized: auth server error"),
                     colors.red(authenticated.message)
@@ -69,18 +72,18 @@ async function handleRequest(req, res) {
                     Location: authUrl.href,
                 });
                 res.end();
-                await logInfo(colors.green(remote), colors.yellow(res.statusCode), colors.magenta("Unauthorized: not authenticated"));
+                await logInfo(colors.green(padRemote), colors.yellow(res.statusCode), colors.magenta("Unauthorized: not authenticated"));
                 return;
             } else if (!(await utils.hasPermission(req, permRequired))) {
                 res.statusCode = 403;
                 res.end("Forbidden");
-                await logInfo(colors.green(remote), colors.yellow(res.statusCode), colors.magenta("Unauthorized: not enough permissions"));
+                await logInfo(colors.green(padRemote), colors.yellow(res.statusCode), colors.magenta("Unauthorized: not enough permissions"));
                 return;
             } else {
-                await logInfo(colors.green(remote), colors.yellow(req.method), colors.cyan(req.url), colors.magenta("Authorized"));
+                await logInfo(colors.green(padRemote), colors.yellow(req.method), colors.cyan(req.url), colors.magenta("Authorized"));
             }
         } else {
-            await logInfo(colors.green(remote), colors.yellow(req.method), colors.cyan(req.url));
+            await logInfo(colors.green(padRemote), colors.yellow(req.method), colors.cyan(req.url));
         }
 
         if (proxy.configOk && proxy.isRequest(req)) {
