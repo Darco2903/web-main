@@ -1,4 +1,6 @@
-import { startDL, parseSize } from "./utils.js";
+import { socket } from "../../../resources/js/socket.js";
+import { getDownloads, startDL } from "./requests.js";
+import { parseSize } from "./utils.js";
 
 const dlListContainer = document.querySelector("#dl-list-container");
 const dlList = document.querySelector("#dl-list");
@@ -8,15 +10,8 @@ const searchInput = document.getElementById("search");
 const refreshButton = document.getElementById("refresh");
 
 /**
- * @typedef {Object} DLFile
- * @property {string} id
- * @property {string} name
- * @property {number} size
- */
-
-/**
  * Create a file div clone
- * @param {DLFile} file
+ * @param {import("./types.js").DLFile} file
  * @returns {HTMLElement}
  */
 function createFileElem({ id, name, size }) {
@@ -35,17 +30,6 @@ function createFileElem({ id, name, size }) {
     return elem;
 }
 
-/**
- * @returns {Promise<DLFile[]>}
- */
-async function getFiles() {
-    const res = await fetch(`${window.location.pathname}resources/scripts/getDownloads.js`, {
-        method: "POST",
-    });
-    if (!res.ok) return [];
-    return await res.json();
-}
-
 searchInput.addEventListener("input", () => {
     const search = searchInput.value.toLowerCase();
     const files = dlList.querySelectorAll(".file");
@@ -58,13 +42,19 @@ searchInput.addEventListener("input", () => {
 async function updateDLList() {
     dlListContainer.toggleAttribute("loading", true);
     // refreshButton.disabled = true;
-    const refresh = getFiles();
+    const refresh = getDownloads();
     const anim = waitForAnim(refreshButton, { animName: "refresh-spin" });
-    const [files] = await Promise.all([refresh, anim]);
-    console.log("files", files);
-    dlList.innerHTML = "";
-    const fileElems = files.map(createFileElem);
-    dlList.append(...fileElems);
+    const [res] = await Promise.all([refresh, anim]);
+    console.log("res", res);
+    if (res.error) {
+        console.error("error", res.error);
+        alert("Error: " + res.error);
+    } else {
+        const files = res.result;
+        dlList.innerHTML = "";
+        const fileElems = files.map(createFileElem);
+        dlList.append(...fileElems);
+    }
     dlListContainer.toggleAttribute("loading", false);
 }
 

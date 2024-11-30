@@ -22,15 +22,3 @@ export function parseSize(size) {
 export function parseDate(date) {
     return new Date(date).toLocaleString();
 }
-
-export function createDLURL(id) {
-    return `${window.location.origin}/download/${id}`;
-}
-
-export function startDL(id, name) {
-    const url = createDLURL(id);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = name;
-    a.click();
-}
