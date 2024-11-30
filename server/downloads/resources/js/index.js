@@ -19,9 +19,11 @@ function createFileElem({ id, name, size }) {
     const elem = fileClone.cloneNode(true);
     const iconElem = elem.querySelector(".download-icon");
     const nameElem = elem.querySelector(".download-name");
+    const sizeElem = elem.querySelector(".download-size");
     elem.dataset.id = id;
     elem.dataset.name = name.toLowerCase();
     nameElem.innerText = name;
+    sizeElem.innerText = parseSize(size);
 
     elem.addEventListener("click", () => {
         // console.log("download", id);
