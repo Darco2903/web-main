@@ -109,7 +109,7 @@ async function hasPermission(req, level) {
     }
 
     // console.log(session_id, level);
-    const { result, error } = await AuthAPI.hasPermission(session_id, level);
+    let { result, error } = await AuthAPI.hasPermission(session_id, level);
 
     if (error) {
         result = false;
