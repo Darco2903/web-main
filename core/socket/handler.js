@@ -5,6 +5,10 @@ const { io } = require("./index");
 
 const downloads = require("./handler/downloads/index");
 
+const filetransfert = require("./handler/filetransfert/index");
+
+const SOCKET_ADDR_PAD = 28;
+
 io.use(async (socket, next) => {
     // console.log("Middleware");
 
@@ -34,10 +38,10 @@ io.use(async (socket, next) => {
 
     next();
 }).on("connection", async (socket) => {
-    const socketAddr = socket.handshake.address;
+    const paddedSocketAddr = socket.handshake.address.padEnd(SOCKET_ADDR_PAD);
     const socketPath = socket.handshake.query.path;
 
-    logInfo(colors.green(socketAddr), colors.yellow("   SOCKET"), colors.cyan(socketPath));
+    logInfo(colors.green(paddedSocketAddr), colors.yellow("SOCKET"), colors.cyan(socketPath), colors.green("CONNECTED"));
 
     if (socketPath === "/downloads/") {
         downloads(socket);
@@ -48,6 +52,6 @@ io.use(async (socket, next) => {
     }
 
     socket.on("disconnect", () => {
-        logInfo(colors.green(socketAddr), colors.yellow("   SOCKET"), colors.cyan(socketPath), colors.red("DISCONNECTED"));
+        logInfo(colors.green(paddedSocketAddr), colors.yellow("SOCKET"), colors.cyan(socketPath), colors.red("DISCONNECTED"));
     });
 });
