@@ -7,17 +7,13 @@ window.addEventListener("load", async () => {
     if (FAST_REDIRECT) window.location.replace(`./?user=${user_id}`); // fast redirect
 
     iframe.src = `./?user=${user_id}`;
-    iframe.onload = async () => {
-        // await new Promise((resolve) => setTimeout(resolve, 100));
-        // console.log("title", iframe.contentDocument.title);
-        // document.title = iframe.contentDocument.title;
-
-        iframe.contentDocument.querySelectorAll("a").forEach((a) => {
-            a.addEventListener("click", (e) => {
+    iframe.onload = () => {
+        iframe.contentWindow.addEventListener("click", (e) => {
+            if (e.target.href) {
                 e.preventDefault();
-                const href = e.target.href;
-                window.location.href = href;
-            });
+                console.log("redirect", e.target.href);
+                window.location.href = e.target.href;
+            }
         });
     };
 });
