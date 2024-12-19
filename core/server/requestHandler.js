@@ -28,22 +28,12 @@ const {
  */
 async function handleRequest(req, res) {
     try {
-        const remote = `${req.socket.remoteAddress}:${req.socket.remotePort}`;
+        const forwardedFor = req.headers["x-forwarded-for"];
+        const clientIp = forwardedFor ? forwardedFor.split(",")[0].trim() : req.socket.remoteAddress;
+        const remote = `${clientIp}:${req.socket.remotePort}`;
         const padRemote = padAddr(remote);
         const method = padMethod(req.method);
 
-        const cloudfrontID = req.headers["cloudfront-id"];
-        if (!authorizeNonCloudfront && cloudfrontID !== CLOUDFRONT_ID) {
-            await logInfo(
-                colors.green(padRemote),
-                colors.yellow(res.statusCode),
-                colors.cyan(req.url),
-                colors.magenta("Refused: non-CloudFront request")
-            );
-            res.writeHead(403, "Forbidden");
-            res.end("Forbidden");
-            return;
-        }
 
         if (utils.isAPIRequest(req)) {
             await logInfo(colors.green(padRemote), colors.yellow(method), colors.cyan(req.url), colors.magenta("API request"));

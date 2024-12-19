@@ -1,4 +1,6 @@
+const fs = require("fs");
 const http = require("http");
+const https = require("https");
 const { colors, logInfo, logDebug } = require("logger");
 
 require("./prototypes");
@@ -7,7 +9,14 @@ const { handleRequest } = require("./requestHandler");
 
 const { listen, port } = require("../../config/server.json");
 
-const server = http.createServer(handleRequest);
+const httpsOptions = {
+    key: fs.readFileSync("./config/ssl/key.pem"),
+    cert: fs.readFileSync("./config/ssl/cert.pem"),
+    ca: fs.readFileSync("./config/ssl/ca.pem"),
+};
+
+// const server = http.createServer(handleRequest);
+const server = https.createServer(httpsOptions, handleRequest);
 
 async function start() {
     return new Promise((resolve) => {
