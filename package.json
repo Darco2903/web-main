@@ -18,8 +18,8 @@
   },
   "homepage": "https://github.com/Darco2903/web-server#readme",
   "dependencies": {
-    "auth-api": "file:../../npm/auth-api/dist/auth-api-1.0.2.tgz",
-    "darco2903-db": "file:../../npm/darco2903-db/dist/darco2903-db-1.9.2.tgz",
+    "auth-api": "file:../../npm/auth-api/dist/auth-api-1.0.3.tgz",
+    "darco2903-db": "file:../../npm/darco2903-db/dist/darco2903-db-2.0.0.tgz",
     "logger": "file:../../npm/logger/dist/logger-1.1.0.tgz",
     "mysql": "^2.18.1",
     "request": "^2.88.2",
