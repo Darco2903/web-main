@@ -17,13 +17,13 @@ function getCookie(name) {
  * Sets a cookie
  * @param {string} name
  * @param {string} value
- * @param {object} [data]
- * @param {string} [data.path]
- * @param {string} [data.domain]
- * @param {string} [data.expires]
- * @param {string} [data.maxAge]
- * @param {boolean} [data.secure]
- * @param {string} [data.samesite]
+ * @param {object} [#data]
+ * @param {string} [#data.path]
+ * @param {string} [#data.domain]
+ * @param {string} [#data.expires]
+ * @param {string} [#data.maxAge]
+ * @param {boolean} [#data.secure]
+ * @param {string} [#data.samesite]
  * @returns {void}
  */
 function setCookie(name, value, data = {}) {
@@ -41,9 +41,9 @@ function setCookie(name, value, data = {}) {
 /**
  * Deletes a cookie
  * @param {string} name
- * @param {object} [data]
- * @param {string} [data.path]
- * @param {string} [data.domain]
+ * @param {object} [#data]
+ * @param {string} [#data.path]
+ * @param {string} [#data.domain]
  * @returns {void}
  */
 function deleteCookie(name, data = {}) {
@@ -63,25 +63,39 @@ async function wait(ms) {
 /**
  * @param {HTMLElement} elem
  */
-async function waitForAnim(elem, { animName, iter = 1 } = {}) {
+async function waitForEvent(elem, type) {
     return new Promise((resolve) => {
+        elem.addEventListener(type, resolve, { once: true });
+    });
+}
+
+/**
+ * @param {HTMLElement} elem
+ */
+async function waitForAnim(elem, animName) {
+    await new Promise((resolve) => {
+        const animHandler = (e) => {
+            if (!animName || animName === e.animationName) {
+                resolve();
+                elem.removeEventListener("animationend", animHandler);
+            }
+        };
+        elem.addEventListener("animationend", animHandler);
+    });
+}
+
+async function waitForAnimIter(elem, iter, animName) {
+    await new Promise((resolve) => {
         const iterHandler = (e) => {
             if (!animName || animName === e.animationName) {
                 iter--;
                 if (iter <= 0) {
                     resolve();
+                    elem.removeEventListener("animationiteration", iterHandler);
                 }
             }
         };
         elem.addEventListener("animationiteration", iterHandler);
-        elem.addEventListener(
-            "animationend",
-            (e) => {
-                elem.removeEventListener("animationiteration", iterHandler);
-                resolve();
-            },
-            { once: true }
-        );
     });
 }
 

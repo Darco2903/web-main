@@ -28,5 +28,11 @@ function deleteCookie(
 
 function wait(ms: number): Promise<void>;
 
-async function waitForAnim(elem: HTMLElement, options?: { animName?: string; iter?: number }): Promise<void>;
+async function waitForEvent<K extends keyof HTMLElementEventMap>(
+    elem: HTMLElement,
+    type: K,
+    // options?: boolean | AddEventListenerOptions
+): Promise<HTMLElementEventMap[K]>;
+async function waitForAnim(elem: HTMLElement, animName?: string): Promise<void>;
+async function waitForAnimIter(elem: HTMLElement, iter: number, animName?: string): Promise<void>;
 async function waitForTransition(elem: HTMLElement, options?: { propertyName?: string }): Promise<void>;
