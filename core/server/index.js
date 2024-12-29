@@ -7,12 +7,12 @@ require("./prototypes");
 const { DEBUG, DEV_MODE } = require("../utils");
 const { handleRequest } = require("./requestHandler");
 
-const { listen, port } = require("../../config/server.json");
+const { listen, port, ssl } = require("../../config/server.json");
 
 const httpsOptions = {
-    key: fs.readFileSync("./config/ssl/key.pem"),
-    cert: fs.readFileSync("./config/ssl/cert.pem"),
-    ca: fs.readFileSync("./config/ssl/ca.pem"),
+    ca: fs.readFileSync(ssl.ca),
+    cert: fs.readFileSync(ssl.cert),
+    key: fs.readFileSync(ssl.key),
 };
 
 // const server = http.createServer(handleRequest);
