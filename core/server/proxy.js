@@ -1,4 +1,4 @@
-const request = require("request");
+// const request = require("request");
 const { colors, logInfo, logDebug } = require("logger");
 
 let config;
@@ -48,8 +48,9 @@ function parseUrl(req) {
  */
 async function proxy(req, res, url) {
     return new Promise((resolve, reject) => {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        req.pipe(request(url)).on("error", reject).pipe(res).on("finish", resolve);
+        reject("Proxy not implemented");
+        // res.setHeader("Access-Control-Allow-Origin", "*");
+        // req.pipe(request(url)).on("error", reject).pipe(res).on("finish", resolve);
     });
 }
 

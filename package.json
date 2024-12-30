@@ -22,7 +22,6 @@
     "darco2903-db": "file:../../npm/darco2903-db/dist/darco2903-db-2.0.0.tgz",
     "logger": "file:../../npm/logger/dist/logger-1.1.0.tgz",
     "mysql": "^2.18.1",
-    "request": "^2.88.2",
     "socket.io": "^4.7.5"
   }
 }
