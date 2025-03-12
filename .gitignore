@@ -1,0 +1,16 @@
+# Dev files
+/.vscode/
+/node_modules/
+*_.*
+*_
+
+
+/config/
+/dist/
+/logs/
+/src/config/
+
+
+# Ignore the public folder
+/public/*
+!/public/robots.txt

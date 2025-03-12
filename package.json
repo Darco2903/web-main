@@ -1,0 +1,33 @@
+{
+    "name": "web-server-v2",
+    "private": true,
+    "version": "1.0.0",
+    "type": "module",
+    "main": "server.js",
+    "scripts": {
+        "dev": "node . --dev",
+        "devvite": "vite",
+        "build": "vite build",
+        "start": "node .",
+        "preview": "vite preview",
+        "clean": "npx rm -s ./dist/*"
+    },
+    "dependencies": {
+        "auth-api": "file:../../npm/auth-api",
+        "darco2903-db": "file:../../npm/darco2903-db/dist/darco2903-db-2.1.0.tgz",
+        "express": "^4.21.2",
+        "logger": "file:../../npm/logger/dist/logger-1.1.1.tgz",
+        "multer": "^1.4.5-lts.1",
+        "mysql2": "^3.12.0",
+        "socket.io": "^4.8.1",
+        "socket.io-client": "^4.8.1",
+        "vue": "^3.5.13",
+        "vue-router": "^4.5.0",
+        "web-common": "file:../../npm/web-common/dist/web-common-0.4.1.tgz"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-vue": "^5.2.1",
+        "darco2903-os-command-kit": "file:../../npm/os-command-kit/dist/darco2903-os-command-kit-0.1.1.tgz",
+        "vite": "^6.0.5"
+    }
+}
