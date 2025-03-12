@@ -5,6 +5,8 @@ import { getCookie, IS_MOBILE, wait } from "web-common";
 import LoadingSpinner from "@comp/LoadingSpinner.vue";
 import UserIcon from "@comp/UserIcon.vue";
 
+import { origin } from "@config/auth-server.json";
+
 export default {
     name: "ProfileEdit",
 
@@ -215,7 +217,11 @@ export default {
 
         async init() {
             if (!this.userId) {
-                alert("Not logged");
+                alert("You must be logged in to view this page");
+                
+                const loginUrl = new URL(origin + "/login");
+                loginUrl.searchParams.append("redirect", window.location.href);
+                window.location.href = loginUrl.href;
             } else {
                 const p1 = AuthAPI.user.getFromId(this.userId).then((res) => {
                     if (res.error) {
