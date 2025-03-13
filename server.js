@@ -25,7 +25,7 @@ process.on("SIGINT", async (signal) => {
         await await stopServer();
         logInfo(colors.green("Server stopped"));
         // await db.disconnect();
-        logInfo(colors.green("Database disconnected"));
+        // logInfo(colors.green("Database disconnected"));
         process.exit(0);
     }
 });
