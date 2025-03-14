@@ -22,7 +22,7 @@ export default {
             userIcon: null,
             restoreUserIcon: null,
             border: null,
-            userId: getCookie("user_id"),
+            userId: this.$store.state.user.public_id,
             /** @type {import("vue").Ref<import("auth-api").Types.User>} */
             user: {},
             userName: "",
@@ -218,7 +218,7 @@ export default {
         async init() {
             if (!this.userId) {
                 alert("You must be logged in to view this page");
-                
+
                 const loginUrl = new URL(origin + "/login");
                 loginUrl.searchParams.append("redirect", window.location.href);
                 window.location.href = loginUrl.href;
@@ -351,9 +351,7 @@ export default {
                         </div>
 
                         <div class="on-edit" id="username-options" :style="buttonStyle(nameEdited)">
-                            <button class="but-option" id="username-cancel" :disabled="savingUsername" @click="cancelUsername">
-                                Cancel
-                            </button>
+                            <button class="but-option" id="username-cancel" :disabled="savingUsername" @click="cancelUsername">Cancel</button>
                             <button class="but-option" id="username-save" :disabled="savingUsername" @click="saveUsername">Save</button>
                         </div>
                     </div>

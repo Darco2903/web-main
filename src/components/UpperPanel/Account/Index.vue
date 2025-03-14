@@ -31,7 +31,7 @@ export default {
             deg: 135,
             sessionInterval: null,
 
-            userId: getCookie("user_id"),
+            userId: this.$store.state.user?.public_id,
             /** @type {import("vue").Ref<import("auth-api").Types.User>} */
             user: {},
             userBoxImageContainerStyle: {},
@@ -131,6 +131,8 @@ export default {
     },
 
     async mounted() {
+        console.log("userId", this.userId);
+
         console.log("UserAccount mounted");
 
         await this.init();

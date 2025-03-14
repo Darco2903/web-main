@@ -18,7 +18,7 @@ export default {
 
     data() {
         return {
-            userCookie: "",
+            currentUser: "",
             userId: "",
             userIcon: null,
             /** @type {import("vue").Ref<import("auth-api").Types.User>} */
@@ -34,7 +34,7 @@ export default {
 
     computed: {
         ownProfile() {
-            return this.userId === this.userCookie;
+            return this.userId === this.currentUser;
         },
     },
 
@@ -42,7 +42,7 @@ export default {
         async init() {
             if (!this.userId) {
                 alert("You must be logged in to view this page");
-                
+
                 const loginUrl = new URL(origin + "/login");
                 loginUrl.searchParams.append("redirect", window.location.href);
                 window.location.href = loginUrl.href;
@@ -85,8 +85,8 @@ export default {
 
     async mounted() {
         const location = useRoute();
-        this.userCookie = getCookie("user_id");
-        this.userId = location.params.id === "me" ? this.userCookie : location.params.id;
+        this.currentUser = this.$store.state.user.public_id;
+        this.userId = location.params.id === "me" ? this.currentUser : location.params.id;
 
         // window.addEventListener("storage", async (e) => {
         //     if (!e.key) {
@@ -114,12 +114,7 @@ export default {
 
         <div class="user-profile-content" v-show="ready">
             <div id="profile">
-                <UserIcon
-                    :user-icon="userIcon"
-                    :round-border="this.user.round_border"
-                    :size="userIconSize"
-                    :border-size="userIconBorderSize"
-                />
+                <UserIcon :user-icon="userIcon" :round-border="this.user.round_border" :size="userIconSize" :border-size="userIconBorderSize" />
 
                 <label id="user-name">{{ user.name }}</label>
 
