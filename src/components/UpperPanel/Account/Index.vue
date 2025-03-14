@@ -30,10 +30,7 @@ export default {
             border: false,
             deg: 135,
             sessionInterval: null,
-
-            userId: this.$store.state.user?.public_id,
-            /** @type {import("vue").Ref<import("auth-api").Types.User>} */
-            user: {},
+            user: this.$store.state.user,
             userBoxImageContainerStyle: {},
         };
     },
@@ -78,24 +75,13 @@ export default {
         },
 
         async init() {
-            if (this.userId) {
-                const p1 = AuthAPI.user.getFromId(this.userId).then((res) => {
-                    if (res.error) {
-                        console.error(res.error);
-                        return;
-                    }
-                    if (!res.result) {
-                        console.error("No user found");
-                        return;
-                    }
-                    this.noSession = false;
-                    this.user = res.user;
-                    this.border = this.user.round_border;
-                    this.userBoxImageContainerStyle["border-radius"] = this.user.round_border ? "50%" : "0%";
-                });
+            if (this.user) {
+                this.noSession = false;
+                this.border = this.user.round_border;
+                this.userBoxImageContainerStyle["border-radius"] = this.user.round_border ? "50%" : "0%";
 
-                const p2 = AuthAPI.user.picture.profile
-                    .get(this.userId)
+                await AuthAPI.user.picture.profile
+                    .get(this.user.public_id)
                     .then((blob) => {
                         if (blob.size !== 0) {
                             this.userIcon = URL.createObjectURL(blob);
@@ -107,7 +93,6 @@ export default {
                         console.error("Unable to load profile picture", err);
                     });
 
-                await Promise.allSettled([p1, p2]);
                 console.log("noSession", this.noSession);
                 console.log("User loaded");
             }
@@ -131,7 +116,7 @@ export default {
     },
 
     async mounted() {
-        console.log("userId", this.userId);
+        // console.log("userId", this.user);
 
         console.log("UserAccount mounted");
 

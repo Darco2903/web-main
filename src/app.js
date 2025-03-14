@@ -18,6 +18,7 @@ async function refreshSession() {
     const res = await AuthAPI.session.refresh();
     if (res.error || !res.result) {
         console.error("Failed to refresh session", res.error || res.result);
+        return;
     }
     // console.log("sessionRefresh", res);
     console.log("Session refreshed");

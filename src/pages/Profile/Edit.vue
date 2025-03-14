@@ -22,9 +22,7 @@ export default {
             userIcon: null,
             restoreUserIcon: null,
             border: null,
-            userId: this.$store.state.user.public_id,
-            /** @type {import("vue").Ref<import("auth-api").Types.User>} */
-            user: {},
+            user: this.$store.state.user,
             userName: "",
             iconDragOver: false,
 
@@ -216,31 +214,18 @@ export default {
         },
 
         async init() {
-            if (!this.userId) {
+            if (!this.user) {
                 alert("You must be logged in to view this page");
 
                 const loginUrl = new URL(origin + "/login");
                 loginUrl.searchParams.append("redirect", window.location.href);
                 window.location.href = loginUrl.href;
             } else {
-                const p1 = AuthAPI.user.getFromId(this.userId).then((res) => {
-                    if (res.error) {
-                        console.error(res.error);
-                        return;
-                    }
-                    if (!res.result) {
-                        console.error("No user found");
-                        return;
-                    }
-                    console.log(res.user);
+                this.userName = this.user.name;
+                this.border = this.user.round_border;
 
-                    this.user = res.user;
-                    this.userName = this.user.name;
-                    this.border = this.user.round_border;
-                });
-
-                const p2 = AuthAPI.user.picture.profile
-                    .get(this.userId)
+                await AuthAPI.user.picture.profile
+                    .get(this.user.public_id)
                     .then((blob) => {
                         if (blob.size === 0) {
                             this.userIcon = null;
@@ -255,9 +240,7 @@ export default {
                         this.userIcon = null;
                     });
 
-                Promise.all([p1, p2]).finally(() => {
-                    this.ready = true;
-                });
+                this.ready = true;
             }
         },
     },
@@ -351,7 +334,9 @@ export default {
                         </div>
 
                         <div class="on-edit" id="username-options" :style="buttonStyle(nameEdited)">
-                            <button class="but-option" id="username-cancel" :disabled="savingUsername" @click="cancelUsername">Cancel</button>
+                            <button class="but-option" id="username-cancel" :disabled="savingUsername" @click="cancelUsername">
+                                Cancel
+                            </button>
                             <button class="but-option" id="username-save" :disabled="savingUsername" @click="saveUsername">Save</button>
                         </div>
                     </div>

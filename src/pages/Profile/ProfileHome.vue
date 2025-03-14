@@ -18,11 +18,13 @@ export default {
 
     data() {
         return {
-            currentUser: "",
             userId: "",
             userIcon: null,
             /** @type {import("vue").Ref<import("auth-api").Types.User>} */
-            user: {},
+            user: {
+                name: "Username",
+                round_border: false,
+            },
             userBoxImageContainerStyle: {},
             ready: false,
 
@@ -34,21 +36,18 @@ export default {
 
     computed: {
         ownProfile() {
-            return this.userId === this.currentUser;
+            return this.userId && this.userId === this.$store.state.user?.public_id;
         },
     },
 
     methods: {
         async init() {
-            if (!this.userId) {
-                alert("You must be logged in to view this page");
-
-                const loginUrl = new URL(origin + "/login");
-                loginUrl.searchParams.append("redirect", window.location.href);
-                window.location.href = loginUrl.href;
-                return;
+            let p1;
+            if (this.ownProfile) {
+                this.user = this.$store.state.user;
+                document.title = "My Profile";
             } else {
-                const p1 = AuthAPI.user.getFromId(this.userId).then((res) => {
+                p1 = AuthAPI.user.getFromId(this.userId).then((res) => {
                     if (res.error) {
                         console.error(res.error);
                         alert("An error occurred while loading the profile");
@@ -61,32 +60,37 @@ export default {
                     }
                     this.user = res.user;
                     document.title = `${res.user.name}'s Profile`;
-                    console.log("user", this.user);
+                    // console.log("user", this.user);
+                });
+            }
+
+            const p2 = AuthAPI.user.picture.profile
+                .get(this.userId)
+                .then((blob) => {
+                    if (blob.size !== 0) {
+                        this.userIcon = URL.createObjectURL(blob);
+                        // console.log("userIcon", this.userIcon);
+                    }
+                })
+                .catch((err) => {
+                    console.error("Unable to load profile picture", err);
                 });
 
-                const p2 = AuthAPI.user.picture.profile
-                    .get(this.userId)
-                    .then((blob) => {
-                        if (blob.size !== 0) {
-                            this.userIcon = URL.createObjectURL(blob);
-                            console.log("userIcon", this.userIcon);
-                        }
-                    })
-                    .catch((err) => {
-                        console.error("Unable to load profile picture", err);
-                    });
-
-                await Promise.allSettled([p1, p2]);
-                this.ready = true;
-                console.log("ready", this.ready);
-            }
+            await Promise.allSettled([p1, p2]);
+            this.ready = true;
+            // console.log("ready", this.ready);
         },
     },
 
     async mounted() {
         const location = useRoute();
-        this.currentUser = this.$store.state.user.public_id;
-        this.userId = location.params.id === "me" ? this.currentUser : location.params.id;
+        this.userId = location.params.id === "me" ? this.$store.state.user?.public_id : location.params.id;
+        if (!this.userId) {
+            console.error("No user id found");
+            alert("No user id found");
+            this.ready = true;
+            return;
+        }
 
         // window.addEventListener("storage", async (e) => {
         //     if (!e.key) {
@@ -112,9 +116,14 @@ export default {
     <div>
         <LoadingSpinner class="user-edit-loading" :loading="!ready" v-show="!ready" />
 
-        <div class="user-profile-content" v-show="ready">
+        <div class="user-profile-content" v-show="ready && userId">
             <div id="profile">
-                <UserIcon :user-icon="userIcon" :round-border="this.user.round_border" :size="userIconSize" :border-size="userIconBorderSize" />
+                <UserIcon
+                    :user-icon="userIcon"
+                    :round-border="this.user.round_border"
+                    :size="userIconSize"
+                    :border-size="userIconBorderSize"
+                />
 
                 <label id="user-name">{{ user.name }}</label>
 
