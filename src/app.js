@@ -4,6 +4,7 @@ import { createApp } from "vue";
 import { IS_MOBILE } from "web-common";
 
 import { router } from "@router/index";
+import store from "@store/store";
 
 import App from "@/App.vue";
 
@@ -16,6 +17,7 @@ AuthAPI.setApiOrigin(origin);
 createApp(App)
     //
     .use(router)
+    .use(store)
     .mount("#app");
 
 async function refreshSession() {

@@ -23,6 +23,7 @@
         "socket.io-client": "^4.8.1",
         "vue": "^3.5.13",
         "vue-router": "^4.5.0",
+        "vuex": "^4.0.2",
         "web-common": "file:../../npm/web-common/dist/web-common-0.4.1.tgz"
     },
     "devDependencies": {

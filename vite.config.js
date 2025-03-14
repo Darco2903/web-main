@@ -27,6 +27,7 @@ export default defineConfig({
             "@mod": "/src/modules",
             "@pages": "/src/pages",
             "@router": "/src/router",
+            "@store": "/src/store",
             "@styles": "/src/styles",
             "@utils": "/src/utils",
         },
