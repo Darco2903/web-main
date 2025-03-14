@@ -18,6 +18,8 @@ export default {
 
     data() {
         return {
+            verifyUrl: origin + "/verify-request",
+
             userId: "",
             userIcon: null,
             /** @type {import("vue").Ref<import("auth-api").Types.User>} */
@@ -118,16 +120,34 @@ export default {
 
         <div class="user-profile-content" v-show="ready && userId">
             <div id="profile">
-                <UserIcon
-                    :user-icon="userIcon"
-                    :round-border="this.user.round_border"
-                    :size="userIconSize"
-                    :border-size="userIconBorderSize"
-                />
+                <div class="profile-first-row">
+                    <UserIcon
+                        :user-icon="userIcon"
+                        :round-border="this.user.round_border"
+                        :size="userIconSize"
+                        :border-size="userIconBorderSize"
+                    />
 
-                <label id="user-name">{{ user.name }}</label>
+                    <div style="display: flex; flex-direction: row; gap: 10px; align-items: center">
+                        <label id="user-name">{{ user.name }}</label>
+                        <img
+                            class="verified-icon"
+                            src="@icons/verified-96px.png"
+                            alt="Verified"
+                            title="Verified"
+                            width="32"
+                            height="32"
+                            v-if="ownProfile && user.verified"
+                        />
+                    </div>
 
-                <RouterLink id="edit-profile" to="/profile/edit" v-if="ownProfile">Edit Profile</RouterLink>
+                    <RouterLink id="edit-profile" to="/profile/edit" v-if="ownProfile">Edit Profile</RouterLink>
+                </div>
+
+                <div class="user-profile-verified" v-if="ownProfile && !user.verified">
+                    <span>Email Non Verifié</span>
+                    <a class="verify-link" :href="verifyUrl">Vérifier Maintenant</a>
+                </div>
             </div>
         </div>
     </div>
@@ -154,6 +174,14 @@ export default {
 }
 
 #profile {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.profile-first-row {
     display: flex;
     flex-direction: row;
     gap: v-bind(profileGap);
@@ -189,5 +217,25 @@ body[mobile] #edit-profile {
 
 #edit-profile:hover {
     filter: drop-shadow(2px 2px 3px var(--hover-color));
+}
+
+.user-profile-verified {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: center;
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 1.2em;
+    color: #ff9900;
+}
+
+.verify-link {
+    text-decoration: none;
+    padding: 10px 12px;
+    border: 2px solid #fff;
+    border-radius: 5px;
+    color: #eee;
+    background-color: #0004;
 }
 </style>
