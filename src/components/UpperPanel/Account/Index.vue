@@ -93,7 +93,7 @@ export default {
                         console.error("Unable to load profile picture", err);
                     });
 
-                console.log("noSession", this.noSession);
+                // console.log("noSession", this.noSession);
                 console.log("User loaded");
             }
             this.ready = true;

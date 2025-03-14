@@ -40,6 +40,12 @@ export default {
         ownProfile() {
             return this.userId && this.userId === this.$store.state.user?.public_id;
         },
+
+        loginUrl() {
+            const url = new URL(origin + "/login");
+            url.searchParams.append("redirect", window.location.href);
+            return url.href;
+        },
     },
 
     methods: {
@@ -88,8 +94,14 @@ export default {
         const location = useRoute();
         this.userId = location.params.id === "me" ? this.$store.state.user?.public_id : location.params.id;
         if (!this.userId) {
-            console.error("No user id found");
-            alert("No user id found");
+            if (location.params.id === "me") {
+                console.error("Not logged in");
+                alert("You must be logged in to view your profile");
+                window.location.href = this.loginUrl;
+            } else {
+                console.error("No user id found");
+                alert("No user id found");
+            }
             this.ready = true;
             return;
         }
@@ -146,7 +158,7 @@ export default {
 
                 <div class="user-profile-verified" v-if="ownProfile && !user.verified">
                     <span>Email Non Verifié</span>
-                    <a class="verify-link" :href="verifyUrl">Vérifier Maintenant</a>
+                    <a class="verify-link" :href="verifyUrl" target="_blank">Vérifier Maintenant</a>
                 </div>
             </div>
         </div>
