@@ -6,11 +6,10 @@ import { IS_MOBILE } from "web-common";
 import { router } from "@router/index";
 import store from "@store/store";
 
+import "@styles/style.css";
 import App from "@/App.vue";
 
 import { origin, sessionRefresh } from "@config/auth-server.json";
-
-import "@styles/style.css";
 
 AuthAPI.setApiOrigin(origin);
 

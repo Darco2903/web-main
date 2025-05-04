@@ -372,6 +372,7 @@ input[type="password"] {
     width: 100%;
     padding: 10px 8px;
     display: inline-block;
+    border-radius: 0;
     /* border: 2px solid #222245; */
     border: 2px solid #eee;
     box-sizing: border-box;
