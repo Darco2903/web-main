@@ -49,27 +49,34 @@ export default {
     },
 };
 </script>
+
 <template>
-    <div id="user-image-container" :style="userBoxImageStyle">
-        <img id="user-image" :src="imageSrc" />
+    <div class="user-image-container">
+        <div class="user-image-box" :style="userBoxImageStyle">
+            <img class="user-image" :src="imageSrc" />
+        </div>
     </div>
 </template>
+
 <style>
-#user-image-container {
+.user-image-container {
+    width: calc(v-bind(size) + v-bind(borderSize) * 2);
+    height: calc(v-bind(size) + v-bind(borderSize) * 2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-image-box {
     width: v-bind(size);
     height: v-bind(size);
-
-    /* width: 100px; */
-    /* height: 100px; */
-    /* outline: 4px solid #222245; */
     outline: v-bind(borderSize) solid #eee;
     outline-offset: -1px;
-    /* border-radius: 5%; */
     overflow: hidden;
     transition: outline var(--theme-time) ease, border-radius 0.2s ease;
 }
 
-#user-image {
+.user-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
