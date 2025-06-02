@@ -60,16 +60,16 @@ export default {
 
 <style>
 .user-image-container {
-    width: calc(v-bind(size) + v-bind(borderSize) * 2);
-    height: calc(v-bind(size) + v-bind(borderSize) * 2);
+    width: v-bind(size);
+    height: v-bind(size);
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .user-image-box {
-    width: v-bind(size);
-    height: v-bind(size);
+    width: calc(v-bind(size) - v-bind(borderSize) * 2);
+    height: calc(v-bind(size) - v-bind(borderSize) * 2);
     outline: v-bind(borderSize) solid #eee;
     outline-offset: -1px;
     overflow: hidden;

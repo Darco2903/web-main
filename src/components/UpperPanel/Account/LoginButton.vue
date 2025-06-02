@@ -69,11 +69,11 @@ export default {
 </script>
 
 <template>
-    <a id="user-account-login" :href="loginURL" v-on="loginHandlers" :style="loginStyles">Se connecter</a>
+    <a class="user-account-login" :href="loginURL" v-on="loginHandlers" :style="loginStyles">Se connecter</a>
 </template>
 
 <style scoped>
-#user-account-login {
+.user-account-login {
     border-radius: 5px;
     padding: 10px;
     font-size: 12px;
@@ -81,6 +81,7 @@ export default {
     user-select: none;
     color: #fff;
     /* background-image: v-bind(bluePinkGradient); */
+    text-decoration: none;
     transition: filter v-bind(hoverTime) ease, animation v-bind(hoverTime) ease;
 }
 
