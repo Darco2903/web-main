@@ -9,6 +9,7 @@ export default defineConfig({
         hmr: {
             host: "localhost",
             protocol: "ws",
+            port: 8081,
         },
         allowedHosts: [
             //
