@@ -4,7 +4,7 @@ import { IS_MOBILE } from "web-common";
 import SiteIcon from "@comp/UpperPanel/SiteIcon.vue";
 import UserAccount from "@comp/UpperPanel/Account/Index.vue";
 
-import mainIcon from "@assets/icon-128px.png";
+import mainIcon from "@assets/icon-main.svg";
 import cdnIcon from "@assets/icon-cdn.svg";
 
 import cdnServer from "@config/cdn-server.json";
