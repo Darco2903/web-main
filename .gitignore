@@ -4,13 +4,8 @@
 *_.*
 *_
 
-
+# Ignored folders
 /config/
 /dist/
 /logs/
 /src/config/
-
-
-# Ignore the public folder
-/public/*
-!/public/robots.txt
