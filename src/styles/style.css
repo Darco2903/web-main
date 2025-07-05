@@ -1,7 +1,6 @@
 @import "./fonts.css";
 
 :root {
-    font-family: Inter, sans-serif;
     /* line-height: 1.5; */
     /* font-weight: 400; */
 
@@ -44,6 +43,10 @@ body[mobile] {
 
 ::selection {
     background-color: var(--selection);
+}
+
+* {
+    font-family: Inter, sans-serif;
 }
 
 /* @media (prefers-color-scheme: light) {
