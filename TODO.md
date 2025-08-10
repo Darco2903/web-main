@@ -1,0 +1,4 @@
+-   [x] rework AuthAPI to use the new API
+-   [ ] rework profile /profile/<username> or /profile/<id> (abandoned)
+-   [ ] loading animation while account checks (?)
+-   [x] add email verif to profile page

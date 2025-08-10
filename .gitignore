@@ -1,11 +1,8 @@
 # Dev files
-/.vscode/
-/node_modules/
+node_modules/
 *_.*
 *_
 
 # Ignored folders
 /config/
-/dist/
-/logs/
-/src/config/
+dist/
