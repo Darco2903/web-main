@@ -1,0 +1,19 @@
+{
+    "name": "web-server",
+    "version": "1.0.0",
+    "description": "",
+    "main": "",
+    "keywords": [],
+    "author": "Darco2903",
+    "license": "ISC",
+    "private": true,
+    "type": "module",
+    "packageManager": "pnpm@10.14.0",
+    "scripts": {
+        "install": "pnpm install --filter client && pnpm install --filter server",
+        "build": "pnpm --filter client build && pnpm --filter server build",
+        "start": "pnpm --filter server start",
+        "dev": "pnpm --filter server dev",
+        "clean": "pnpm --filter client clean && pnpm --filter server clean"
+    }
+}

@@ -1,17 +1,23 @@
 {
     "name": "client",
-    "version": "0.0.0",
+    "version": "1.0.0",
+    "description": "",
+    "main": "",
+    "keywords": [],
+    "author": "Darco2903",
+    "license": "ISC",
     "private": true,
     "type": "module",
+    "packageManager": "pnpm@10.14.0",
     "engines": {
         "node": "^20.19.0 || >=22.12.0"
     },
     "scripts": {
-        "dev": "vite",
-        "build": "run-p type-check \"build-only {@}\" --",
+        "build": "run-p check \"build-only {@}\" --",
         "preview": "vite preview",
         "build-only": "vite build",
-        "type-check": "vue-tsc --build"
+        "check": "vue-tsc --build",
+        "clean": "rimraf dist"
     },
     "dependencies": {
         "auth-api": "file:../../npm_packs/auth-api-1.3.0.tgz",
@@ -27,6 +33,7 @@
         "@vitejs/plugin-vue": "^6.0.1",
         "@vue/tsconfig": "^0.7.0",
         "npm-run-all2": "^8.0.4",
+        "rimraf": "^6.0.1",
         "typescript": "~5.8.0",
         "vite": "^7.0.6",
         "vite-plugin-vue-devtools": "^8.0.0",
