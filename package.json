@@ -2,7 +2,7 @@
     "name": "web-server",
     "version": "1.0.0",
     "description": "",
-    "main": "",
+    "main": "server/dist/index.js",
     "keywords": [],
     "author": "Darco2903",
     "license": "ISC",
