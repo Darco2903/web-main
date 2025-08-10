@@ -1,6 +1,7 @@
 import path from "path";
 import express from "express";
 // import pinoHttp from "pino-http";
+import { fileURLToPath } from "url";
 import { app } from "./app.js";
 import { logger } from "../logger.js";
 import { IS_PROD } from "../utils.js";
@@ -32,14 +33,18 @@ app.use((req, res, next) => {
     next();
 });
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const clientPath = path.join(__dirname, "../../../client");
+
 if (!IS_PROD) {
     const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
-        root: path.resolve("../client"),
+        root: path.resolve(clientPath),
     });
     app.use(vite.middlewares);
 } else {
-    const distPath = path.resolve("../client/dist");
+    const distPath = path.resolve(clientPath, "dist");
     const p = path.resolve(distPath, "index.html");
 
     app.use(express.static(distPath));
