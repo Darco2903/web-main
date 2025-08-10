@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { Cookie } from "web-common";
+import { type Cookie } from "web-common";
 
 export function reqHandler(fn: RequestHandler) {
     return fn;

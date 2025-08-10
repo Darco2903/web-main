@@ -52,8 +52,6 @@ window.addEventListener("load", async () => {
 if (import.meta.hot) {
     import.meta.hot.on(
         "vite:beforeUpdate",
-        /* eslint-disable-next-line no-console */
-        // () => console.clear()
         () => {
             const n = 24;
             const message = "Hot Reload";

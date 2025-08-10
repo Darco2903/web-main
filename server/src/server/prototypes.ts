@@ -1,5 +1,5 @@
 import { IncomingMessage, ServerResponse } from "http";
-import { Cookie } from "web-common";
+import { type Cookie } from "web-common";
 import { createCookie } from "./utils.js";
 
 type Cookies = {

@@ -1,28 +1,10 @@
 import path from "path";
 import express from "express";
-// import pinoHttp from "pino-http";
+
 import { fileURLToPath } from "url";
 import { app } from "./app.js";
 import { logger } from "../logger.js";
 import { IS_PROD } from "../utils.js";
-
-// app.use(
-//     pinoHttp({
-//         logger,
-//         autoLogging: false,
-//         customSuccessMessage: function (req, res) {
-//             return `${req.method} ${req.url} ${res.statusCode}`;
-//         },
-//         customErrorMessage: function (req, res, err) {
-//             return `${req.method} ${req.url} ${res.statusCode} - Error: ${err.message}`;
-//         },
-//         customLogLevel: (req, res, err) => {
-//             if (res.statusCode >= 500) return "error";
-//             if (res.statusCode >= 400) return "warn";
-//             return "info";
-//         },
-//     })
-// );
 
 app.use((req, res, next) => {
     let clientIP = req.header("CF-Connecting-IP");
