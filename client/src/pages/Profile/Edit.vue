@@ -1,14 +1,12 @@
 <script lang="ts">
-import AuthAPI from "auth-api";
 import { type CSSProperties } from "vue";
-import { IS_MOBILE, wait } from "web-common";
 import { useStore } from "vuex";
-import { key } from "@/store/store";
+import { IS_MOBILE, wait } from "web-common";
+import { api } from "@mod/authApi";
+import { key } from "@store/store";
 
 import LoadingSpinner from "@comp/LoadingSpinner.vue";
 import UserIcon from "@comp/UserIcon.vue";
-
-import { origin } from "@config/auth-server.json";
 
 export default {
     name: "ProfileEdit",
@@ -21,11 +19,11 @@ export default {
     setup() {
         const store = useStore(key);
         const user = store.state.user;
-        
+
         if (!user) {
             alert("You must be logged in to view this page");
 
-            const loginUrl = new URL(origin + "/login");
+            const loginUrl = new URL(import.meta.env.VITE_AUTH_SERVER_ORIGIN + "/login");
             loginUrl.searchParams.append("redirect", window.location.href);
             window.location.href = loginUrl.href;
             // window.close();
@@ -143,12 +141,15 @@ export default {
             let reload;
 
             if (this.iconEdited) {
-                if (!this.iconRemoved) {
-                    const blob = await fetch(this.userIcon as string).then((res) => res.blob());
-                    res = await AuthAPI.user.picture.profile.update(blob);
-                } else {
-                    res = await AuthAPI.user.picture.profile.delete();
-                }
+                console.error("Temporary disable icon editing");
+                return;
+
+                // if (!this.iconRemoved) {
+                //     const blob = await fetch(this.userIcon as string).then((res) => res.blob());
+                //     res = await AuthAPI.user.picture.profile.update(blob);
+                // } else {
+                //     res = await AuthAPI.user.picture.profile.delete();
+                // }
 
                 if (res?.error) {
                     console.error(res.error);
@@ -189,14 +190,24 @@ export default {
             }
 
             if (this.borderEdited) {
-                const resBorder = await AuthAPI.user.picture.profile.border(this.border);
+                // const resBorder = await AuthAPI.user.picture.profile.border(this.border);
+                // if (resBorder?.error) {
+                //     console.error(resBorder.error);
+                // } else if (resBorder?.result) {
+                //     console.log("Profile picture border updated");
+                //     this.user.round_border = this.border;
+                //     reload = true;
+                // }
 
-                if (resBorder?.error) {
-                    console.error(resBorder.error);
-                } else if (resBorder?.result) {
+                const resBorder = await api.pictureSetBorder({ body: { roundBorder: this.border } });
+                if (resBorder.status === 200) {
                     console.log("Profile picture border updated");
                     this.user.round_border = this.border;
                     reload = true;
+                } else if (resBorder.status === 400) {
+                    console.error("Invalid border radius", resBorder.body.issues.find((issue) => issue.message)?.message);
+                } else if (resBorder.status === 401 || resBorder.status === 500) {
+                    console.error("Internal server error", resBorder.body.error);
                 }
             }
 
@@ -217,12 +228,27 @@ export default {
             }
             this.savingUsername = true;
 
-            const res = await AuthAPI.user.updateUsername(this.user.name, "");
-            if (res.error) {
-                console.error("Update username error", res.error);
-                alert("Unable to update username");
+            // const res = await AuthAPI.user.updateUsername(this.user.name, "");
+            // if (res.error) {
+            //     console.error("Update username error", res.error);
+            //     alert("Unable to update username");
+            //     return;
+            // }
+
+            const res = await api.userUpdateUsername({ body: { username: this.user.name } });
+
+            if (res.status === 200) {
+                // console.log("Username updated");
+            } else if (res.status === 400) {
+                console.error("Invalid username", res.body.issues.find((issue) => issue.message)?.message);
+                alert("Invalid username");
+                return;
+            } else if (res.status === 401 || res.status === 500) {
+                console.error("Internal server error", res.body.error);
+                alert("Internal server error");
                 return;
             }
+
             this.userName = this.user.name;
             console.log("Username updated");
             await this.sendReload();
@@ -241,21 +267,22 @@ export default {
             this.userName = this.user.name;
             this.border = this.user.round_border;
 
-            await AuthAPI.user.picture.profile
-                .get(this.user.public_id)
-                .then((blob) => {
-                    if (blob.size === 0) {
-                        this.userIcon = null;
-                        return;
-                    }
-                    const url = URL.createObjectURL(blob);
-                    this.userIcon = url;
-                    this.restoreUserIcon = url;
-                })
-                .catch((err) => {
-                    console.error("Unable to load profile picture", err);
-                    this.userIcon = null;
-                });
+            // Temporary disable profile picture loading
+            // await AuthAPI.user.picture.profile
+            //     .get(this.user.public_id)
+            //     .then((blob) => {
+            //         if (blob.size === 0) {
+            //             this.userIcon = null;
+            //             return;
+            //         }
+            //         const url = URL.createObjectURL(blob);
+            //         this.userIcon = url;
+            //         this.restoreUserIcon = url;
+            //     })
+            //     .catch((err) => {
+            //         console.error("Unable to load profile picture", err);
+            //         this.userIcon = null;
+            //     });
 
             this.ready = true;
         },

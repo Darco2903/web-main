@@ -1,14 +1,16 @@
 <script lang="ts">
-import AuthAPI, { type Types } from "auth-api";
+import type { User, UserPublic } from "auth-api";
+import { ref } from "vue";
 import { useRoute } from "vue-router";
-import { IS_MOBILE } from "web-common";
 import { useStore } from "vuex";
-import { key } from "@/store/store";
+import { IS_MOBILE, wait } from "web-common";
+import { api } from "@mod/authApi";
+import { key } from "@store/store";
 
 import LoadingSpinner from "@comp/LoadingSpinner.vue";
 import UserIcon from "@comp/UserIcon.vue";
 
-import { origin } from "@config/auth-server.json";
+const user = ref<UserPublic | User | null>(null);
 
 export default {
     name: "ProfileHome",
@@ -30,15 +32,11 @@ export default {
 
     data() {
         return {
-            verifyUrl: origin + "/verify-request",
+            verifyUrl: import.meta.env.VITE_AUTH_SERVER_ORIGIN + "/verify-request",
 
             userId: "",
             userIcon: "",
-            /** @type {import("vue").Ref<import("auth-api").Types.User>} */
-            user: {
-                name: "Username",
-                round_border: false,
-            } as Types.UserPublic | Types.User,
+            user,
             userBoxImageContainerStyle: {},
             ready: false,
 
@@ -54,7 +52,7 @@ export default {
         },
 
         loginUrl() {
-            const url = new URL(origin + "/login");
+            const url = new URL(import.meta.env.VITE_AUTH_SERVER_ORIGIN + "/login");
             url.searchParams.append("redirect", window.location.href);
             return url.href;
         },
@@ -64,37 +62,57 @@ export default {
         async init() {
             let p1;
             if (this.ownProfile) {
-                this.user = this.store.state.user as Types.User;
+                this.user = this.store.state.user;
                 document.title = "My Profile";
             } else {
-                p1 = AuthAPI.user.getFromId(this.userId).then((res) => {
-                    if (res.error) {
-                        console.error(res.error);
-                        alert("An error occurred while loading the profile");
-                        return;
+                // p1 = AuthAPI.user.getFromId(this.userId).then((res) => {
+                //     if (res.error) {
+                //         console.error(res.error);
+                //         alert("An error occurred while loading the profile");
+                //         return;
+                //     }
+                //     if (!res.result) {
+                //         console.error("No user found");
+                //         alert("No user found");
+                //         return;
+                //     }
+                //     this.user = res.user as UserPublic;
+                //     document.title = `${this.user.name}'s Profile`;
+                //     // console.log("user", this.user);
+                // });
+
+                p1 = api.userGetFromId({ params: { userId: this.userId } }).then((res) => {
+                    if (res.status === 200) {
+                        this.user = res.body;
+                        document.title = `${this.user.name}'s Profile`;
+                        // console.log("user", this.user);
+                    } else {
+                        if (res.status === 400) {
+                            console.error("Invalid user ID", res.body.issues.find((issue) => issue.message)?.message);
+                            alert("Invalid user ID");
+                        } else if (res.status === 404 || res.status === 500) {
+                            console.error(res.body.error);
+                            alert(res.body.error);
+                        } else {
+                            alert("Error loading user");
+                        }
                     }
-                    if (!res.result) {
-                        console.error("No user found");
-                        alert("No user found");
-                        return;
-                    }
-                    this.user = res.user as Types.UserPublic;
-                    document.title = `${this.user.name}'s Profile`;
-                    // console.log("user", this.user);
                 });
             }
 
-            const p2 = AuthAPI.user.picture.profile
-                .get(this.userId)
-                .then((blob) => {
-                    if (blob.size !== 0) {
-                        this.userIcon = URL.createObjectURL(blob);
-                        // console.log("userIcon", this.userIcon);
-                    }
-                })
-                .catch((err) => {
-                    console.error("Unable to load profile picture", err);
-                });
+            // Temporary disable profile picture loading
+            // const p2 = AuthAPI.user.picture.profile
+            //     .get(this.userId)
+            //     .then((blob) => {
+            //         if (blob.size !== 0) {
+            //             this.userIcon = URL.createObjectURL(blob);
+            //             // console.log("userIcon", this.userIcon);
+            //         }
+            //     })
+            //     .catch((err) => {
+            //         console.error("Unable to load profile picture", err);
+            //     });
+            const p2 = wait(100);
 
             await Promise.allSettled([p1, p2]);
             this.ready = true;
@@ -148,13 +166,13 @@ export default {
                 <div class="profile-first-row">
                     <UserIcon
                         :user-icon="userIcon"
-                        :round-border="user.round_border"
+                        :round-border="user?.round_border"
                         :size="userIconSize"
                         :border-size="userIconBorderSize"
                     />
 
                     <div style="display: flex; flex-direction: row; gap: 10px; align-items: center">
-                        <label id="user-name">{{ user.name }}</label>
+                        <label id="user-name">{{ user?.name }}</label>
                         <img
                             class="verified-icon"
                             src="@icons/verified-96px.png"
@@ -162,14 +180,14 @@ export default {
                             title="Verified"
                             width="32"
                             height="32"
-                            v-if="ownProfile && (user as Types.User).verified"
+                            v-if="ownProfile && (user as User).verified"
                         />
                     </div>
 
                     <RouterLink id="edit-profile" to="/profile/edit" v-if="ownProfile">Edit Profile</RouterLink>
                 </div>
 
-                <div class="user-profile-verified" v-if="ownProfile && !(user as Types.User).verified ">
+                <div class="user-profile-verified" v-if="ownProfile && !(user as User).verified ">
                     <span>Email Non Verifié</span>
                     <a class="verify-link" :href="verifyUrl" target="_blank">Vérifier Maintenant</a>
                 </div>

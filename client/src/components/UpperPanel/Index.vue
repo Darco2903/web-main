@@ -7,8 +7,6 @@ import UserAccount from "@comp/UpperPanel/Account/Index.vue";
 import mainIcon from "@assets/icon-main.svg";
 import cdnIcon from "@assets/icon-cdn.svg";
 
-import cdnServer from "@config/cdn-server.json";
-
 export default {
     name: "UpperPanel",
 
@@ -22,7 +20,7 @@ export default {
             IS_MOBILE,
             mainIcon,
             cdnIcon,
-            cdnServer,
+            cdnOrigin: import.meta.env.VITE_CDN_SERVER_ORIGIN,
         };
     },
 
@@ -45,7 +43,7 @@ export default {
         <div class="upper-panel-row" id="panel-first-row" :style="upperPanelRowStyle">
             <div id="upper-panel-left">
                 <SiteIcon :icon="mainIcon" :size="siteIconSize" internal="/" />
-                <SiteIcon :icon="cdnIcon" :size="siteIconSize" :external="cdnServer.origin" target="_blank" />
+                <SiteIcon :icon="cdnIcon" :size="siteIconSize" :external="cdnOrigin" target="_blank" />
             </div>
 
             <div id="upper-panel-right">

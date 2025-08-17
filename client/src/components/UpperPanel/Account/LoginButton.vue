@@ -1,10 +1,5 @@
 <script>
-import { computed, ref } from "vue";
-import { useRoute } from "vue-router";
-
 import { IS_MOBILE, wait } from "web-common";
-
-import { origin } from "@config/auth-server.json";
 import { gradient } from "@utils/index";
 
 const ANGLE = 60;
@@ -32,7 +27,7 @@ export default {
 
     computed: {
         loginURL() {
-            const url = new URL(origin + "/login");
+            const url = new URL(import.meta.env.VITE_AUTH_SERVER_ORIGIN + "/login");
             this.$route.path;
             url.searchParams.append("redirect", window.location.href);
             return url.href;

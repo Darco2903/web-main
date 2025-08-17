@@ -9,8 +9,11 @@ importers:
   .:
     dependencies:
       auth-api:
-        specifier: file:../../npm_packs/auth-api-1.3.0.tgz
-        version: file:../../npm_packs/auth-api-1.3.0.tgz
+        specifier: file:../../npm_packs/auth-api-2.0.0-pre.tgz
+        version: file:../../npm_packs/auth-api-2.0.0-pre.tgz(@types/node@24.2.1)
+      dotenv:
+        specifier: ^17.2.1
+        version: 17.2.1
       express:
         specifier: ^4.21.2
         version: 4.21.2
@@ -18,8 +21,8 @@ importers:
         specifier: ^9.8.0
         version: 9.8.0
       web-common:
-        specifier: file:../../npm_packs/web-common-0.5.1.tgz
-        version: file:../../npm_packs/web-common-0.5.1.tgz
+        specifier: file:../../npm_packs/web-common-0.6.1.tgz
+        version: file:../../npm_packs/web-common-0.6.1.tgz
     devDependencies:
       '@types/express':
         specifier: ^5.0.3
@@ -48,6 +51,12 @@ importers:
   ../client: {}
 
 packages:
+
+  '@anatine/zod-openapi@1.14.2':
+    resolution: {integrity: sha512-q0qHfnuNYVKu0Swrnnvfj9971AEyW7c8v9jCOZGCl5ZbyGMNG4RPyJkRcMi/JC8CRfdOe0IDfNm1nNsi2avprg==}
+    peerDependencies:
+      openapi3-ts: ^2.0.0 || ^3.0.0
+      zod: ^3.20.0
 
   '@esbuild/aix-ppc64@0.25.8':
     resolution: {integrity: sha512-urAvrUedIqEiFR3FYSLTWQgLu5tb+m0qZw0NBEasUeo6wuqatkMDaRT+1uABiGXEu5vqgPd7FGE1BhsAIy9QVA==}
@@ -317,6 +326,23 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@ts-rest/core@3.52.1':
+    resolution: {integrity: sha512-tAjz7Kxq/grJodcTA1Anop4AVRDlD40fkksEV5Mmal88VoZeRKAG8oMHsDwdwPZz+B/zgnz0q2sF+cm5M7Bc7g==}
+    peerDependencies:
+      '@types/node': ^18.18.7 || >=20.8.4
+      zod: ^3.22.3
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+      zod:
+        optional: true
+
+  '@ts-rest/open-api@3.52.1':
+    resolution: {integrity: sha512-VY91g6HFzCe1/fNgX4Y3HzaJbIdztCGHTg34drkh7bKgtNOizLJLXV0wwIkMwLGvjhRHojJxnwYxHjGMIkScwg==}
+    peerDependencies:
+      '@ts-rest/core': ~3.52.0
+      zod: ^3.22.3
+
   '@types/body-parser@1.19.6':
     resolution: {integrity: sha512-HLFeCYgz89uk22N5Qg3dvGvsv46B8GLvKKo1zKG4NybA8U2DiEO3w9lqGg29t/tfLRJpJ6iQxnVw4OnB7MoM9g==}
 
@@ -380,9 +406,9 @@ packages:
     resolution: {integrity: sha512-kNOjDqAh7px0XWNI+4QbzoiR/nTkHAWNud2uvnJquD1/x5a7EQZMJT0AczqK0Qn67oY/TTQ1LbUKajZpp3I9tQ==}
     engines: {node: '>=8.0.0'}
 
-  auth-api@file:../../npm_packs/auth-api-1.3.0.tgz:
-    resolution: {integrity: sha512-jl8xagIFIunFv9r/dc4TuwXSg/nEuEN1AXr2dvTuzKyOUCqAB+2nZ9elSKLEK0GZEqK4ZfkLPN1qtts97sXrvg==, tarball: file:../../npm_packs/auth-api-1.3.0.tgz}
-    version: 1.3.0
+  auth-api@file:../../npm_packs/auth-api-2.0.0-pre.tgz:
+    resolution: {integrity: sha512-wJrCQrA0u2bA4y/NhMJtaRf9Cp6iv0nAkkQhMxdiYiVWtepIVHRr7x+Q9yfuaykvhr7kmGtrwhcrMOcV3i/z1Q==, tarball: file:../../npm_packs/auth-api-2.0.0-pre.tgz}
+    version: 2.0.0-pre
 
   body-parser@1.20.3:
     resolution: {integrity: sha512-7rAxByjUMqQ3/bHJy7D6OGXvx/MMc4IqBn/X0fcM1QUcAItpZrBEYhWGem+tzXH90c+G01ypMcYJBO9Y30203g==}
@@ -447,6 +473,10 @@ packages:
   destroy@1.2.0:
     resolution: {integrity: sha512-2sJGJTaXIIaR1w4iJSNoN0hnMY7Gpc/n8D4qSCJw8QqFWXf7cuAgnEHxBpweaVcPevC2l3KpjYCx3NypQQgaJg==}
     engines: {node: '>= 0.8', npm: 1.2.8000 || >= 1.4.16}
+
+  dotenv@17.2.1:
+    resolution: {integrity: sha512-kQhDYKZecqnM0fCnzI5eIv5L4cAe/iRI+HqMbO/hbRdTAeXDG+M9FjipUxNfbARuEg4iHIbhnhs78BCHNbSxEQ==}
+    engines: {node: '>=12'}
 
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
@@ -679,6 +709,9 @@ packages:
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
 
+  openapi3-ts@2.0.2:
+    resolution: {integrity: sha512-TxhYBMoqx9frXyOgnRHufjQfPXomTIHYKhSKJ6jHfj13kS8OEIhvmE8CTuQyKtjjWttAjX5DPxM1vmalEpo8Qw==}
+
   package-json-from-dist@1.0.1:
     resolution: {integrity: sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==}
 
@@ -862,6 +895,10 @@ packages:
     resolution: {integrity: sha512-o5sSPKEkg/DIQNmH43V0/uerLrpzVedkUh8tGNvaeXpfpuwjKenlSox/2O/BTlZUtEe+JG7s5YhEz608PlAHRA==}
     engines: {node: '>=0.6'}
 
+  ts-deepmerge@6.2.1:
+    resolution: {integrity: sha512-8CYSLazCyj0DJDpPIxOFzJG46r93uh6EynYjuey+bxcLltBeqZL7DMfaE5ZPzZNFlav7wx+2TDa/mBl8gkTYzw==}
+    engines: {node: '>=14.13.1'}
+
   tsx@4.20.3:
     resolution: {integrity: sha512-qjbnuR9Tr+FJOMBqJCW5ehvIo/buZq7vH7qD7JziU98h6l3qGy0a/yPFjwO+y0/T7GFpNgNAvEcPPVfyT8rrPQ==}
     engines: {node: '>=18.0.0'}
@@ -931,9 +968,9 @@ packages:
       yaml:
         optional: true
 
-  web-common@file:../../npm_packs/web-common-0.5.1.tgz:
-    resolution: {integrity: sha512-DpDX4jJ7UvSLFmPYdMLLuUtBCDEtI5pNFd+fjnpkASSoQ3LJ1HHsFCwe7wsz1rJsugJtLQAI6RDHTzVAqIEo4w==, tarball: file:../../npm_packs/web-common-0.5.1.tgz}
-    version: 0.5.1
+  web-common@file:../../npm_packs/web-common-0.6.1.tgz:
+    resolution: {integrity: sha512-zljgzhSTHoi6HrpKdvUmGdpnTw8p6XxsMqjU9mOt50c70UcS5+mNFp794v0oeWwrQ+DGSkIZi71QRYg1wN23hA==, tarball: file:../../npm_packs/web-common-0.6.1.tgz}
+    version: 0.6.1
 
   which@2.0.2:
     resolution: {integrity: sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==}
@@ -951,7 +988,20 @@ packages:
   wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
 
+  yaml@1.10.2:
+    resolution: {integrity: sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==}
+    engines: {node: '>= 6'}
+
+  zod@3.25.76:
+    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
+
 snapshots:
+
+  '@anatine/zod-openapi@1.14.2(openapi3-ts@2.0.2)(zod@3.25.76)':
+    dependencies:
+      openapi3-ts: 2.0.2
+      ts-deepmerge: 6.2.1
+      zod: 3.25.76
 
   '@esbuild/aix-ppc64@0.25.8':
     optional: true
@@ -1106,6 +1156,18 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.46.2':
     optional: true
 
+  '@ts-rest/core@3.52.1(@types/node@24.2.1)(zod@3.25.76)':
+    optionalDependencies:
+      '@types/node': 24.2.1
+      zod: 3.25.76
+
+  '@ts-rest/open-api@3.52.1(@ts-rest/core@3.52.1(@types/node@24.2.1)(zod@3.25.76))(zod@3.25.76)':
+    dependencies:
+      '@anatine/zod-openapi': 1.14.2(openapi3-ts@2.0.2)(zod@3.25.76)
+      '@ts-rest/core': 3.52.1(@types/node@24.2.1)(zod@3.25.76)
+      openapi3-ts: 2.0.2
+      zod: 3.25.76
+
   '@types/body-parser@1.19.6':
     dependencies:
       '@types/connect': 3.4.38
@@ -1172,7 +1234,13 @@ snapshots:
 
   atomic-sleep@1.0.0: {}
 
-  auth-api@file:../../npm_packs/auth-api-1.3.0.tgz: {}
+  auth-api@file:../../npm_packs/auth-api-2.0.0-pre.tgz(@types/node@24.2.1):
+    dependencies:
+      '@ts-rest/core': 3.52.1(@types/node@24.2.1)(zod@3.25.76)
+      '@ts-rest/open-api': 3.52.1(@ts-rest/core@3.52.1(@types/node@24.2.1)(zod@3.25.76))(zod@3.25.76)
+      zod: 3.25.76
+    transitivePeerDependencies:
+      - '@types/node'
 
   body-parser@1.20.3:
     dependencies:
@@ -1236,6 +1304,8 @@ snapshots:
   depd@2.0.0: {}
 
   destroy@1.2.0: {}
+
+  dotenv@17.2.1: {}
 
   dunder-proto@1.0.1:
     dependencies:
@@ -1485,6 +1555,10 @@ snapshots:
     dependencies:
       wrappy: 1.0.2
 
+  openapi3-ts@2.0.2:
+    dependencies:
+      yaml: 1.10.2
+
   package-json-from-dist@1.0.1: {}
 
   parseurl@1.3.3: {}
@@ -1722,6 +1796,8 @@ snapshots:
 
   toidentifier@1.0.1: {}
 
+  ts-deepmerge@6.2.1: {}
+
   tsx@4.20.3:
     dependencies:
       esbuild: 0.25.8
@@ -1757,7 +1833,7 @@ snapshots:
       fsevents: 2.3.3
       tsx: 4.20.3
 
-  web-common@file:../../npm_packs/web-common-0.5.1.tgz: {}
+  web-common@file:../../npm_packs/web-common-0.6.1.tgz: {}
 
   which@2.0.2:
     dependencies:
@@ -1776,3 +1852,7 @@ snapshots:
       strip-ansi: 7.1.0
 
   wrappy@1.0.2: {}
+
+  yaml@1.10.2: {}
+
+  zod@3.25.76: {}

@@ -1,13 +1,7 @@
+import "./loadEnv.js";
 import { IS_PROD } from "./utils.js";
 import { startServer, stopServer } from "./server/index.js";
 import { logger } from "./logger.js";
-
-import config from "../config/express.json" with { type: "json" };
-
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
-const AuthAPI = require("auth-api");
-AuthAPI.setApiOrigin(config.origin);
 
 let stop = false;
 

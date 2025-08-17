@@ -1,14 +1,12 @@
 import { logger } from "../logger.js";
 import { server } from "./app.js";
 import "./prototypes.js";
-import "./handler.js"
-
-import config from "../../config/express.json" with { type: "json" };
+import "./handler.js";
 
 export async function startServer() {
     await new Promise<void>((resolve) => {
-        server.listen(config.port, config.host, () => {
-            logger.info(`Server listening ${config.host}:${config.port}`);
+        server.listen(parseInt(process.env.SERVER_PORT), process.env.SERVER_LISTEN, () => {
+            logger.info(`Server listening ${process.env.SERVER_LISTEN}:${process.env.SERVER_PORT}`);
             resolve();
         });
     });

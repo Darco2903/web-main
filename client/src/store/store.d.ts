@@ -1,12 +1,12 @@
-import { Store } from "vuex";
-import { type Types } from "auth-api";
+// import { Store } from "vuex";
+// import { User } from "auth-api";
 
-declare module "vue" {
-    interface State {
-        user: Types.User;
-    }
+// declare module "vue" {
+//     interface State {
+//         user: User;
+//     }
 
-    interface ComponentCustomProperties {
-        $store: Store<State>;
-    }
-}
+//     interface ComponentCustomProperties {
+//         $store: Store<State>;
+//     }
+// }

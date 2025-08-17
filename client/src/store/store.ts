@@ -1,9 +1,9 @@
 import { type InjectionKey } from "vue";
 import { createStore, Store } from "vuex";
-import { type Types } from "auth-api";
+import type { User } from "auth-api";
 
 export interface State {
-    user: Types.User | null;
+    user: User | null;
 }
 
 export const key: InjectionKey<Store<State>> = Symbol();

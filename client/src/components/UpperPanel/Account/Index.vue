@@ -1,17 +1,13 @@
 <script>
-import AuthAPI from "auth-api";
+// import AuthAPI from "auth-api";
 import { RouterLink } from "vue-router";
-import { getCookie, wait } from "web-common";
 
 import UserIcon from "@comp/UserIcon.vue";
 import LoginButton from "@comp/UpperPanel/Account/LoginButton.vue";
 
 import userIconDark from "@icons/profile/user-default-dark.jpg";
 
-import { origin } from "@config/auth-server.json";
-
 const SESSION_ANIM_UPDATE_TIME = 100;
-const HIVER_TIME = "0.1s";
 
 export default {
     name: "UserAccount",
@@ -43,7 +39,7 @@ export default {
         },
 
         logoutURL() {
-            const url = new URL(origin + "/logout");
+            const url = new URL(import.meta.env.VITE_AUTH_SERVER_ORIGIN + "/logout");
             url.searchParams.append("redirect", window.location.origin);
             return url.href;
         },
@@ -80,18 +76,19 @@ export default {
                 this.border = this.user.round_border;
                 this.userBoxImageContainerStyle["border-radius"] = this.user.round_border ? "50%" : "0%";
 
-                await AuthAPI.user.picture.profile
-                    .get(this.user.public_id)
-                    .then((blob) => {
-                        if (blob.size !== 0) {
-                            this.userIcon = URL.createObjectURL(blob);
-                        } else {
-                            this.userIcon = userIconDark;
-                        }
-                    })
-                    .catch((err) => {
-                        console.error("Unable to load profile picture", err);
-                    });
+                // Temporary disable profile picture loading
+                // await AuthAPI.user.picture.profile
+                //     .get(this.user.public_id)
+                //     .then((blob) => {
+                //         if (blob.size !== 0) {
+                //             this.userIcon = URL.createObjectURL(blob);
+                //         } else {
+                //             this.userIcon = userIconDark;
+                //         }
+                //     })
+                //     .catch((err) => {
+                //         console.error("Unable to load profile picture", err);
+                //     });
 
                 // console.log("noSession", this.noSession);
                 console.log("User loaded");
