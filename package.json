@@ -10,10 +10,10 @@
     "type": "module",
     "packageManager": "pnpm@10.14.0",
     "scripts": {
-        "install": "pnpm install --filter client && pnpm install --filter server",
-        "build": "pnpm --filter client build && pnpm --filter server build",
+        "install": "pnpm --filter client --filter server install",
+        "build": "pnpm -r --parallel build",
         "start": "pnpm --filter server start",
         "dev": "pnpm --filter server dev",
-        "clean": "pnpm --filter client clean && pnpm --filter server clean"
+        "clean": "pnpm -r clean"
     }
 }
