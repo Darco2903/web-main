@@ -21,7 +21,8 @@
     },
     "dependencies": {
         "@ts-rest/core": "^3.52.1",
-        "auth-api": "file:../../npm_packs/auth-api-2.0.0-pre.tgz",
+        "auth-api": "link:../../../npm/auth-api",
+        "cdn-api": "link:../../../npm/cdn-api",
         "vue": "^3.5.18",
         "vue-router": "^4.5.0",
         "vuex": "^4.1.0",

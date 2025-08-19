@@ -1,6 +1,8 @@
-<script>
-// import AuthAPI from "auth-api";
+<script setup lang="ts">
+import { computed, onMounted, onUnmounted, ref, type CSSProperties, type Ref } from "vue";
 import { RouterLink } from "vue-router";
+import { store } from "@store/store";
+import { cdnApi } from "@mod/api";
 
 import UserIcon from "@comp/UserIcon.vue";
 import LoginButton from "@comp/UpperPanel/Account/LoginButton.vue";
@@ -9,133 +11,125 @@ import userIconDark from "@icons/profile/user-default-dark.jpg";
 
 const SESSION_ANIM_UPDATE_TIME = 100;
 
-export default {
-    name: "UserAccount",
+const ready = ref(false);
+const noSession = ref(true);
+const userIcon = ref(userIconDark);
+const border = ref(false);
+const deg = ref(135);
+const sessionInterval: Ref<number | null> = ref(null);
+const user = ref(store.state.user);
+const userBoxImageContainerStyle: Ref<CSSProperties> = ref({});
 
-    components: {
-        UserIcon,
-        LoginButton,
-        RouterLink,
-    },
+const sessionStyles = computed(() => {
+    return {
+        background: `linear-gradient(${deg.value}deg, #00a6ff, #c5007f)`,
+    };
+});
 
-    data() {
-        return {
-            ready: false,
-            noSession: true,
-            userIcon: userIconDark,
-            border: false,
-            deg: 135,
-            sessionInterval: null,
-            user: this.$store.state.user,
-            userBoxImageContainerStyle: {},
-        };
-    },
+const logoutURL = computed(() => {
+    const url = new URL(import.meta.env.VITE_AUTH_SERVER_ORIGIN + "/logout");
+    url.searchParams.append("redirect", window.location.origin);
+    return url.href;
+});
 
-    computed: {
-        sessionStyles() {
-            return {
-                background: `linear-gradient(${this.deg}deg, #00a6ff, #c5007f)`,
-            };
-        },
+function loadSessionDeg() {
+    const sessionDeg = window.localStorage.getItem("session-deg");
+    if (sessionDeg) {
+        deg.value = parseInt(sessionDeg);
+    }
+}
 
-        logoutURL() {
-            const url = new URL(import.meta.env.VITE_AUTH_SERVER_ORIGIN + "/logout");
-            url.searchParams.append("redirect", window.location.origin);
-            return url.href;
-        },
-    },
+function saveSessionDeg() {
+    window.localStorage.setItem("session-deg", deg.value.toString());
+}
 
-    methods: {
-        loadSessionDeg() {
-            const sessionDeg = parseInt(window.localStorage.getItem("session-deg"));
-            if (sessionDeg) {
-                this.deg = sessionDeg;
-            }
-        },
+function startSession() {
+    sessionInterval.value = setInterval(() => {
+        deg.value += 1;
+        if (deg.value >= 360) {
+            deg.value = 0;
+        }
+    }, SESSION_ANIM_UPDATE_TIME);
+}
 
-        saveSessionDeg() {
-            window.localStorage.setItem("session-deg", this.deg);
-        },
+function stopSession() {
+    if (sessionInterval.value) {
+        clearInterval(sessionInterval.value);
+    }
+}
 
-        startSession() {
-            this.sessionInterval = setInterval(() => {
-                this.deg += 1;
-                if (this.deg >= 360) {
-                    this.deg = 0;
-                }
-            }, SESSION_ANIM_UPDATE_TIME);
-        },
+async function init() {
+    // console.log("init user", user.value);
+    if (user.value) {
+        noSession.value = false;
+        border.value = user.value.round_border;
+        userBoxImageContainerStyle.value["border-radius"] = user.value.round_border ? "50%" : "0%";
 
-        stopSession() {
-            clearInterval(this.sessionInterval);
-        },
+        // Temporary disable profile picture loading
+        // await AuthAPI.user.picture.profile
+        //     .get(user.value.public_id)
+        //     .then((blob) => {
+        //         if (blob.size !== 0) {
+        //             userIcon.value = URL.createObjectURL(blob);
+        //         } else {
+        //             userIcon.value = userIconDark;
+        //         }
+        //     })
+        //     .catch((err) => {
+        //         console.error("Unable to load profile picture", err);
+        //     });
 
-        async init() {
-            if (this.user) {
-                this.noSession = false;
-                this.border = this.user.round_border;
-                this.userBoxImageContainerStyle["border-radius"] = this.user.round_border ? "50%" : "0%";
+        const url = await cdnApi
+            .profilePictureGet({ params: { userId: user.value.public_id } })
+            .then((res) => (res.status === 200 && res.body ? new URL(res.body, import.meta.env.VITE_CDN_SERVER_ORIGIN).href : null))
+            .catch((err) => null)
+            .then((src) => src || userIconDark);
+        // console.log("noSession", noSession.value);
+        // console.log("UserIcon:", url);
+        userIcon.value = url + "?" + Date.now(); // Add cache-busting query parameter
+        console.log("User loaded");
+    }
+    ready.value = true;
+}
 
-                // Temporary disable profile picture loading
-                // await AuthAPI.user.picture.profile
-                //     .get(this.user.public_id)
-                //     .then((blob) => {
-                //         if (blob.size !== 0) {
-                //             this.userIcon = URL.createObjectURL(blob);
-                //         } else {
-                //             this.userIcon = userIconDark;
-                //         }
-                //     })
-                //     .catch((err) => {
-                //         console.error("Unable to load profile picture", err);
-                //     });
+async function onStorage(e: StorageEvent) {
+    if (!e.key) {
+        return;
+    }
 
-                // console.log("noSession", this.noSession);
-                console.log("User loaded");
-            }
-            this.ready = true;
-        },
+    // console.log("storage", e.key, e.newValue, e.oldValue);
 
-        async onStorage(e) {
-            if (!e.key) {
-                return;
-            }
+    if (e.key === "reloadUser") {
+        if (ready.value) {
+            await init();
+            // console.log("User reloaded");
+        }
+    }
+}
 
-            // console.log("storage", e.key, e.newValue, e.oldValue);
+onMounted(async () => {
+    // console.log("userId", user.value);
 
-            if (e.key === "reloadUser") {
-                if (this.ready) {
-                    await this.init();
-                    console.log("User reloaded");
-                }
-            }
-        },
-    },
+    console.log("UserAccount mounted");
 
-    async mounted() {
-        // console.log("userId", this.user);
+    await init();
 
-        console.log("UserAccount mounted");
+    loadSessionDeg();
+    startSession();
 
-        await this.init();
+    window.addEventListener("beforeunload", saveSessionDeg);
+    window.addEventListener("storage", onStorage);
+});
 
-        this.loadSessionDeg();
-        this.startSession();
+onUnmounted(async () => {
+    console.log("UserAccount unmounted");
 
-        window.addEventListener("beforeunload", this.saveSessionDeg);
-        window.addEventListener("storage", this.onStorage);
-    },
+    window.removeEventListener("beforeunload", saveSessionDeg);
+    window.removeEventListener("storage", onStorage);
 
-    unmounted() {
-        console.log("UserAccount unmounted");
-
-        window.removeEventListener("beforeunload", this.saveSessionDeg);
-        window.removeEventListener("storage", this.onStorage);
-
-        this.stopSession();
-        this.saveSessionDeg();
-    },
-};
+    stopSession();
+    saveSessionDeg();
+});
 </script>
 
 <template>
@@ -149,9 +143,9 @@ export default {
                         <img id="user-account-icon" />
                     </div> -->
 
-                    <UserIcon :userIcon="userIcon" :roundBorder="border" size="48px" border-size="3px" />
+                    <UserIcon :userIcon :roundBorder="border" size="48px" border-size="3px" />
 
-                    <label id="user-account-name">{{ user.name }}</label>
+                    <label id="user-account-name">{{ user?.name || "Unknown" }}</label>
                 </div>
 
                 <div id="user-links">

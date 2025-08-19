@@ -2,11 +2,13 @@
 import { type CSSProperties } from "vue";
 import { useStore } from "vuex";
 import { IS_MOBILE, wait } from "web-common";
-import { api } from "@mod/authApi";
-import { key } from "@store/store";
+import { authApi, cdnApi } from "@/modules/api";
+import { store } from "@store/store";
 
 import LoadingSpinner from "@comp/LoadingSpinner.vue";
 import UserIcon from "@comp/UserIcon.vue";
+
+import userIconDark from "@icons/profile/user-default-dark.jpg";
 
 export default {
     name: "ProfileEdit",
@@ -17,7 +19,6 @@ export default {
     },
 
     setup() {
-        const store = useStore(key);
         const user = store.state.user;
 
         if (!user) {
@@ -141,8 +142,8 @@ export default {
             let reload;
 
             if (this.iconEdited) {
-                console.error("Temporary disable icon editing");
-                return;
+                // console.error("Temporary disable icon editing");
+                // return;
 
                 // if (!this.iconRemoved) {
                 //     const blob = await fetch(this.userIcon as string).then((res) => res.blob());
@@ -151,42 +152,61 @@ export default {
                 //     res = await AuthAPI.user.picture.profile.delete();
                 // }
 
-                if (res?.error) {
-                    console.error(res.error);
-                    switch (res.error) {
-                        case "FILE_TOO_LARGE":
-                            alert("File too large");
-                            break;
+                if (this.iconRemoved) {
+                    console.log("Deleting profile picture");
+                    res = await cdnApi.profilePictureDelete();
+                } else {
+                    console.log("Updating profile picture");
+                    const blob = await fetch(this.userIcon as string).then((res) => res.blob());
+                    const file = new File([blob], "profile.jpg", { type: blob.type });
+                    res = await cdnApi.profilePictureUpdate({ body: { picture: file } });
+                }
 
-                        case "IMAGE_DIMENSIONS_TOO_LARGE":
-                            alert("Image dimensions too large");
-                            break;
-
-                        case "UNSUPPORTED_FILE_TYPE":
-                            alert("Unsupported file type");
-                            break;
-
-                        case "INVALID_SESSION_ID":
-                            alert("Unauthorized");
-                            break;
-
-                        case "INTERNAL_SERVER_ERROR":
-                            alert("Internal server error");
-                            break;
-
-                        case "CONNECTION_ERROR":
-                            alert("Error connecting to the auth server");
-                            break;
-
-                        default:
-                            alert("An error occurred while updating the profile picture");
-                            break;
-                    }
-                } else if (res?.result) {
+                if (res.status === 200) {
                     console.log("Profile picture updated");
                     this.restoreUserIcon = this.userIcon;
                     reload = true;
+                } else {
+                    console.error("Failed to update profile picture");
+                    alert("Failed to update profile picture");
                 }
+
+                // if (res?.error) {
+                //     console.error(res.error);
+                //     switch (res.error) {
+                //         case "FILE_TOO_LARGE":
+                //             alert("File too large");
+                //             break;
+
+                //         case "IMAGE_DIMENSIONS_TOO_LARGE":
+                //             alert("Image dimensions too large");
+                //             break;
+
+                //         case "UNSUPPORTED_FILE_TYPE":
+                //             alert("Unsupported file type");
+                //             break;
+
+                //         case "INVALID_SESSION_ID":
+                //             alert("Unauthorized");
+                //             break;
+
+                //         case "INTERNAL_SERVER_ERROR":
+                //             alert("Internal server error");
+                //             break;
+
+                //         case "CONNECTION_ERROR":
+                //             alert("Error connecting to the auth server");
+                //             break;
+
+                //         default:
+                //             alert("An error occurred while updating the profile picture");
+                //             break;
+                //     }
+                // } else if (res?.result) {
+                //     console.log("Profile picture updated");
+                //     this.restoreUserIcon = this.userIcon;
+                //     reload = true;
+                // }
             }
 
             if (this.borderEdited) {
@@ -199,7 +219,7 @@ export default {
                 //     reload = true;
                 // }
 
-                const resBorder = await api.pictureSetBorder({ body: { roundBorder: this.border } });
+                const resBorder = await authApi.pictureSetBorder({ body: { roundBorder: this.border } });
                 if (resBorder.status === 200) {
                     console.log("Profile picture border updated");
                     this.user.round_border = this.border;
@@ -235,7 +255,7 @@ export default {
             //     return;
             // }
 
-            const res = await api.userUpdateUsername({ body: { username: this.user.name } });
+            const res = await authApi.userUpdateUsername({ body: { username: this.user.name } });
 
             if (res.status === 200) {
                 // console.log("Username updated");
@@ -267,22 +287,20 @@ export default {
             this.userName = this.user.name;
             this.border = this.user.round_border;
 
-            // Temporary disable profile picture loading
-            // await AuthAPI.user.picture.profile
-            //     .get(this.user.public_id)
-            //     .then((blob) => {
-            //         if (blob.size === 0) {
-            //             this.userIcon = null;
-            //             return;
-            //         }
-            //         const url = URL.createObjectURL(blob);
-            //         this.userIcon = url;
-            //         this.restoreUserIcon = url;
-            //     })
-            //     .catch((err) => {
-            //         console.error("Unable to load profile picture", err);
-            //         this.userIcon = null;
-            //     });
+            await cdnApi
+                .profilePictureGet({ params: { userId: this.user.public_id } })
+                .then((res) =>
+                    res.status === 200 && res.body ? new URL(res.body, import.meta.env.VITE_CDN_SERVER_ORIGIN).href : null
+                )
+                .catch((err) => {
+                    console.error("Unable to load profile picture", err);
+                    return null;
+                })
+                .then((icon) => {
+                    console.log("UserIcon:", icon);
+                    this.userIcon = icon;
+                    this.restoreUserIcon = icon;
+                });
 
             this.ready = true;
         },

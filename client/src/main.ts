@@ -1,6 +1,6 @@
 import { createApp } from "vue";
 import { IS_MOBILE } from "web-common";
-import { api } from "@mod/authApi";
+import { authApi } from "@/modules/api";
 
 import { router } from "@router/index";
 import { store, key } from "@store/store";
@@ -40,7 +40,7 @@ window.addEventListener("load", async () => {
     //     setInterval(refreshSession, sessionRefresh * 1000);
     // }
 
-    const res = await api.userMe();
+    const res = await authApi.userMe();
     console.log("User response:", res);
     if (res.status === 200) {
         store.state.user = res.body;

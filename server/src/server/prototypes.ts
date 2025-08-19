@@ -1,12 +1,6 @@
 import { IncomingMessage, ServerResponse } from "http";
-import { type Cookie } from "web-common";
-import { createCookie } from "./utils.js";
-
-type Cookies = {
-    [key: string]: string | undefined;
-    session_id?: string;
-    public_id?: string;
-};
+import { createCookie, type Cookie } from "web-common";
+import { Cookies } from "../types/cookie.js";
 
 declare module "http" {
     interface IncomingMessage {

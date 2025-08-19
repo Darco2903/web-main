@@ -12,8 +12,11 @@ importers:
         specifier: ^3.52.1
         version: 3.52.1(@types/node@22.17.1)(zod@3.25.76)
       auth-api:
-        specifier: file:../../npm_packs/auth-api-2.0.0-pre.tgz
-        version: file:../../npm_packs/auth-api-2.0.0-pre.tgz(@types/node@22.17.1)
+        specifier: link:../../../npm/auth-api
+        version: link:../../../npm/auth-api
+      cdn-api:
+        specifier: link:../../../npm/cdn-api
+        version: link:../../../npm/cdn-api
       vue:
         specifier: ^3.5.18
         version: 3.5.18(typescript@5.8.3)
@@ -63,12 +66,6 @@ packages:
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
-
-  '@anatine/zod-openapi@1.14.2':
-    resolution: {integrity: sha512-q0qHfnuNYVKu0Swrnnvfj9971AEyW7c8v9jCOZGCl5ZbyGMNG4RPyJkRcMi/JC8CRfdOe0IDfNm1nNsi2avprg==}
-    peerDependencies:
-      openapi3-ts: ^2.0.0 || ^3.0.0
-      zod: ^3.20.0
 
   '@babel/code-frame@7.27.1':
     resolution: {integrity: sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg==}
@@ -515,12 +512,6 @@ packages:
       zod:
         optional: true
 
-  '@ts-rest/open-api@3.52.1':
-    resolution: {integrity: sha512-VY91g6HFzCe1/fNgX4Y3HzaJbIdztCGHTg34drkh7bKgtNOizLJLXV0wwIkMwLGvjhRHojJxnwYxHjGMIkScwg==}
-    peerDependencies:
-      '@ts-rest/core': ~3.52.0
-      zod: ^3.22.3
-
   '@tsconfig/node22@22.0.2':
     resolution: {integrity: sha512-Kmwj4u8sDRDrMYRoN9FDEcXD8UpBSaPQQ24Gz+Gamqfm7xxn+GBR7ge/Z7pK8OXNGyUzbSwJj+TH6B+DS/epyA==}
 
@@ -649,10 +640,6 @@ packages:
   ansis@4.1.0:
     resolution: {integrity: sha512-BGcItUBWSMRgOCe+SVZJ+S7yTRG0eGt9cXAHev72yuGcY23hnLA7Bky5L/xLyPINoSN95geovfBkqoTlNZYa7w==}
     engines: {node: '>=14'}
-
-  auth-api@file:../../npm_packs/auth-api-2.0.0-pre.tgz:
-    resolution: {integrity: sha512-wJrCQrA0u2bA4y/NhMJtaRf9Cp6iv0nAkkQhMxdiYiVWtepIVHRr7x+Q9yfuaykvhr7kmGtrwhcrMOcV3i/z1Q==, tarball: file:../../npm_packs/auth-api-2.0.0-pre.tgz}
-    version: 2.0.0-pre
 
   birpc@2.5.0:
     resolution: {integrity: sha512-VSWO/W6nNQdyP520F1mhf+Lc2f8pjGQOtoHHm7Ze8Go1kX7akpVIrtTa0fn+HB0QJEDVacl6aO08YE0PgXfdnQ==}
@@ -927,9 +914,6 @@ packages:
     resolution: {integrity: sha512-YgBpdJHPyQ2UE5x+hlSXcnejzAvD0b22U2OuAP+8OnlJT+PjWPxtgmGqKKc+RgTM63U9gN0YzrYc71R2WT/hTA==}
     engines: {node: '>=18'}
 
-  openapi3-ts@2.0.2:
-    resolution: {integrity: sha512-TxhYBMoqx9frXyOgnRHufjQfPXomTIHYKhSKJ6jHfj13kS8OEIhvmE8CTuQyKtjjWttAjX5DPxM1vmalEpo8Qw==}
-
   package-json-from-dist@1.0.1:
     resolution: {integrity: sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==}
 
@@ -1062,10 +1046,6 @@ packages:
   totalist@3.0.1:
     resolution: {integrity: sha512-sf4i37nQ2LBx4m3wB74y+ubopq6W/dIzXg0FDGjsYnZHVa1Da8FH853wlL2gtUhg+xJXjfk3kUZS3BRoQeoQBQ==}
     engines: {node: '>=6'}
-
-  ts-deepmerge@6.2.1:
-    resolution: {integrity: sha512-8CYSLazCyj0DJDpPIxOFzJG46r93uh6EynYjuey+bxcLltBeqZL7DMfaE5ZPzZNFlav7wx+2TDa/mBl8gkTYzw==}
-    engines: {node: '>=14.13.1'}
 
   typescript@5.8.3:
     resolution: {integrity: sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ==}
@@ -1216,10 +1196,6 @@ packages:
   yallist@3.1.1:
     resolution: {integrity: sha512-a4UGQaWPH59mOXUYnAG2ewncQS4i4F43Tv3JoAM+s2VDAmS9NsK8GpDMLrCHPksFT7h3K6TOoUNn2pb7RoXx4g==}
 
-  yaml@1.10.2:
-    resolution: {integrity: sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==}
-    engines: {node: '>= 6'}
-
   yoctocolors@2.1.1:
     resolution: {integrity: sha512-GQHQqAopRhwU8Kt1DDM8NjibDXHC8eoh1erhGAJPEyveY9qqVeXvVikNKrDz69sHowPMorbPUrH/mx8c50eiBQ==}
     engines: {node: '>=18'}
@@ -1233,12 +1209,6 @@ snapshots:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.12
       '@jridgewell/trace-mapping': 0.3.29
-
-  '@anatine/zod-openapi@1.14.2(openapi3-ts@2.0.2)(zod@3.25.76)':
-    dependencies:
-      openapi3-ts: 2.0.2
-      ts-deepmerge: 6.2.1
-      zod: 3.25.76
 
   '@babel/code-frame@7.27.1':
     dependencies:
@@ -1611,13 +1581,6 @@ snapshots:
       '@types/node': 22.17.1
       zod: 3.25.76
 
-  '@ts-rest/open-api@3.52.1(@ts-rest/core@3.52.1(@types/node@22.17.1)(zod@3.25.76))(zod@3.25.76)':
-    dependencies:
-      '@anatine/zod-openapi': 1.14.2(openapi3-ts@2.0.2)(zod@3.25.76)
-      '@ts-rest/core': 3.52.1(@types/node@22.17.1)(zod@3.25.76)
-      openapi3-ts: 2.0.2
-      zod: 3.25.76
-
   '@tsconfig/node22@22.0.2': {}
 
   '@types/estree@1.0.8': {}
@@ -1791,14 +1754,6 @@ snapshots:
   ansi-styles@6.2.1: {}
 
   ansis@4.1.0: {}
-
-  auth-api@file:../../npm_packs/auth-api-2.0.0-pre.tgz(@types/node@22.17.1):
-    dependencies:
-      '@ts-rest/core': 3.52.1(@types/node@22.17.1)(zod@3.25.76)
-      '@ts-rest/open-api': 3.52.1(@ts-rest/core@3.52.1(@types/node@22.17.1)(zod@3.25.76))(zod@3.25.76)
-      zod: 3.25.76
-    transitivePeerDependencies:
-      - '@types/node'
 
   birpc@2.5.0: {}
 
@@ -2045,10 +2000,6 @@ snapshots:
       is-inside-container: 1.0.0
       wsl-utils: 0.1.0
 
-  openapi3-ts@2.0.2:
-    dependencies:
-      yaml: 1.10.2
-
   package-json-from-dist@1.0.1: {}
 
   parse-ms@4.0.0: {}
@@ -2178,8 +2129,6 @@ snapshots:
       picomatch: 4.0.3
 
   totalist@3.0.1: {}
-
-  ts-deepmerge@6.2.1: {}
 
   typescript@5.8.3: {}
 
@@ -2321,8 +2270,7 @@ snapshots:
 
   yallist@3.1.1: {}
 
-  yaml@1.10.2: {}
-
   yoctocolors@2.1.1: {}
 
-  zod@3.25.76: {}
+  zod@3.25.76:
+    optional: true
