@@ -152,15 +152,32 @@ export default {
                 //     res = await AuthAPI.user.picture.profile.delete();
                 // }
 
+                const r = await authApi.assets.assetsToken({ body: { type: "avatar" } });
+                if (r.status !== 200) {
+                    console.error("Unable to get assets token", r.status, r.body);
+                    alert("Unable to get assets token");
+                    this.savingIcon = false;
+                    return;
+                }
+
+                const authorization = `Bearer ${r.body.cdnToken}`;
+
                 if (this.iconRemoved) {
                     console.log("Deleting profile picture");
-                    res = await cdnApi.profilePictureDelete();
+                    // res = await cdnApi.profilePictureDelete();
+                    res = await cdnApi.service.delete({ headers: { authorization } });
                 } else {
                     console.log("Updating profile picture");
                     const blob = await fetch(this.userIcon as string).then((res) => res.blob());
                     const file = new File([blob], "profile.jpg", { type: blob.type });
-                    res = await cdnApi.profilePictureUpdate({ body: { picture: file } });
+                    // res = await cdnApi.profilePictureUpdate({ body: { picture: file } });
+                    res = await cdnApi.service.update({
+                        headers: { authorization },
+                        body: { file },
+                    });
                 }
+
+                console.log("Profile picture response", res);
 
                 if (res.status === 200) {
                     console.log("Profile picture updated");
@@ -219,7 +236,7 @@ export default {
                 //     reload = true;
                 // }
 
-                const resBorder = await authApi.pictureSetBorder({ body: { roundBorder: this.border } });
+                const resBorder = await authApi.user.setBorder({ body: { roundBorder: this.border } });
                 if (resBorder.status === 200) {
                     console.log("Profile picture border updated");
                     this.user.round_border = this.border;
@@ -255,7 +272,7 @@ export default {
             //     return;
             // }
 
-            const res = await authApi.userUpdateUsername({ body: { username: this.user.name } });
+            const res = await authApi.user.updateUsername({ body: { username: this.user.name } });
 
             if (res.status === 200) {
                 // console.log("Username updated");
@@ -287,20 +304,24 @@ export default {
             this.userName = this.user.name;
             this.border = this.user.round_border;
 
-            await cdnApi
-                .profilePictureGet({ params: { userId: this.user.public_id } })
-                .then((res) =>
-                    res.status === 200 && res.body ? new URL(res.body, import.meta.env.VITE_CDN_SERVER_ORIGIN).href : null
-                )
-                .catch((err) => {
-                    console.error("Unable to load profile picture", err);
-                    return null;
-                })
-                .then((icon) => {
-                    console.log("UserIcon:", icon);
-                    this.userIcon = icon;
-                    this.restoreUserIcon = icon;
-                });
+            // V2
+            // await cdnApi
+            //     .profilePictureGet({ params: { userId: this.user.public_id } })
+            //     .then((res) => (res.status === 200 && res.body ? new URL(res.body, import.meta.env.VITE_CDN_SERVER_ORIGIN).href : null))
+            //     .catch((err) => {
+            //         console.error("Unable to load profile picture", err);
+            //         return null;
+            //     })
+            //     .then((icon) => {
+            //         console.log("UserIcon:", icon);
+            //         this.userIcon = icon;
+            //         this.restoreUserIcon = icon;
+            //     });
+
+            this.userIcon = this.user.assets.avatar;
+            this.restoreUserIcon = this.userIcon;
+            // console.log("UserIcon:", this.userIcon);
+            // console.log("RestoreUserIcon:", this.restoreUserIcon);
 
             this.ready = true;
         },

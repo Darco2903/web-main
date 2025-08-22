@@ -2,22 +2,22 @@
 import { computed, onMounted, onUnmounted, ref, type CSSProperties, type Ref } from "vue";
 import { RouterLink } from "vue-router";
 import { store } from "@store/store";
-import { cdnApi } from "@mod/api";
+import { authApi, cdnApi } from "@mod/api";
 
 import UserIcon from "@comp/UserIcon.vue";
 import LoginButton from "@comp/UpperPanel/Account/LoginButton.vue";
 
 import userIconDark from "@icons/profile/user-default-dark.jpg";
+import { loadUser } from "@/main";
 
 const SESSION_ANIM_UPDATE_TIME = 100;
 
 const ready = ref(false);
 const noSession = ref(true);
-const userIcon = ref(userIconDark);
+const userIcon: Ref<string | null> = ref(null);
 const border = ref(false);
 const deg = ref(135);
-const sessionInterval: Ref<number | null> = ref(null);
-const user = ref(store.state.user);
+const sessionInterval: Ref<NodeJS.Timeout | null> = ref(null);
 const userBoxImageContainerStyle: Ref<CSSProperties> = ref({});
 
 const sessionStyles = computed(() => {
@@ -59,11 +59,11 @@ function stopSession() {
 }
 
 async function init() {
-    // console.log("init user", user.value);
-    if (user.value) {
+    console.log("init user", store.state.user);
+    if (store.state.user) {
         noSession.value = false;
-        border.value = user.value.round_border;
-        userBoxImageContainerStyle.value["border-radius"] = user.value.round_border ? "50%" : "0%";
+        border.value = store.state.user.round_border;
+        userBoxImageContainerStyle.value["border-radius"] = store.state.user.round_border ? "50%" : "0%";
 
         // Temporary disable profile picture loading
         // await AuthAPI.user.picture.profile
@@ -79,14 +79,22 @@ async function init() {
         //         console.error("Unable to load profile picture", err);
         //     });
 
-        const url = await cdnApi
-            .profilePictureGet({ params: { userId: user.value.public_id } })
-            .then((res) => (res.status === 200 && res.body ? new URL(res.body, import.meta.env.VITE_CDN_SERVER_ORIGIN).href : null))
-            .catch((err) => null)
-            .then((src) => src || userIconDark);
+        // V2
+        // const url = await cdnApi
+        //     .profilePictureGet({ params: { userId: user.value.public_id } })
+        //     .then((res) => (res.status === 200 && res.body ? new URL(res.body, import.meta.env.VITE_CDN_SERVER_ORIGIN).href : null))
+        //     .catch((err) => null)
+        //     .then((src) => src || userIconDark);
         // console.log("noSession", noSession.value);
         // console.log("UserIcon:", url);
+
+        // const me = await authApi.user.me();
+        await loadUser();
+        console.log("avatar", store.state.user.assets.avatar);
+        const url = store.state.user.assets.avatar || userIconDark;
         userIcon.value = url + "?" + Date.now(); // Add cache-busting query parameter
+        // userIcon.value = url;
+        console.log("UserIcon:", userIcon.value);
         console.log("User loaded");
     }
     ready.value = true;
@@ -145,7 +153,7 @@ onUnmounted(async () => {
 
                     <UserIcon :userIcon :roundBorder="border" size="48px" border-size="3px" />
 
-                    <label id="user-account-name">{{ user?.name || "Unknown" }}</label>
+                    <label id="user-account-name">{{ store.state.user?.name || "Unknown" }}</label>
                 </div>
 
                 <div id="user-links">

@@ -1,59 +1,49 @@
 <script setup lang="ts">
 import type { User, UserPublic } from "auth-api";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, useId, watch, type ComputedRef } from "vue";
 import { useRoute } from "vue-router";
-import { IS_MOBILE, wait } from "web-common";
-import { authApi, cdnApi } from "@mod/api";
+import { IS_MOBILE } from "web-common";
+import { authApi } from "@mod/api";
 import { store } from "@store/store";
 
 import LoadingSpinner from "@comp/LoadingSpinner.vue";
 import UserIcon from "@comp/UserIcon.vue";
 
-import userIconDark from "@icons/profile/user-default-dark.jpg";
+const location = useRoute();
 
 const verifyUrl = ref(import.meta.env.VITE_AUTH_SERVER_ORIGIN + "/verify-request");
-const userId = ref("");
 const userIcon = ref("");
 const user = ref<UserPublic | User | null>(null);
-const userBoxImageContainerStyle = ref({});
 const ready = ref(false);
 const profileGap = ref(IS_MOBILE ? "30px" : "80px");
 const userIconSize = ref(IS_MOBILE ? "64px" : "128px");
 const userIconBorderSize = ref(IS_MOBILE ? "3px" : "5px");
 const errorMessage = ref("");
 
-const ownProfile = computed(() => {
-    return userId.value && userId.value === store.state.user?.public_id;
+const userId = computed(() => {
+    return location.params.id === "me" ? store.state.user?.public_id : (location.params.id as string);
 });
 
-const loginUrl = computed(() => {
-    const url = new URL(import.meta.env.VITE_AUTH_SERVER_ORIGIN + "/login");
-    url.searchParams.append("redirect", window.location.href);
-    return url.href;
+const ownProfile = computed(() => {
+    return userId?.value === store.state.user?.public_id;
 });
+
+// const loginUrl = computed(() => {
+//     const url = new URL(import.meta.env.VITE_AUTH_SERVER_ORIGIN + "/login");
+//     url.searchParams.append("redirect", window.location.href);
+//     return url.href;
+// });
 
 async function init() {
-    if (ownProfile.value) {
+    if (!userId.value) {
+        errorMessage.value = "No user id found";
+        console.error("No user id found");
+        return;
+    } else if (ownProfile.value) {
         user.value = store.state.user;
         document.title = "My Profile";
     } else {
-        // p1 = AuthAPI.user.getFromId(userId.value).then((res) => {
-        //     if (res.error) {
-        //         console.error(res.error);
-        //         alert("An error occurred while loading the profile");
-        //         return;
-        //     }
-        //     if (!res.result) {
-        //         console.error("No user found");
-        //         alert("No user found");
-        //         return;
-        //     }
-        //     user.value = res.user as UserPublic;
-        //     document.title = `${user.value.name}'s Profile`;
-        //     // console.log("user", user.value);
-        // });
-
-        const res = await authApi.userGetFromId({ params: { userId: userId.value } });
+        const res = await authApi.user.fromId({ params: { userId: userId.value } });
         if (res.status === 200) {
             user.value = res.body;
             document.title = `${user.value.name}'s Profile`;
@@ -75,47 +65,77 @@ async function init() {
         }
     }
 
-    if (user.value) {
-        await cdnApi
-            .profilePictureGet({ params: { userId: user.value.public_id } })
-            .then((res) => (res.status === 200 && res.body ? new URL(res.body, import.meta.env.VITE_CDN_SERVER_ORIGIN).href : userIconDark))
-            .catch((err) => {
-                console.error("Unable to load profile picture", err);
-                return userIconDark;
-            })
-            .then((icon) => {
-                userIcon.value = icon;
-            });
+    console.log(user.value);
+    if (user.value?.assets.avatar) {
+        // V2
+        // await cdnApi
+        //     .profilePictureGet({ params: { userId: user.value.public_id } })
+        //     .then((res) => (res.status === 200 && res.body ? new URL(res.body, import.meta.env.VITE_CDN_SERVER_ORIGIN).href : userIconDark))
+        //     .catch((err) => {
+        //         console.error("Unable to load profile picture", err);
+        //         return userIconDark;
+        //     })
+        //     .then((icon) => {
+        //         userIcon.value = icon;
+        //     });
+        userIcon.value = user.value.assets.avatar;
     }
 
     ready.value = true;
     // console.log("ready", ready.value);
 }
 
-onMounted(async () => {
-    const location = useRoute();
-    userId.value = location.params.id === "me" ? store.state.user?.public_id || "" : (location.params.id as string);
+// const user: ComputedRef<Promise<UserPublic | null>> = computed(async () => {
+//     const id = Array.isArray(location.params.id) ? location.params.id[0] : location.params.id;
+//     console.log("Route param id:", id);
+//     if (id === "me") {
+//         return store.state.user;
+//     } else {
+//         return authApi.user
+//             .fromId({ params: { userId: id } })
+//             .then((res) => (res.status === 200 ? res.body : null))
+//             .catch(() => null);
+//     }
+// });
+// watch(
+//     () => user.value,
+//     (newVal) => {
+//         console.log("Route changed", newVal);
+//     }
+// );
 
-    if (!userId.value) {
-        if (location.params.id === "me") {
-            console.error("Not logged in");
-            alert("You must be logged in to view your profile");
-            window.location.href = loginUrl.value;
-        } else {
-            console.error("No user id found");
-            alert("No user id found");
+watch(
+    () => userId.value,
+    async (newId, oldId) => {
+        if (newId !== oldId) {
+            console.log("Route param id changed:", newId);
+            ready.value = false;
+            errorMessage.value = "";
+            await init();
         }
-        ready.value = true;
-        return;
     }
+);
 
+onMounted(async () => {
+    console.log("Mounted ProfileHome with id:", userId.value);
+    // userId.value = location.params.id === "me" ? store.state.user?.public_id || "" : (location.params.id as string);
+    // if (!userId.value) {
+    //     if (location.params.id === "me") {
+    //         console.error("Not logged in");
+    //         alert("You must be logged in to view your profile");
+    //         window.location.href = loginUrl.value;
+    //     } else {
+    //         console.error("No user id found");
+    //         alert("No user id found");
+    //     }
+    //     ready.value = true;
+    //     return;
+    // }
     // window.addEventListener("storage", async (e) => {
     //     if (!e.key) {
     //         return;
     //     }
-
     //     console.log("storage", e.key, e.newValue, e.oldValue);
-
     //     if (e.key === "reloadUser") {
     //         if (ready.value) {
     //             await init();
@@ -123,7 +143,6 @@ onMounted(async () => {
     //         }
     //     }
     // });
-
     await init();
 });
 </script>

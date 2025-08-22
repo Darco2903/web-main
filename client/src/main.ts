@@ -20,6 +20,19 @@ import App from "@/App.vue";
 //     console.log("Session refreshed");
 // }
 
+export async function loadUser() {
+    const res = await authApi.user.me();
+    console.log("User response:", res);
+    if (res.status === 200) {
+        store.state.user = res.body;
+        console.log("User loaded");
+    } else if (res.status === 401 || res.status === 500) {
+        console.error("Failed to reload user", res.body.error);
+    } else {
+        console.error("Failed to reload user");
+    }
+}
+
 window.addEventListener("load", async () => {
     document.body.classList.remove("no-transition");
     document.body.toggleAttribute("mobile", IS_MOBILE);
@@ -40,16 +53,7 @@ window.addEventListener("load", async () => {
     //     setInterval(refreshSession, sessionRefresh * 1000);
     // }
 
-    const res = await authApi.userMe();
-    console.log("User response:", res);
-    if (res.status === 200) {
-        store.state.user = res.body;
-        console.log("user_id set in store");
-    } else if (res.status === 401 || res.status === 500) {
-        console.error("Failed to fetch user", res.body.error);
-    } else {
-        console.log("Failed to fetch user");
-    }
+    await loadUser();
 
     createApp(App)
         //
