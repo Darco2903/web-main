@@ -26,7 +26,14 @@ export async function loadUser() {
     if (res.status === 200) {
         store.state.user = res.body;
         console.log("User loaded");
-    } else if (res.status === 401 || res.status === 500) {
+    } else if (res.status === 401) {
+        const refreshRes = await authApi.refresh({ body: undefined });
+        if (refreshRes.status === 200) {
+            await loadUser();
+        } else {
+            console.error("Failed to reload user", refreshRes.body);
+        }
+    } else if (res.status === 500) {
         console.error("Failed to reload user", res.body.error);
     } else {
         console.error("Failed to reload user");

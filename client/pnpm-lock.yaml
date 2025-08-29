@@ -27,8 +27,8 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0(vue@3.5.18(typescript@5.8.3))
       web-common:
-        specifier: file:../../npm_packs/web-common-0.6.1.tgz
-        version: file:../../npm_packs/web-common-0.6.1.tgz
+        specifier: file:../../npm_packs/web-common-0.6.2.tgz
+        version: file:../../npm_packs/web-common-0.6.2.tgz
     devDependencies:
       '@tsconfig/node22':
         specifier: ^22.0.2
@@ -1167,9 +1167,9 @@ packages:
     peerDependencies:
       vue: ^3.2.0
 
-  web-common@file:../../npm_packs/web-common-0.6.1.tgz:
-    resolution: {integrity: sha512-zljgzhSTHoi6HrpKdvUmGdpnTw8p6XxsMqjU9mOt50c70UcS5+mNFp794v0oeWwrQ+DGSkIZi71QRYg1wN23hA==, tarball: file:../../npm_packs/web-common-0.6.1.tgz}
-    version: 0.6.1
+  web-common@file:../../npm_packs/web-common-0.6.2.tgz:
+    resolution: {integrity: sha512-PQP1+J3Td/fsgM5DNTUN50SyOLoKe6SCVcLmi/bVwNIixk2oBmZDV3S3DnyBoUTxhqP7C+cZHKGrs/xagLDN6g==, tarball: file:../../npm_packs/web-common-0.6.2.tgz}
+    version: 0.6.2
 
   which@2.0.2:
     resolution: {integrity: sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==}
@@ -2242,7 +2242,7 @@ snapshots:
       '@vue/devtools-api': 6.6.4
       vue: 3.5.18(typescript@5.8.3)
 
-  web-common@file:../../npm_packs/web-common-0.6.1.tgz: {}
+  web-common@file:../../npm_packs/web-common-0.6.2.tgz: {}
 
   which@2.0.2:
     dependencies:

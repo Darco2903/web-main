@@ -1,14 +1,11 @@
 <script lang="ts">
 import { type CSSProperties } from "vue";
-import { useStore } from "vuex";
 import { IS_MOBILE, wait } from "web-common";
-import { authApi, cdnApi } from "@/modules/api";
+import { authApi, cdnApi } from "@mod/api";
 import { store } from "@store/store";
 
 import LoadingSpinner from "@comp/LoadingSpinner.vue";
 import UserIcon from "@comp/UserIcon.vue";
-
-import userIconDark from "@icons/profile/user-default-dark.jpg";
 
 export default {
     name: "ProfileEdit",
@@ -152,7 +149,7 @@ export default {
                 //     res = await AuthAPI.user.picture.profile.delete();
                 // }
 
-                const r = await authApi.assets.assetsToken({ body: { type: "avatar" } });
+                const r = await authApi.assets.token({ body: { type: "avatar" } });
                 if (r.status !== 200) {
                     console.error("Unable to get assets token", r.status, r.body);
                     alert("Unable to get assets token");
@@ -236,7 +233,7 @@ export default {
                 //     reload = true;
                 // }
 
-                const resBorder = await authApi.user.setBorder({ body: { roundBorder: this.border } });
+                const resBorder = await authApi.user.updateBorder({ body: { roundBorder: this.border } });
                 if (resBorder.status === 200) {
                     console.log("Profile picture border updated");
                     this.user.round_border = this.border;

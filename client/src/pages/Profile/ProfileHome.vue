@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { User, UserPublic } from "auth-api";
+import type { User, UserPublic } from "auth-api/client";
 import { computed, onMounted, ref, useId, watch, type ComputedRef } from "vue";
 import { useRoute } from "vue-router";
 import { IS_MOBILE } from "web-common";

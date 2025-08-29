@@ -2,7 +2,6 @@
 import { computed, onMounted, onUnmounted, ref, type CSSProperties, type Ref } from "vue";
 import { RouterLink } from "vue-router";
 import { store } from "@store/store";
-import { authApi, cdnApi } from "@mod/api";
 
 import UserIcon from "@comp/UserIcon.vue";
 import LoginButton from "@comp/UpperPanel/Account/LoginButton.vue";
@@ -12,13 +11,17 @@ import { loadUser } from "@/main";
 
 const SESSION_ANIM_UPDATE_TIME = 100;
 
+let sessionInterval: ReturnType<typeof setInterval> | null = null;
+
 const ready = ref(false);
 const noSession = ref(true);
 const userIcon: Ref<string | null> = ref(null);
-const border = ref(false);
 const deg = ref(135);
-const sessionInterval: Ref<NodeJS.Timeout | null> = ref(null);
 const userBoxImageContainerStyle: Ref<CSSProperties> = ref({});
+
+const border = computed(() => {
+    return store.state.user?.round_border || false;
+});
 
 const sessionStyles = computed(() => {
     return {
@@ -44,7 +47,7 @@ function saveSessionDeg() {
 }
 
 function startSession() {
-    sessionInterval.value = setInterval(() => {
+    sessionInterval = setInterval(() => {
         deg.value += 1;
         if (deg.value >= 360) {
             deg.value = 0;
@@ -53,8 +56,8 @@ function startSession() {
 }
 
 function stopSession() {
-    if (sessionInterval.value) {
-        clearInterval(sessionInterval.value);
+    if (sessionInterval) {
+        clearInterval(sessionInterval);
     }
 }
 
@@ -62,33 +65,8 @@ async function init() {
     console.log("init user", store.state.user);
     if (store.state.user) {
         noSession.value = false;
-        border.value = store.state.user.round_border;
         userBoxImageContainerStyle.value["border-radius"] = store.state.user.round_border ? "50%" : "0%";
 
-        // Temporary disable profile picture loading
-        // await AuthAPI.user.picture.profile
-        //     .get(user.value.public_id)
-        //     .then((blob) => {
-        //         if (blob.size !== 0) {
-        //             userIcon.value = URL.createObjectURL(blob);
-        //         } else {
-        //             userIcon.value = userIconDark;
-        //         }
-        //     })
-        //     .catch((err) => {
-        //         console.error("Unable to load profile picture", err);
-        //     });
-
-        // V2
-        // const url = await cdnApi
-        //     .profilePictureGet({ params: { userId: user.value.public_id } })
-        //     .then((res) => (res.status === 200 && res.body ? new URL(res.body, import.meta.env.VITE_CDN_SERVER_ORIGIN).href : null))
-        //     .catch((err) => null)
-        //     .then((src) => src || userIconDark);
-        // console.log("noSession", noSession.value);
-        // console.log("UserIcon:", url);
-
-        // const me = await authApi.user.me();
         await loadUser();
         console.log("avatar", store.state.user.assets.avatar);
         const url = store.state.user.assets.avatar || userIconDark;
