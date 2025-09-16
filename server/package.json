@@ -8,7 +8,7 @@
     "license": "ISC",
     "private": true,
     "type": "module",
-    "packageManager": "pnpm@10.15.0",
+    "packageManager": "pnpm@10.16.1",
     "scripts": {
         "build": "tsc",
         "start": "node dist/index.js",
@@ -16,7 +16,7 @@
         "clean": "rimraf dist"
     },
     "dependencies": {
-        "auth-api": "link:../../../npm/auth-api",
+        "auth-api": "file:../../npm_packs/auth-api-2.0.0-pre-1.tgz",
         "dotenv": "^17.2.1",
         "express": "^4.21.2",
         "pino": "^9.8.0",

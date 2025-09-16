@@ -1,12 +1,13 @@
 import { logger } from "../logger.js";
+import { SERVER_LISTEN, SERVER_PORT } from "../config.js";
 import { server } from "./app.js";
 import "./prototypes.js";
 import "./handler.js";
 
 export async function startServer() {
     await new Promise<void>((resolve) => {
-        server.listen(parseInt(process.env.SERVER_PORT), process.env.SERVER_LISTEN, () => {
-            logger.info(`Server listening ${process.env.SERVER_LISTEN}:${process.env.SERVER_PORT}`);
+        server.listen(SERVER_PORT, SERVER_LISTEN, () => {
+            logger.info(`Server listening ${SERVER_LISTEN}:${SERVER_PORT}`);
             resolve();
         });
     });

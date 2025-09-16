@@ -8,7 +8,7 @@
     "license": "ISC",
     "private": true,
     "type": "module",
-    "packageManager": "pnpm@10.15.0",
+    "packageManager": "pnpm@10.16.1",
     "scripts": {
         "install": "pnpm --filter client --filter server install",
         "build": "pnpm -r --parallel build",
