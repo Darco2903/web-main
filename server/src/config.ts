@@ -37,10 +37,6 @@ if (!fs.existsSync(sslCaPath)) {
     configError("Invalid SSL_CA_PATH in environment variables");
 }
 
-if (!process.env.DOMAIN) {
-    configError("Missing DOMAIN in environment variables");
-}
-
 if (!process.env.SERVER_ORIGIN) {
     configError("Missing SERVER_ORIGIN in environment variables");
 }
@@ -57,6 +53,5 @@ export const SSL_KEY_PATH = sslKeyPath;
 export const SSL_CERT_PATH = sslCertPath;
 export const SSL_CA_PATH = sslCaPath;
 
-export const DOMAIN = process.env.DOMAIN;
 export const SERVER_ORIGIN = process.env.SERVER_ORIGIN;
 export const AUTH_SERVER_ORIGIN = process.env.AUTH_SERVER_ORIGIN;
