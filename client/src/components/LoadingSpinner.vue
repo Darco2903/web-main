@@ -1,43 +1,25 @@
-<script>
-export default {
-    name: "LoadingSpinner",
-
-    props: {
-        loading: {
-            type: Boolean,
-            required: true,
-        },
-        color: {
-            type: String,
-            default: "#eee",
-            required: false,
-        },
-        size: {
-            type: String,
-            default: "32px",
-            required: false,
-        },
-        width: {
-            type: String,
-            default: "5px",
-            required: false,
-        },
+<script setup lang="ts">
+const { loading, color, size, width } = defineProps({
+    loading: {
+        type: Boolean,
+        required: true,
     },
-
-    data() {
-        return {
-            //
-        };
+    color: {
+        type: String,
+        default: "#eee",
+        required: false,
     },
-
-    mounted() {
-        //
+    size: {
+        type: String,
+        default: "32px",
+        required: false,
     },
-
-    methods: {
-        //
+    width: {
+        type: String,
+        default: "5px",
+        required: false,
     },
-};
+});
 </script>
 <template>
     <div class="loading-ring-container">

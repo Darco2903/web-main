@@ -1,36 +1,28 @@
-<script>
+<script setup lang="ts">
 import { RouterLink } from "vue-router";
 
-export default {
-    name: "SiteIcon",
-
-    components: {
-        RouterLink,
+const { icon, internal, external, size, target } = defineProps({
+    icon: {
+        type: String,
+        required: true,
     },
-
-    props: {
-        icon: {
-            type: String,
-            required: true,
-        },
-        internal: {
-            type: String,
-            default: "",
-        },
-        external: {
-            type: String,
-            default: "",
-        },
-        size: {
-            type: String,
-            default: "64px",
-        },
-        target: {
-            type: String,
-            default: "_self",
-        },
+    internal: {
+        type: String,
+        default: "",
     },
-};
+    external: {
+        type: String,
+        default: "",
+    },
+    size: {
+        type: String,
+        default: "64px",
+    },
+    target: {
+        type: String,
+        default: "_self",
+    },
+});
 </script>
 
 <template>

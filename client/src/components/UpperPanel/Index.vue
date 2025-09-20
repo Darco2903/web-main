@@ -1,4 +1,5 @@
-<script>
+<script setup lang="ts">
+import type { CSSProperties } from "vue";
 import { IS_MOBILE } from "web-common";
 
 import SiteIcon from "@comp/UpperPanel/SiteIcon.vue";
@@ -7,34 +8,14 @@ import UserAccount from "@comp/UpperPanel/Account/Index.vue";
 import mainIcon from "@assets/icon-main.svg";
 import cdnIcon from "@assets/icon-cdn.svg";
 
-export default {
-    name: "UpperPanel",
+const cdnOrigin = import.meta.env.VITE_CDN_SERVER_ORIGIN;
 
-    components: {
-        SiteIcon,
-        UserAccount,
-    },
-
-    setup() {
-        return {
-            IS_MOBILE,
-            mainIcon,
-            cdnIcon,
-            cdnOrigin: import.meta.env.VITE_CDN_SERVER_ORIGIN,
-        };
-    },
-
-    data() {
-        return {
-            padding: IS_MOBILE ? "10px" : "20px 30px",
-            siteIconSize: IS_MOBILE ? "64px" : "128px",
-            upperPanelRowStyle: {
-                flexDirection: IS_MOBILE ? "column-reverse" : "row",
-                height: IS_MOBILE ? "auto" : "118px",
-                gap: IS_MOBILE ? "20px" : "0",
-            },
-        };
-    },
+const padding = IS_MOBILE ? "10px" : "20px 30px";
+const siteIconSize = IS_MOBILE ? "64px" : "128px";
+const upperPanelRowStyle: CSSProperties = {
+    flexDirection: IS_MOBILE ? "column-reverse" : "row",
+    height: IS_MOBILE ? "auto" : "118px",
+    gap: IS_MOBILE ? "20px" : "0",
 };
 </script>
 

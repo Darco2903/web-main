@@ -2,12 +2,12 @@
 import { computed, onMounted, onUnmounted, ref, type CSSProperties, type Ref } from "vue";
 import { RouterLink } from "vue-router";
 import { store } from "@store/store";
+import { loadUser } from "@/main";
 
 import UserIcon from "@comp/UserIcon.vue";
 import LoginButton from "@comp/UpperPanel/Account/LoginButton.vue";
 
 import userIconDark from "@icons/profile/user-default-dark.jpg";
-import { loadUser } from "@/main";
 
 const SESSION_ANIM_UPDATE_TIME = 100;
 
@@ -15,7 +15,7 @@ let sessionInterval: ReturnType<typeof setInterval> | null = null;
 
 const ready = ref(false);
 const noSession = ref(true);
-const userIcon: Ref<string | null> = ref(null);
+const userIcon: Ref<string | undefined> = ref(undefined);
 const deg = ref(135);
 const userBoxImageContainerStyle: Ref<CSSProperties> = ref({});
 
@@ -129,7 +129,7 @@ onUnmounted(async () => {
                         <img id="user-account-icon" />
                     </div> -->
 
-                    <UserIcon :userIcon :roundBorder="border" size="48px" border-size="3px" />
+                    <UserIcon :iconUrl="userIcon" :roundBorder="border" size="48px" border-size="3px" />
 
                     <label id="user-account-name">{{ store.state.user?.name || "Unknown" }}</label>
                 </div>

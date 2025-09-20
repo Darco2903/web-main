@@ -4,6 +4,7 @@ import type { User } from "auth-api/client";
 
 export interface State {
     user: User | null;
+    userIconUrl?: string;
 }
 
 export const key: InjectionKey<Store<State>> = Symbol();
@@ -11,5 +12,6 @@ export const key: InjectionKey<Store<State>> = Symbol();
 export const store = createStore<State>({
     state: {
         user: null,
+        userIconUrl: undefined,
     },
 });

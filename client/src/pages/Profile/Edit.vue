@@ -1,360 +1,342 @@
-<script lang="ts">
-import { type CSSProperties } from "vue";
+<script setup lang="ts">
+import { computed, onMounted, ref, type ComputedRef, type CSSProperties, type Ref } from "vue";
 import { IS_MOBILE, wait } from "web-common";
 import { authApi, cdnApi } from "@mod/api";
+import { router } from "@/router";
 import { store } from "@store/store";
 
 import LoadingSpinner from "@comp/LoadingSpinner.vue";
 import UserIcon from "@comp/UserIcon.vue";
 
-export default {
-    name: "ProfileEdit",
+const { user } = store.state;
 
-    components: {
-        LoadingSpinner,
-        UserIcon,
-    },
+if (!user) {
+    alert("You must be logged in to view this page");
+    router.push("/");
+}
 
-    setup() {
-        const user = store.state.user;
+const ready: Ref<boolean> = ref(false);
+const userIcon: Ref<string | undefined> = ref(undefined);
+const restoreUserIcon: Ref<string | undefined> = ref(undefined);
+const border: Ref<boolean> = ref(false);
+const userName: Ref<string> = ref("");
+let iconDragOver = false;
+const savingIcon = ref(false);
+let savingUsername = false;
 
-        if (!user) {
-            alert("You must be logged in to view this page");
+const userIconSize = IS_MOBILE ? "128px" : "192px";
+const userIconBorderSize = IS_MOBILE ? "3px" : "6px";
+const roundBorderContainerStyle: CSSProperties = {
+    flexDirection: IS_MOBILE ? "column-reverse" : "row",
+    gap: IS_MOBILE ? "0.8em" : "15px",
+};
 
-            const loginUrl = new URL(import.meta.env.VITE_AUTH_SERVER_ORIGIN + "/login");
-            loginUrl.searchParams.append("redirect", window.location.href);
-            window.location.href = loginUrl.href;
-            // window.close();
-            return null;
+const borderEdited = computed(() => {
+    return !!user && user.round_border !== border.value;
+});
+
+const iconEdited = computed(() => {
+    return userIcon.value !== restoreUserIcon.value;
+});
+
+const iconRemoved = computed(() => {
+    return userIcon.value === undefined;
+});
+
+const nameEdited: ComputedRef<boolean> = computed(() => {
+    return !!user && user.name !== userName.value;
+});
+
+function buttonStyle(state: boolean): CSSProperties {
+    return {
+        opacity: state ? 1 : 0,
+        pointerEvents: state ? "auto" : "none",
+    };
+}
+
+function onIconDragover() {
+    // console.log("dragover");
+    iconDragOver = true;
+}
+
+function onIconDragleave() {
+    // console.log("dragleave");
+    iconDragOver = false;
+}
+
+function loadIcon(file: File) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        if (typeof e.target?.result !== "string") {
+            console.error("Error reading file");
+            return;
+        }
+        userIcon.value = e.target?.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+function onIconInput(e: Event) {
+    const input = e.target as HTMLInputElement;
+    const file: File | undefined = input.files ? input.files[0] : undefined;
+    input.value = "";
+    if (!file) {
+        return;
+    }
+    loadIcon(file);
+}
+
+function onIconDrop(e: DragEvent) {
+    iconDragOver = false;
+    const file = e.dataTransfer?.files[0];
+    if (!file) {
+        return;
+    }
+    loadIcon(file);
+}
+
+function removeIcon() {
+    userIcon.value = undefined;
+}
+
+function cancelIcon() {
+    userIcon.value = restoreUserIcon.value;
+    border.value = !!user?.round_border;
+}
+
+async function saveIcon() {
+    if (savingIcon.value) {
+        return;
+    }
+    savingIcon.value = true;
+
+    let res;
+    let reload;
+
+    if (iconEdited.value) {
+        // console.error("Temporary disable icon editing");
+        // return;
+
+        // if (!iconRemoved) {
+        //     const blob = await fetch(userIcon as string).then((res) => res.blob());
+        //     res = await AuthAPI.user.picture.profile.update(blob);
+        // } else {
+        //     res = await AuthAPI.user.picture.profile.delete();
+        // }
+
+        const r = await authApi.assets.token({ body: { type: "avatar" } });
+        if (r.status !== 200) {
+            console.error("Unable to get assets token", r.status, r.body);
+            alert("Unable to get assets token");
+            savingIcon.value = false;
+            return;
         }
 
-        return {
-            user,
-            IS_MOBILE,
-        };
-    },
-
-    data() {
-        return {
-            initialized: false,
-            ready: false,
-            userIcon: "" as string | ArrayBuffer | null | undefined,
-            restoreUserIcon: "" as string | ArrayBuffer | null | undefined,
-            border: false,
-            // user: this.$store.state.user,
-            userName: "",
-            iconDragOver: false,
-
-            savingIcon: false,
-            savingUsername: false,
-
-            userIconSize: IS_MOBILE ? "128px" : "192px",
-            userIconBorderSize: IS_MOBILE ? "3px" : "6px",
-            roundBorderContainerStyle: {
-                flexDirection: IS_MOBILE ? "column-reverse" : "row",
-                gap: IS_MOBILE ? "0.8em" : "15px",
-            } as CSSProperties,
-        };
-    },
-
-    computed: {
-        borderEdited() {
-            return this.user.round_border !== this.border;
-        },
-
-        iconEdited() {
-            return this.userIcon !== this.restoreUserIcon;
-        },
-
-        iconRemoved() {
-            return this.userIcon === null;
-        },
-
-        nameEdited() {
-            return this.user.name !== this.userName;
-        },
-    },
-
-    methods: {
-        buttonStyle(state: boolean): CSSProperties {
-            return {
-                opacity: state ? 1 : 0,
-                pointerEvents: state ? "auto" : "none",
-            };
-        },
-
-        onIconDragover() {
-            // console.log("dragover");
-            this.iconDragOver = true;
-        },
-
-        onIconDragleave() {
-            // console.log("dragleave");
-            this.iconDragOver = false;
-        },
-
-        loadIcon(file: File) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                this.userIcon = e.target?.result;
-            };
-            reader.readAsDataURL(file);
-        },
-
-        onIconInput(e: Event) {
-            const input = e.target as HTMLInputElement;
-            const file: File | undefined = input.files ? input.files[0] : undefined;
-            input.value = "";
-            if (!file) {
-                return;
+        const authorization = `Bearer ${r.body.cdnToken}`;
+        // console.log("restoreUserIcon", restoreUserIcon.value);
+        // console.log("iconRemoved", iconRemoved.value);
+        if (iconRemoved.value && restoreUserIcon.value !== undefined) {
+            console.log("Deleting profile picture");
+            // res = await cdnApi.profilePictureDelete();
+            res = await cdnApi.service.delete({ headers: { authorization } });
+            if (res.status !== 200) {
+                alert("Error deleting profile picture");
             }
-            this.loadIcon(file);
-        },
+        } else if (userIcon.value) {
+            console.log("Updating profile picture");
+            const blob = await fetch(userIcon.value).then((res) => res.blob());
+            const file = new File([blob], "profile.jpg", { type: blob.type });
+            // res = await cdnApi.profilePictureUpdate({ body: { picture: file } });
+            res = await cdnApi.service.update({
+                headers: { authorization },
+                body: { file },
+            });
 
-        onIconDrop(e: DragEvent) {
-            this.iconDragOver = false;
-            const file = e.dataTransfer?.files[0];
-            if (!file) {
-                return;
+            if (res.status === 400) {
+                alert(`Failed to update profile picture: ${res.body.error}`);
             }
-            this.loadIcon(file);
-        },
+        }
 
-        removeIcon() {
-            this.userIcon = null;
-        },
+        if (!res) {
+            console.error("No response from profile picture update");
+            alert("No response from profile picture update");
+            savingIcon.value = false;
+            return;
+        }
 
-        cancelIcon() {
-            this.userIcon = this.restoreUserIcon;
-            this.border = this.user.round_border;
-        },
+        console.log("Profile picture response", res);
 
-        async saveIcon() {
-            if (this.savingIcon) {
-                return;
-            }
-            this.savingIcon = true;
+        if (res.status === 200) {
+            console.log("Profile picture updated");
+            restoreUserIcon.value = userIcon.value;
+            reload = true;
+        }
 
-            let res;
-            let reload;
+        // if (res?.error) {
+        //     console.error(res.error);
+        //     switch (res.error) {
+        //         case "FILE_TOO_LARGE":
+        //             alert("File too large");
+        //             break;
 
-            if (this.iconEdited) {
-                // console.error("Temporary disable icon editing");
-                // return;
+        //         case "IMAGE_DIMENSIONS_TOO_LARGE":
+        //             alert("Image dimensions too large");
+        //             break;
 
-                // if (!this.iconRemoved) {
-                //     const blob = await fetch(this.userIcon as string).then((res) => res.blob());
-                //     res = await AuthAPI.user.picture.profile.update(blob);
-                // } else {
-                //     res = await AuthAPI.user.picture.profile.delete();
-                // }
+        //         case "UNSUPPORTED_FILE_TYPE":
+        //             alert("Unsupported file type");
+        //             break;
 
-                const r = await authApi.assets.token({ body: { type: "avatar" } });
-                if (r.status !== 200) {
-                    console.error("Unable to get assets token", r.status, r.body);
-                    alert("Unable to get assets token");
-                    this.savingIcon = false;
-                    return;
-                }
+        //         case "INVALID_SESSION_ID":
+        //             alert("Unauthorized");
+        //             break;
 
-                const authorization = `Bearer ${r.body.cdnToken}`;
+        //         case "INTERNAL_SERVER_ERROR":
+        //             alert("Internal server error");
+        //             break;
 
-                if (this.iconRemoved) {
-                    console.log("Deleting profile picture");
-                    // res = await cdnApi.profilePictureDelete();
-                    res = await cdnApi.service.delete({ headers: { authorization } });
-                } else {
-                    console.log("Updating profile picture");
-                    const blob = await fetch(this.userIcon as string).then((res) => res.blob());
-                    const file = new File([blob], "profile.jpg", { type: blob.type });
-                    // res = await cdnApi.profilePictureUpdate({ body: { picture: file } });
-                    res = await cdnApi.service.update({
-                        headers: { authorization },
-                        body: { file },
-                    });
-                }
+        //         case "CONNECTION_ERROR":
+        //             alert("Error connecting to the auth server");
+        //             break;
 
-                console.log("Profile picture response", res);
-
-                if (res.status === 200) {
-                    console.log("Profile picture updated");
-                    this.restoreUserIcon = this.userIcon;
-                    reload = true;
-                } else {
-                    console.error("Failed to update profile picture");
-                    alert("Failed to update profile picture");
-                }
-
-                // if (res?.error) {
-                //     console.error(res.error);
-                //     switch (res.error) {
-                //         case "FILE_TOO_LARGE":
-                //             alert("File too large");
-                //             break;
-
-                //         case "IMAGE_DIMENSIONS_TOO_LARGE":
-                //             alert("Image dimensions too large");
-                //             break;
-
-                //         case "UNSUPPORTED_FILE_TYPE":
-                //             alert("Unsupported file type");
-                //             break;
-
-                //         case "INVALID_SESSION_ID":
-                //             alert("Unauthorized");
-                //             break;
-
-                //         case "INTERNAL_SERVER_ERROR":
-                //             alert("Internal server error");
-                //             break;
-
-                //         case "CONNECTION_ERROR":
-                //             alert("Error connecting to the auth server");
-                //             break;
-
-                //         default:
-                //             alert("An error occurred while updating the profile picture");
-                //             break;
-                //     }
-                // } else if (res?.result) {
-                //     console.log("Profile picture updated");
-                //     this.restoreUserIcon = this.userIcon;
-                //     reload = true;
-                // }
-            }
-
-            if (this.borderEdited) {
-                // const resBorder = await AuthAPI.user.picture.profile.border(this.border);
-                // if (resBorder?.error) {
-                //     console.error(resBorder.error);
-                // } else if (resBorder?.result) {
-                //     console.log("Profile picture border updated");
-                //     this.user.round_border = this.border;
-                //     reload = true;
-                // }
-
-                const resBorder = await authApi.user.updateBorder({ body: { roundBorder: this.border } });
-                if (resBorder.status === 200) {
-                    console.log("Profile picture border updated");
-                    this.user.round_border = this.border;
-                    reload = true;
-                } else if (resBorder.status === 400) {
-                    console.error("Invalid border radius", resBorder.body.issues.find((issue) => issue.message)?.message);
-                } else if (resBorder.status === 401 || resBorder.status === 500) {
-                    console.error("Internal server error", resBorder.body.error);
-                }
-            }
-
-            if (reload) {
-                await this.sendReload();
-            }
-
-            this.savingIcon = false;
-        },
-
-        cancelUsername() {
-            this.user.name = this.userName;
-        },
-
-        async saveUsername() {
-            if (this.savingUsername) {
-                return;
-            }
-            this.savingUsername = true;
-
-            // const res = await AuthAPI.user.updateUsername(this.user.name, "");
-            // if (res.error) {
-            //     console.error("Update username error", res.error);
-            //     alert("Unable to update username");
-            //     return;
-            // }
-
-            const res = await authApi.user.updateUsername({ body: { username: this.user.name } });
-
-            if (res.status === 200) {
-                // console.log("Username updated");
-            } else if (res.status === 400) {
-                console.error("Invalid username", res.body.issues.find((issue) => issue.message)?.message);
-                alert("Invalid username");
-                return;
-            } else if (res.status === 401 || res.status === 500) {
-                console.error("Internal server error", res.body.error);
-                alert("Internal server error");
-                return;
-            }
-
-            this.userName = this.user.name;
-            console.log("Username updated");
-            await this.sendReload();
-
-            this.savingUsername = false;
-        },
-
-        async sendReload() {
-            window.dispatchEvent(new StorageEvent("storage", { key: "reloadUser" })); // internal event
-            localStorage.setItem("reloadUser", "true");
-            await wait(500);
-            localStorage.removeItem("reloadUser");
-        },
-
-        async init() {
-            this.userName = this.user.name;
-            this.border = this.user.round_border;
-
-            // V2
-            // await cdnApi
-            //     .profilePictureGet({ params: { userId: this.user.public_id } })
-            //     .then((res) => (res.status === 200 && res.body ? new URL(res.body, import.meta.env.VITE_CDN_SERVER_ORIGIN).href : null))
-            //     .catch((err) => {
-            //         console.error("Unable to load profile picture", err);
-            //         return null;
-            //     })
-            //     .then((icon) => {
-            //         console.log("UserIcon:", icon);
-            //         this.userIcon = icon;
-            //         this.restoreUserIcon = icon;
-            //     });
-
-            this.userIcon = this.user.assets.avatar;
-            this.restoreUserIcon = this.userIcon;
-            // console.log("UserIcon:", this.userIcon);
-            // console.log("RestoreUserIcon:", this.restoreUserIcon);
-
-            this.ready = true;
-        },
-    },
-
-    async mounted() {
-        // window.addEventListener("storage", async (e) => {
-        //     if (!e.key) {
-        //         return;
+        //         default:
+        //             alert("An error occurred while updating the profile picture");
+        //             break;
         //     }
+        // } else if (res?.result) {
+        //     console.log("Profile picture updated");
+        //     restoreUserIcon.value = userIcon;
+        //     reload = true;
+        // }
+    }
 
-        //     console.log("storage", e.key, e.newValue, e.oldValue);
+    if (borderEdited) {
+        // const resBorder = await AuthAPI.user.picture.profile.border(border);
+        // if (resBorder?.error) {
+        //     console.error(resBorder.error);
+        // } else if (resBorder?.result) {
+        //     console.log("Profile picture border updated");
+        //     user.round_border = border;
+        //     reload = true;
+        // }
 
-        //     if (e.key === "reloadUser") {
-        //         if (this.ready) {
-        //             await this.init();
-        //             console.log("User reloaded");
-        //         }
-        //     }
-        // });
+        const resBorder = await authApi.user.updateBorder({ body: { roundBorder: border.value } });
+        if (resBorder.status === 200) {
+            console.log("Profile picture border updated");
+            if (user) {
+                user.round_border = border.value;
+            }
+            reload = true;
+        } else if (resBorder.status === 400) {
+            console.error("Invalid border radius", resBorder.body.issues.find((issue) => issue.message)?.message);
+        } else if (resBorder.status === 401 || resBorder.status === 500) {
+            console.error("Internal server error", resBorder.body.error);
+        }
+    }
 
-        await this.init();
-    },
-};
+    if (reload) {
+        await sendReload();
+    }
+
+    savingIcon.value = false;
+}
+
+function cancelUsername() {
+    if (!user) {
+        return;
+    }
+    userName.value = user.name;
+}
+
+async function saveUsername() {
+    if (savingUsername || !user) {
+        return;
+    }
+    savingUsername = true;
+
+    // const res = await AuthAPI.user.updateUsername(user.name, "");
+    // if (res.error) {
+    //     console.error("Update username error", res.error);
+    //     alert("Unable to update username");
+    //     return;
+    // }
+
+    const res = await authApi.user.updateUsername({ body: { username: userName.value } });
+
+    if (res.status === 200) {
+        // console.log("Username updated");
+    } else if (res.status === 400) {
+        console.error("Invalid username", res.body.issues.find((issue) => issue.message)?.message);
+        alert("Invalid username");
+        return;
+    } else if (res.status === 401 || res.status === 500) {
+        console.error("Internal server error", res.body.error);
+        alert("Internal server error");
+        return;
+    }
+
+    // userName.value = user.name;
+    user.name = userName.value;
+    console.log("Username updated");
+    await sendReload();
+
+    savingUsername = false;
+}
+
+async function sendReload() {
+    window.dispatchEvent(new StorageEvent("storage", { key: "reloadUser" })); // internal event
+    localStorage.setItem("reloadUser", "true");
+    await wait(500);
+    localStorage.removeItem("reloadUser");
+}
+
+onMounted(() => {
+    if (!user) {
+        return;
+    }
+
+    userName.value = user.name;
+    border.value = user.round_border;
+
+    // V2
+    // await cdnApi
+    //     .profilePictureGet({ params: { userId: user.public_id } })
+    //     .then((res) => (res.status === 200 && res.body ? new URL(res.body, import.meta.env.VITE_CDN_SERVER_ORIGIN).href : null))
+    //     .catch((err) => {
+    //         console.error("Unable to load profile picture", err);
+    //         return null;
+    //     })
+    //     .then((icon) => {
+    //         console.log("UserIcon:", icon);
+    //         userIcon.value = icon;
+    //         restoreUserIcon.value = icon;
+    //     });
+
+    userIcon.value = user.assets.avatar || undefined;
+    restoreUserIcon.value = userIcon.value;
+    // console.log("UserIcon:", userIcon);
+    // console.log("RestoreUserIcon:", restoreUserIcon);
+
+    // ready.value = true;
+});
 </script>
 
 <template>
     <div>
-        <LoadingSpinner class="user-edit-loading" :loading="!ready" v-show="!ready" />
+        <LoadingSpinner class="user-edit-loading" :loading="true" v-show="!ready" />
 
-        <div class="user-edit-content" v-show="ready">
+        <div class="user-edit-content" :style="{ opacity:  1 }">
             <div id="user-data">
                 <div class="data-section" id="image-section">
                     <div class="data-edit">
                         <div id="user-image-content">
-                            <UserIcon :user-icon="userIcon" :round-border="border" :size="userIconSize" :border-size="userIconBorderSize" />
+                            <UserIcon
+                                :iconUrl="userIcon"
+                                :round-border="border"
+                                :size="userIconSize"
+                                :border-size="userIconBorderSize"
+                                @load="ready = true"
+                            />
 
                             <div
                                 id="image-input-container"
@@ -409,7 +391,7 @@ export default {
                 <div class="data-section" id="username-section">
                     <div class="data-edit">
                         <div class="username-content">
-                            <input type="text" placeholder="Username" v-model="user.name" />
+                            <input type="text" placeholder="Username" v-model="userName" />
                         </div>
 
                         <div class="on-edit" id="username-options" :style="buttonStyle(nameEdited)">

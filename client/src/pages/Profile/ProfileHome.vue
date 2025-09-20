@@ -155,7 +155,7 @@ onMounted(async () => {
             <div id="profile">
                 <div class="profile-first-row">
                     <UserIcon
-                        :user-icon="userIcon"
+                        :iconUrl="userIcon"
                         :round-border="user?.round_border"
                         :size="userIconSize"
                         :border-size="userIconBorderSize"
