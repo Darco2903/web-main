@@ -1,25 +1,28 @@
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
 
-const { icon, internal, external, size, target } = defineProps({
+const { icon, size, url, external, target } = defineProps({
     icon: {
         type: String,
         required: true,
     },
-    internal: {
-        type: String,
-        default: "",
-    },
-    external: {
-        type: String,
-        default: "",
-    },
     size: {
         type: String,
+        required: false,
         default: "64px",
+    },
+    url: {
+        type: String,
+        required: true,
+    },
+    external: {
+        type: Boolean,
+        required: false,
+        default: false,
     },
     target: {
         type: String,
+        required: false,
         default: "_self",
     },
 });
@@ -27,10 +30,10 @@ const { icon, internal, external, size, target } = defineProps({
 
 <template>
     <div class="site-icon">
-        <a class="site-icon-redirect" :href="external" :target="target" v-if="external">
+        <a class="site-icon-redirect" :href="url" :target="target" v-if="external">
             <img class="site-icon-img" :src="icon" alt="Site icon" />
         </a>
-        <RouterLink :to="internal" v-if="internal">
+        <RouterLink :to="url" v-else>
             <img class="site-icon-img" :src="icon" alt="Site icon" />
         </RouterLink>
     </div>
@@ -52,6 +55,28 @@ const { icon, internal, external, size, target } = defineProps({
 body[mobile] .site-icon {
     /* width: 32px; */
     /* height: 32px; */
+}
+
+.site-icon::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    /* background: linear-gradient(135deg, #eeeeee02, #ffffff18); */
+    z-index: 1;
+}
+
+.site-icon::after {
+    content: "";
+    position: absolute;
+    transform: scale(1.01);
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    /* background: linear-gradient(135deg, #fffc, #fff2, #fffc); */
+    /* background: linear-gradient(135deg, #b19fd3dd, #fff2, #b19fd3dd); */
+    z-index: -1;
 }
 
 .site-icon:hover {

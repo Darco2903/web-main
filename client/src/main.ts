@@ -60,7 +60,9 @@ window.addEventListener("load", async () => {
     //     setInterval(refreshSession, sessionRefresh * 1000);
     // }
 
-    await loadUser();
+    await loadUser().catch((err) => {
+        console.error("Error loading user:", err);
+    });
 
     createApp(App)
         //
