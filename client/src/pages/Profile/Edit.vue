@@ -135,26 +135,33 @@ async function saveIcon() {
         const authorization = `Bearer ${r.body.cdnToken}`;
         // console.log("restoreUserIcon", restoreUserIcon.value);
         // console.log("iconRemoved", iconRemoved.value);
-        if (iconRemoved.value && restoreUserIcon.value !== undefined) {
-            console.log("Deleting profile picture");
-            // res = await cdnApi.profilePictureDelete();
-            res = await cdnApi.service.delete({ headers: { authorization } });
-            if (res.status !== 200) {
-                alert("Error deleting profile picture");
-            }
-        } else if (userIcon.value) {
-            console.log("Updating profile picture");
-            const blob = await fetch(userIcon.value).then((res) => res.blob());
-            const file = new File([blob], "profile.jpg", { type: blob.type });
-            // res = await cdnApi.profilePictureUpdate({ body: { picture: file } });
-            res = await cdnApi.service.update({
-                headers: { authorization },
-                body: { file },
-            });
+        try {
+            if (iconRemoved.value && restoreUserIcon.value !== undefined) {
+                console.log("Deleting profile picture");
+                // res = await cdnApi.profilePictureDelete();
+                res = await cdnApi.service.delete({ headers: { authorization } });
+                if (res.status !== 200) {
+                    alert("Error deleting profile picture");
+                }
+            } else if (userIcon.value) {
+                console.log("Updating profile picture");
+                const blob = await fetch(userIcon.value).then((res) => res.blob());
+                const file = new File([blob], "profile.jpg", { type: blob.type });
+                // res = await cdnApi.profilePictureUpdate({ body: { picture: file } });
+                res = await cdnApi.service.update({
+                    headers: { authorization },
+                    body: { file },
+                });
 
-            if (res.status === 400) {
-                alert(`Failed to update profile picture: ${res.body.error}`);
+                if (res.status === 400) {
+                    alert(`Failed to update profile picture: ${res.body.error}`);
+                }
             }
+        } catch (error) {
+            console.error("Error updating profile picture", error);
+            alert("Error updating profile picture");
+            savingIcon.value = false;
+            return;
         }
 
         if (!res) {
@@ -325,7 +332,7 @@ onMounted(() => {
     <div>
         <LoadingSpinner class="user-edit-loading" :loading="true" v-show="!ready" />
 
-        <div class="user-edit-content" :style="{ opacity:  1 }">
+        <div class="user-edit-content" :style="{ opacity: 1 }">
             <div id="user-data">
                 <div class="data-section" id="image-section">
                     <div class="data-edit">
