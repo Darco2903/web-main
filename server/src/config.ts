@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import { logger } from "./logger.js";
 import { rootPath } from "./utils.js";
 
-dotenv.config();
+dotenv.config({ path: path.join(rootPath, ".env") });
 
 function configError(message: string) {
     logger.error(message);
