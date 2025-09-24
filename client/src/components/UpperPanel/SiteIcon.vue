@@ -57,27 +57,32 @@ body[mobile] .site-icon {
     /* height: 32px; */
 }
 
-.site-icon::before {
+/* .site-icon::before {
     content: "";
     position: absolute;
+    transform: scale(0.99) translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    /* background: linear-gradient(135deg, #eeeeee02, #ffffff18); */
+    background: linear-gradient(135deg, #eeeeee02, #ffffff18);
     z-index: 1;
-}
+} */
 
-.site-icon::after {
+/* .site-icon::after {
     content: "";
     position: absolute;
-    transform: scale(1.01);
+    transform: scale(1.01) translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    /* background: linear-gradient(135deg, #fffc, #fff2, #fffc); */
-    /* background: linear-gradient(135deg, #b19fd3dd, #fff2, #b19fd3dd); */
+    background: linear-gradient(135deg, #fffc, #fff2, #fffc);
+    background: linear-gradient(135deg, #b19fd3dd, #fff2, #b19fd3dd);
     z-index: -1;
-}
+} */
 
 .site-icon:hover {
     filter: drop-shadow(2px 2px 5px var(--hover-color-light)) brightness(1.01);
