@@ -413,7 +413,7 @@ onMounted(() => {
 
                 <div class="data-section" id="password">
                     <div style="text-align: center; user-select: none">
-                        <a class="edit-password-but but-option" :href="editPasswordURL" target="_blank">Change Password</a>
+                        <a class="edit-password-but but-option" :href="editPasswordURL">Change Password</a>
                     </div>
                 </div>
 
