@@ -15,6 +15,7 @@ if (!user) {
     router.push("/");
 }
 
+const editPasswordURL = ref(import.meta.env.VITE_AUTH_SERVER_ORIGIN + "/password/edit");
 const ready: Ref<boolean> = ref(false);
 const userIcon: Ref<string | undefined> = ref(undefined);
 const restoreUserIcon: Ref<string | undefined> = ref(undefined);
@@ -410,6 +411,12 @@ onMounted(() => {
                     </div>
                 </div>
 
+                <div class="data-section" id="password">
+                    <div style="text-align: center; user-select: none">
+                        <a class="edit-password-but but-option" :href="editPasswordURL" target="_blank">Change Password</a>
+                    </div>
+                </div>
+
                 <!-- <div class="data-section" id="email-password">
                     <div class="data-edit">
                         <input type="text" id="email-input" placeholder="Email" />
@@ -659,5 +666,10 @@ input:checked + label #image-round-border-box {
     border-radius: 50%;
     /* background-color: var(--background-color-dark); */
     background-color: #222245;
+}
+
+.edit-password-but {
+    padding: 8px 12px;
+    text-decoration: none;
 }
 </style>
