@@ -36,8 +36,15 @@ const ownProfile = computed(() => {
 
 async function init() {
     if (!userId.value) {
-        errorMessage.value = "No user id found";
-        console.error("No user id found");
+        if (location.params.id === "me") {
+            errorMessage.value = "You must be logged in to view your profile";
+            console.error("You must be logged in to view your profile");
+            // alert("You must be logged in to view your profile");
+            // window.location.href = loginUrl.value;
+        } else {
+            errorMessage.value = "No user id found";
+            console.error("No user id found");
+        }
         return;
     } else if (ownProfile.value) {
         user.value = store.state.user;
