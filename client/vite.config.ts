@@ -16,7 +16,7 @@ export default defineConfig({
         allowedHosts: [
             //
             "darco2903.fr",
-            "dev-www.darco2903.fr",
+            ".darco2903.fr",
         ],
     },
 
