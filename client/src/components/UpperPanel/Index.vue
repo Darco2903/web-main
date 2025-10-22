@@ -24,7 +24,7 @@ const upperPanelRowStyle: CSSProperties = {
         <div class="upper-panel-row" id="panel-first-row" :style="upperPanelRowStyle">
             <div id="upper-panel-left">
                 <SiteIcon :icon="mainIcon" :size="siteIconSize" url="/" />
-                <SiteIcon :icon="cdnIcon" :size="siteIconSize" :url="cdnOrigin" :external="true" target="_blank" />
+                <SiteIcon :icon="cdnIcon" :size="siteIconSize" :url="`${cdnOrigin}/app/`" :external="true" target="_blank" />
             </div>
 
             <div id="upper-panel-right">
