@@ -4,5 +4,5 @@ import { myProfile } from "./common";
 
 export default {
     ...myProfile,
-    logout: "Logout",
+    logout: "Sign Out",
 } satisfies AccountIndex;

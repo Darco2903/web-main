@@ -8,7 +8,7 @@ export default {
     editProfile: "Edit Profile",
     emailUnverified: "Email Unverified",
     verifyNow: "Verify Now",
-    loginRequired: "You must be logged in to view your profile",
+    loginRequired: "You must be signed in to view your profile",
     noUserId: "No user id found",
     invalidUserId: "Invalid User ID.",
     failedToLoadUser: "Failed to load user.",
