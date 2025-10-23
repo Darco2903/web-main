@@ -1,5 +1,5 @@
 import type { LoginButton } from "../types/LoginButton";
 
 export default {
-    login: "Sign In",
+    login: "Sign in",
 } satisfies LoginButton;
