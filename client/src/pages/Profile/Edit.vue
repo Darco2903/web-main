@@ -4,10 +4,12 @@ import { IS_MOBILE, wait } from "web-common";
 import { authApi, cdnApi } from "@mod/api";
 import { router } from "@/router";
 import { store } from "@store/store";
+import { useI18n } from "vue-i18n";
 
 import LoadingSpinner from "@comp/LoadingSpinner.vue";
 import UserIcon from "@comp/UserIcon.vue";
 
+const { t } = useI18n();
 const { user } = store.state;
 
 if (!user) {
@@ -363,7 +365,7 @@ onMounted(() => {
 
                         <div id="image-options">
                             <div id="image-round-border-container" :style="roundBorderContainerStyle">
-                                <div id="image-round-border-label">Round Border</div>
+                                <div id="image-round-border-label">{{ t("edit.roundBorder") }}</div>
                                 <div id="image-round-border">
                                     <input type="checkbox" id="image-round-border-input" v-model="border" />
                                     <label for="image-round-border-input">
@@ -372,7 +374,7 @@ onMounted(() => {
                                 </div>
                             </div>
                             <button class="but-option on-edit" id="image-remove" @click="removeIcon" :style="buttonStyle(!iconRemoved)">
-                                Remove
+                                {{ t("edit.remove") }}
                             </button>
                             <button
                                 class="but-option on-edit"
@@ -381,7 +383,7 @@ onMounted(() => {
                                 :disabled="savingIcon"
                                 @click="cancelIcon"
                             >
-                                Cancel
+                                {{ t("edit.cancel") }}
                             </button>
                             <button
                                 class="but-option on-edit"
@@ -390,7 +392,7 @@ onMounted(() => {
                                 :disabled="savingIcon"
                                 @click="saveIcon"
                             >
-                                Save
+                                {{ t("edit.save") }}
                             </button>
                         </div>
                     </div>
@@ -399,21 +401,23 @@ onMounted(() => {
                 <div class="data-section" id="username-section">
                     <div class="data-edit">
                         <div class="username-content">
-                            <input type="text" placeholder="Username" v-model="userName" />
+                            <input type="text" :placeholder="t('edit.username')" v-model="userName" />
                         </div>
 
                         <div class="on-edit" id="username-options" :style="buttonStyle(nameEdited)">
                             <button class="but-option" id="username-cancel" :disabled="savingUsername" @click="cancelUsername">
-                                Cancel
+                                {{ t("edit.cancel") }}
                             </button>
-                            <button class="but-option" id="username-save" :disabled="savingUsername" @click="saveUsername">Save</button>
+                            <button class="but-option" id="username-save" :disabled="savingUsername" @click="saveUsername">
+                                {{ t("edit.save") }}
+                            </button>
                         </div>
                     </div>
                 </div>
 
                 <div class="data-section" id="password">
                     <div style="text-align: center; user-select: none">
-                        <a class="edit-password-but but-option" :href="editPasswordURL">Change Password</a>
+                        <a class="edit-password-but but-option" :href="editPasswordURL">{{ t("edit.changePassword") }}</a>
                     </div>
                 </div>
 

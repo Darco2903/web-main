@@ -1,25 +1,27 @@
 <script setup lang="ts">
-import { computed, ref, type ComputedRef } from "vue";
+import { computed, ref } from "vue";
 import { IS_MOBILE, wait } from "web-common";
-import { gradient } from "@utils/index";
+import { gradient } from "@utils/gradient";
+import { useI18n } from "vue-i18n";
 
 const ANGLE = 60;
 const STEPS = 100;
 const STEP_TIME = 10;
+// const HOVER_TIME = 0;
 
-let hovering = false;
+const { t } = useI18n();
+const hovering = ref(false);
 const iter = ref(0);
-// const loginHandlers = IS_MOBILE
-//     ? {
-//           //   touchstart: loginHover,
-//           //   touchend: loginUnhover,
-//       }
-//     : {
-//           mouseover: loginHover,
-//           mouseleave: loginUnhover,
-//       };
-
-const loginURL: ComputedRef<string> = computed(() => {
+const loginHandlers = IS_MOBILE
+    ? {
+          touchstart: () => {},
+          touchend: () => {},
+      }
+    : {
+          mouseover: loginHover,
+          mouseleave: loginUnhover,
+      };
+const loginURL = computed(() => {
     const url = new URL(import.meta.env.VITE_AUTH_SERVER_ORIGIN + "/login");
     url.searchParams.append("redirect", window.location.href);
     return url.href;
@@ -31,30 +33,28 @@ const loginStyles = computed(() => {
     };
 });
 
-function calcLoginGradient(n: number): string {
-    const deg: number = ANGLE * (n / 100) + 135;
+function calcLoginGradient(n: number) {
+    const deg = ANGLE * (n / 100) + 135;
     return gradient(deg, "#00a6ff", "#c5007f");
 }
 
 async function loginHover(e: MouseEvent) {
-    // console.log("hover");
-    hovering = true;
-    for (; iter.value < STEPS && hovering; iter.value++) {
+    hovering.value = true;
+    for (; iter.value < STEPS && hovering.value; iter.value++) {
         await wait(STEP_TIME);
     }
 }
 
 async function loginUnhover(e: MouseEvent) {
-    // console.log("unhover");
-    hovering = false;
-    for (; iter.value > 0 && !hovering; iter.value--) {
+    hovering.value = false;
+    for (; iter.value > 0 && !hovering.value; iter.value--) {
         await wait(STEP_TIME);
     }
 }
 </script>
 
 <template>
-    <a class="user-account-login" :href="loginURL" @mouseover="loginHover" @mouseleave="loginUnhover" :style="loginStyles">Se connecter</a>
+    <a class="user-account-login" :href="loginURL" v-on="loginHandlers" :style="loginStyles">{{ t("loginButton.login") }}</a>
 </template>
 
 <style scoped>
@@ -65,12 +65,10 @@ async function loginUnhover(e: MouseEvent) {
     cursor: pointer;
     user-select: none;
     color: #fff;
-    /* background-image: v-bind(bluePinkGradient); */
     text-decoration: none;
+    display: inline-block;
+    min-width: 50px;
+    text-align: center;
     /* transition: filter v-bind(hoverTime) ease, animation v-bind(hoverTime) ease; */
 }
-
-/* #user-account[session-active] #user-account-login {
-    display: none;
-} */
 </style>

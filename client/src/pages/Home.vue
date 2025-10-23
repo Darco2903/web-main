@@ -1,10 +1,11 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
+</script>
 
 <template>
     <div id="home-content">
-        <!-- <div class="category">
-            <label class="category-title">Main</label>
-        </div> -->
         <div class="category-content">
             <span
                 :style="{
@@ -16,7 +17,7 @@
                     marginTop: '10px',
                     pointerEvents: 'none',
                 }"
-                >A little bit empty here...</span
+                >{{ t("home.welcomeMessage") }}</span
             >
         </div>
     </div>

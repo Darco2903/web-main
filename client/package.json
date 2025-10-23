@@ -20,10 +20,12 @@
         "clean": "rimraf dist"
     },
     "dependencies": {
+        "@intlify/unplugin-vue-i18n": "^11.0.1",
         "@ts-rest/core": "^3.52.1",
         "auth-api": "file:../../npm_packs/auth-api-2.0.0-pre-1.tgz",
         "cdn-api": "file:../../npm_packs/cdn-api-1.0.0-pre-1.tgz",
         "vue": "^3.5.18",
+        "vue-i18n": "^11.1.12",
         "vue-router": "^4.5.0",
         "vuex": "^4.1.0",
         "web-common": "file:../../npm_packs/web-common-0.6.2.tgz"

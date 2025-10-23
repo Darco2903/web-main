@@ -5,11 +5,13 @@ import { useRoute } from "vue-router";
 import { IS_MOBILE } from "web-common";
 import { authApi } from "@mod/api";
 import { store } from "@store/store";
+import { useI18n } from "vue-i18n";
 
 import LoadingSpinner from "@comp/LoadingSpinner.vue";
 import UserIcon from "@comp/UserIcon.vue";
 
 const location = useRoute();
+const { t } = useI18n();
 
 const verifyUrl = ref(import.meta.env.VITE_AUTH_SERVER_ORIGIN + "/verify-request");
 const userIcon = ref("");
@@ -37,35 +39,35 @@ const ownProfile = computed(() => {
 async function init() {
     if (!userId.value) {
         if (location.params.id === "me") {
-            errorMessage.value = "You must be logged in to view your profile";
             console.error("You must be logged in to view your profile");
+            errorMessage.value = t("profileHome.loginRequired");
             // alert("You must be logged in to view your profile");
             // window.location.href = loginUrl.value;
         } else {
-            errorMessage.value = "No user id found";
             console.error("No user id found");
+            errorMessage.value = t("profileHome.noUserId");
         }
         return;
     } else if (ownProfile.value) {
         user.value = store.state.user;
-        document.title = "My Profile";
+        document.title = t("profileHome.myProfile");
     } else {
         const res = await authApi.user.fromId({ params: { userId: userId.value } });
         if (res.status === 200) {
             user.value = res.body;
-            document.title = `${user.value.name}'s Profile`;
+            document.title = t("profileHome.otherProfile", { username: user.value.name });
             // console.log("user", user.value);
         } else {
             if (res.status === 400) {
                 console.error("Invalid user ID", res.body.issues.find((issue) => issue.message)?.message);
-                errorMessage.value = "Invalid user ID";
+                errorMessage.value = t("profileHome.invalidUserId");
                 // alert("Invalid user ID");
             } else if (res.status === 404 || res.status === 500) {
                 errorMessage.value = res.body.error;
                 // console.error(res.body.error);
                 // alert(res.body.error);
             } else {
-                errorMessage.value = "Error loading user";
+                errorMessage.value = t("profileHome.failedToLoadUser");
                 // alert("Error loading user");
             }
             return;
@@ -115,7 +117,7 @@ watch(
     () => userId.value,
     async (newId, oldId) => {
         if (newId !== oldId) {
-            console.log("Route param id changed:", newId);
+            // console.log("Route param id changed:", newId);
             ready.value = false;
             errorMessage.value = "";
             await init();
@@ -181,12 +183,12 @@ onMounted(async () => {
                         />
                     </div>
 
-                    <RouterLink id="edit-profile" to="/profile/edit" v-if="ownProfile">Edit Profile</RouterLink>
+                    <RouterLink id="edit-profile" to="/profile/edit" v-if="ownProfile">{{ t("profileHome.editProfile") }}</RouterLink>
                 </div>
 
                 <div class="user-profile-verified" v-if="ownProfile && !(user as User).verified ">
-                    <span>Email Non Verifié</span>
-                    <a class="verify-link" :href="verifyUrl" target="_blank">Vérifier Maintenant</a>
+                    <span>{{ t("profileHome.emailUnverified") }}</span>
+                    <a class="verify-link" :href="verifyUrl" target="_blank">{{ t("profileHome.verifyNow") }}</a>
                 </div>
             </div>
         </div>

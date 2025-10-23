@@ -1,9 +1,9 @@
 import { createApp } from "vue";
 import { IS_MOBILE } from "web-common";
 import { authApi } from "@/modules/api";
-
 import { router } from "@router/index";
 import { store, key } from "@store/store";
+import { i18n } from "./locales";
 
 import "@styles/style.css";
 import App from "@/App.vue";
@@ -68,6 +68,7 @@ window.addEventListener("load", async () => {
         //
         .use(router)
         .use(store, key)
+        .use(i18n)
         .mount("#app");
 });
 

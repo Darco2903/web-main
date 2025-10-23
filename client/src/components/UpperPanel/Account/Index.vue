@@ -2,6 +2,7 @@
 import { computed, onMounted, onUnmounted, ref, type CSSProperties, type Ref } from "vue";
 import { RouterLink } from "vue-router";
 import { store } from "@store/store";
+import { useI18n } from "vue-i18n";
 import { loadUser } from "@/main";
 
 import UserIcon from "@comp/UserIcon.vue";
@@ -13,6 +14,7 @@ const SESSION_ANIM_UPDATE_TIME = 100;
 
 let sessionInterval: ReturnType<typeof setInterval> | null = null;
 
+const { t } = useI18n();
 const ready = ref(false);
 const noSession = ref(true);
 const userIcon: Ref<string | undefined> = ref(undefined);
@@ -135,8 +137,8 @@ onUnmounted(async () => {
                 </div>
 
                 <div id="user-links">
-                    <RouterLink to="/profile/me">Mon Profil</RouterLink>
-                    <a id="user-account-logout" :href="logoutURL">Déconnexion</a>
+                    <RouterLink to="/profile/me">{{ t("accountIndex.myProfile") }}</RouterLink>
+                    <a id="user-account-logout" :href="logoutURL">{{ t("accountIndex.logout") }}</a>
                 </div>
             </div>
         </div>
