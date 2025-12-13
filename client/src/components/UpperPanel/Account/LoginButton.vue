@@ -1,75 +1,60 @@
-<script>
+<script setup lang="ts">
 import { computed, ref } from "vue";
-import { useRoute } from "vue-router";
-
-import { IS_MOBILE, wait } from "web-common";
-
-import { origin } from "@config/auth-server.json";
-import { gradient } from "@utils/index";
+import { IS_MOBILE, wait } from "@darco2903/web-common";
+import { gradient } from "@utils/gradient";
+import { useI18n } from "vue-i18n";
 
 const ANGLE = 60;
 const STEPS = 100;
 const STEP_TIME = 10;
+// const HOVER_TIME = 0;
 
-export default {
-    name: "LoginButton",
+const { t } = useI18n();
+const hovering = ref(false);
+const iter = ref(0);
+const loginHandlers = IS_MOBILE
+    ? {
+          touchstart: () => {},
+          touchend: () => {},
+      }
+    : {
+          mouseover: loginHover,
+          mouseleave: loginUnhover,
+      };
+const loginURL = computed(() => {
+    const url = new URL(import.meta.env.VITE_AUTH_SERVER_ORIGIN + "/login");
+    url.searchParams.append("redirect", window.location.href);
+    return url.href;
+});
 
-    data() {
-        return {
-            hovering: false,
-            iter: 0,
-            loginHandlers: !IS_MOBILE
-                ? {
-                      mouseover: this.loginHover,
-                      mouseleave: this.loginUnhover,
-                  }
-                : {
-                      //   touchstart: loginHover,
-                      //   touchend: loginUnhover,
-                  },
-        };
-    },
+const loginStyles = computed(() => {
+    return {
+        "background-image": calcLoginGradient(iter.value),
+    };
+});
 
-    computed: {
-        loginURL() {
-            const url = new URL(origin + "/login");
-            this.$route.path;
-            url.searchParams.append("redirect", window.location.href);
-            return url.href;
-        },
+function calcLoginGradient(n: number) {
+    const deg = ANGLE * (n / 100) + 135;
+    return gradient(deg, "#00a6ff", "#c5007f");
+}
 
-        loginStyles() {
-            return {
-                "background-image": this.calcLoginGradient(this.iter),
-            };
-        },
-    },
+async function loginHover(e: MouseEvent) {
+    hovering.value = true;
+    for (; iter.value < STEPS && hovering.value; iter.value++) {
+        await wait(STEP_TIME);
+    }
+}
 
-    methods: {
-        calcLoginGradient(n) {
-            const deg = (ANGLE * (n / 100) + 135).toFixed(1);
-            return gradient(deg, "#00a6ff", "#c5007f");
-        },
-
-        async loginHover(e) {
-            this.hovering = true;
-            for (; this.iter < STEPS && this.hovering; this.iter++) {
-                await wait(STEP_TIME);
-            }
-        },
-
-        async loginUnhover(e) {
-            this.hovering = false;
-            for (; this.iter > 0 && !this.hovering; this.iter--) {
-                await wait(STEP_TIME);
-            }
-        },
-    },
-};
+async function loginUnhover(e: MouseEvent) {
+    hovering.value = false;
+    for (; iter.value > 0 && !hovering.value; iter.value--) {
+        await wait(STEP_TIME);
+    }
+}
 </script>
 
 <template>
-    <a class="user-account-login" :href="loginURL" v-on="loginHandlers" :style="loginStyles">Se connecter</a>
+    <a class="user-account-login" :href="loginURL" v-on="loginHandlers" :style="loginStyles">{{ t("loginButton.login") }}</a>
 </template>
 
 <style scoped>
@@ -80,12 +65,10 @@ export default {
     cursor: pointer;
     user-select: none;
     color: #fff;
-    /* background-image: v-bind(bluePinkGradient); */
     text-decoration: none;
-    transition: filter v-bind(hoverTime) ease, animation v-bind(hoverTime) ease;
+    display: inline-block;
+    min-width: 50px;
+    text-align: center;
+    /* transition: filter v-bind(hoverTime) ease, animation v-bind(hoverTime) ease; */
 }
-
-/* #user-account[session-active] #user-account-login {
-    display: none;
-} */
 </style>

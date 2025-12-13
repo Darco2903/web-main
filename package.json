@@ -8,12 +8,11 @@
     "license": "ISC",
     "private": true,
     "type": "module",
-    "packageManager": "pnpm@10.14.0",
+    "packageManager": "pnpm@10.25.0",
     "scripts": {
-        "install": "pnpm install --filter client && pnpm install --filter server",
-        "build": "pnpm --filter client build && pnpm --filter server build",
+        "build": "pnpm -r build",
         "start": "pnpm --filter server start",
         "dev": "pnpm --filter server dev",
-        "clean": "pnpm --filter client clean && pnpm --filter server clean"
+        "clean": "pnpm -r clean"
     }
 }

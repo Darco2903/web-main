@@ -3,7 +3,6 @@ node_modules/
 *_.*
 *_
 
-# Ignored folders
-/client/src/config
-/server/config/
+# Ignored
+.env
 dist/

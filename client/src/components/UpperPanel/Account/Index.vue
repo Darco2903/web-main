@@ -1,144 +1,123 @@
-<script>
-import AuthAPI from "auth-api";
+<script setup lang="ts">
+import { computed, onMounted, onUnmounted, ref, type CSSProperties, type Ref } from "vue";
 import { RouterLink } from "vue-router";
-import { getCookie, wait } from "web-common";
+import { store } from "@store/store";
+import { useI18n } from "vue-i18n";
+import { loadUser } from "@/main";
 
 import UserIcon from "@comp/UserIcon.vue";
 import LoginButton from "@comp/UpperPanel/Account/LoginButton.vue";
 
 import userIconDark from "@icons/profile/user-default-dark.jpg";
 
-import { origin } from "@config/auth-server.json";
-
 const SESSION_ANIM_UPDATE_TIME = 100;
-const HIVER_TIME = "0.1s";
 
-export default {
-    name: "UserAccount",
+let sessionInterval: ReturnType<typeof setInterval> | null = null;
 
-    components: {
-        UserIcon,
-        LoginButton,
-        RouterLink,
-    },
+const { t } = useI18n();
+const ready = ref(false);
+const noSession = ref(true);
+const userIcon: Ref<string | undefined> = ref(undefined);
+const deg = ref(135);
+const userBoxImageContainerStyle: Ref<CSSProperties> = ref({});
 
-    data() {
-        return {
-            ready: false,
-            noSession: true,
-            userIcon: userIconDark,
-            border: false,
-            deg: 135,
-            sessionInterval: null,
-            user: this.$store.state.user,
-            userBoxImageContainerStyle: {},
-        };
-    },
+const border = computed(() => {
+    return store.state.user?.round_border || false;
+});
 
-    computed: {
-        sessionStyles() {
-            return {
-                background: `linear-gradient(${this.deg}deg, #00a6ff, #c5007f)`,
-            };
-        },
+const sessionStyles = computed(() => {
+    return {
+        background: `linear-gradient(${deg.value}deg, #00a6ff, #c5007f)`,
+    };
+});
 
-        logoutURL() {
-            const url = new URL(origin + "/logout");
-            url.searchParams.append("redirect", window.location.origin);
-            return url.href;
-        },
-    },
+const logoutURL = computed(() => {
+    const url = new URL(import.meta.env.VITE_AUTH_SERVER_ORIGIN + "/logout");
+    url.searchParams.append("redirect", window.location.origin);
+    return url.href;
+});
 
-    methods: {
-        loadSessionDeg() {
-            const sessionDeg = parseInt(window.localStorage.getItem("session-deg"));
-            if (sessionDeg) {
-                this.deg = sessionDeg;
-            }
-        },
+function loadSessionDeg() {
+    const sessionDeg = window.localStorage.getItem("session-deg");
+    if (sessionDeg) {
+        deg.value = parseInt(sessionDeg);
+    }
+}
 
-        saveSessionDeg() {
-            window.localStorage.setItem("session-deg", this.deg);
-        },
+function saveSessionDeg() {
+    window.localStorage.setItem("session-deg", deg.value.toString());
+}
 
-        startSession() {
-            this.sessionInterval = setInterval(() => {
-                this.deg += 1;
-                if (this.deg >= 360) {
-                    this.deg = 0;
-                }
-            }, SESSION_ANIM_UPDATE_TIME);
-        },
+function startSession() {
+    sessionInterval = setInterval(() => {
+        deg.value += 1;
+        if (deg.value >= 360) {
+            deg.value = 0;
+        }
+    }, SESSION_ANIM_UPDATE_TIME);
+}
 
-        stopSession() {
-            clearInterval(this.sessionInterval);
-        },
+function stopSession() {
+    if (sessionInterval) {
+        clearInterval(sessionInterval);
+    }
+}
 
-        async init() {
-            if (this.user) {
-                this.noSession = false;
-                this.border = this.user.round_border;
-                this.userBoxImageContainerStyle["border-radius"] = this.user.round_border ? "50%" : "0%";
+async function init() {
+    console.log("init user", store.state.user);
+    if (store.state.user) {
+        noSession.value = false;
+        userBoxImageContainerStyle.value["border-radius"] = store.state.user.round_border ? "50%" : "0%";
 
-                await AuthAPI.user.picture.profile
-                    .get(this.user.public_id)
-                    .then((blob) => {
-                        if (blob.size !== 0) {
-                            this.userIcon = URL.createObjectURL(blob);
-                        } else {
-                            this.userIcon = userIconDark;
-                        }
-                    })
-                    .catch((err) => {
-                        console.error("Unable to load profile picture", err);
-                    });
+        await loadUser();
+        console.log("avatar", store.state.user.assets.avatar);
+        const url = store.state.user.assets.avatar || userIconDark;
+        userIcon.value = url + "?" + Date.now(); // Add cache-busting query parameter
+        // userIcon.value = url;
+        console.log("UserIcon:", userIcon.value);
+        console.log("User loaded");
+    }
+    ready.value = true;
+}
 
-                // console.log("noSession", this.noSession);
-                console.log("User loaded");
-            }
-            this.ready = true;
-        },
+async function onStorage(e: StorageEvent) {
+    if (!e.key) {
+        return;
+    }
 
-        async onStorage(e) {
-            if (!e.key) {
-                return;
-            }
+    // console.log("storage", e.key, e.newValue, e.oldValue);
 
-            // console.log("storage", e.key, e.newValue, e.oldValue);
+    if (e.key === "reloadUser") {
+        if (ready.value) {
+            await init();
+            // console.log("User reloaded");
+        }
+    }
+}
 
-            if (e.key === "reloadUser") {
-                if (this.ready) {
-                    await this.init();
-                    console.log("User reloaded");
-                }
-            }
-        },
-    },
+onMounted(async () => {
+    // console.log("userId", user.value);
 
-    async mounted() {
-        // console.log("userId", this.user);
+    console.log("UserAccount mounted");
 
-        console.log("UserAccount mounted");
+    await init();
 
-        await this.init();
+    loadSessionDeg();
+    startSession();
 
-        this.loadSessionDeg();
-        this.startSession();
+    window.addEventListener("beforeunload", saveSessionDeg);
+    window.addEventListener("storage", onStorage);
+});
 
-        window.addEventListener("beforeunload", this.saveSessionDeg);
-        window.addEventListener("storage", this.onStorage);
-    },
+onUnmounted(async () => {
+    console.log("UserAccount unmounted");
 
-    unmounted() {
-        console.log("UserAccount unmounted");
+    window.removeEventListener("beforeunload", saveSessionDeg);
+    window.removeEventListener("storage", onStorage);
 
-        window.removeEventListener("beforeunload", this.saveSessionDeg);
-        window.removeEventListener("storage", this.onStorage);
-
-        this.stopSession();
-        this.saveSessionDeg();
-    },
-};
+    stopSession();
+    saveSessionDeg();
+});
 </script>
 
 <template>
@@ -152,14 +131,14 @@ export default {
                         <img id="user-account-icon" />
                     </div> -->
 
-                    <UserIcon :userIcon="userIcon" :roundBorder="border" size="48px" border-size="3px" />
+                    <UserIcon :iconUrl="userIcon" :roundBorder="border" size="48px" border-size="3px" />
 
-                    <label id="user-account-name">{{ user.name }}</label>
+                    <label id="user-account-name">{{ store.state.user?.name || "Unknown" }}</label>
                 </div>
 
                 <div id="user-links">
-                    <RouterLink to="/profile/me">Mon Profil</RouterLink>
-                    <a id="user-account-logout" :href="logoutURL">Déconnexion</a>
+                    <RouterLink to="/profile/me">{{ t("accountIndex.myProfile") }}</RouterLink>
+                    <a id="user-account-logout" :href="logoutURL">{{ t("accountIndex.logout") }}</a>
                 </div>
             </div>
         </div>

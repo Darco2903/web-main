@@ -1,5 +1,6 @@
-<script>
-import { IS_MOBILE } from "web-common";
+<script setup lang="ts">
+import type { CSSProperties } from "vue";
+import { IS_MOBILE } from "@darco2903/web-common";
 
 import SiteIcon from "@comp/UpperPanel/SiteIcon.vue";
 import UserAccount from "@comp/UpperPanel/Account/Index.vue";
@@ -7,36 +8,14 @@ import UserAccount from "@comp/UpperPanel/Account/Index.vue";
 import mainIcon from "@assets/icon-main.svg";
 import cdnIcon from "@assets/icon-cdn.svg";
 
-import cdnServer from "@config/cdn-server.json";
+const cdnOrigin = import.meta.env.VITE_CDN_SERVER_ORIGIN;
 
-export default {
-    name: "UpperPanel",
-
-    components: {
-        SiteIcon,
-        UserAccount,
-    },
-
-    setup() {
-        return {
-            IS_MOBILE,
-            mainIcon,
-            cdnIcon,
-            cdnServer,
-        };
-    },
-
-    data() {
-        return {
-            padding: IS_MOBILE ? "10px" : "20px 30px",
-            siteIconSize: IS_MOBILE ? "64px" : "128px",
-            upperPanelRowStyle: {
-                flexDirection: IS_MOBILE ? "column-reverse" : "row",
-                height: IS_MOBILE ? "auto" : "118px",
-                gap: IS_MOBILE ? "20px" : "0",
-            },
-        };
-    },
+const padding = IS_MOBILE ? "10px" : "20px 30px";
+const siteIconSize = IS_MOBILE ? "64px" : "128px";
+const upperPanelRowStyle: CSSProperties = {
+    flexDirection: IS_MOBILE ? "column-reverse" : "row",
+    height: IS_MOBILE ? "auto" : "118px",
+    gap: IS_MOBILE ? "20px" : "0",
 };
 </script>
 
@@ -44,8 +23,8 @@ export default {
     <div id="upper-panel">
         <div class="upper-panel-row" id="panel-first-row" :style="upperPanelRowStyle">
             <div id="upper-panel-left">
-                <SiteIcon :icon="mainIcon" :size="siteIconSize" internal="/" />
-                <SiteIcon :icon="cdnIcon" :size="siteIconSize" :external="cdnServer.origin" target="_blank" />
+                <SiteIcon :icon="mainIcon" :size="siteIconSize" url="/" />
+                <SiteIcon :icon="cdnIcon" :size="siteIconSize" :url="`${cdnOrigin}/app/`" :external="true" target="_blank" />
             </div>
 
             <div id="upper-panel-right">

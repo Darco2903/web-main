@@ -16,7 +16,7 @@ export default defineConfig({
         allowedHosts: [
             //
             "darco2903.fr",
-            "dev-www.darco2903.fr",
+            ".darco2903.fr",
         ],
     },
 
@@ -27,7 +27,6 @@ export default defineConfig({
             "@fonts": "/src/assets/fonts",
             "@icons": "/src/assets/icons",
             "@comp": "/src/components",
-            "@config": "/src/config",
             "@mod": "/src/modules",
             "@pages": "/src/pages",
             "@router": "/src/router",

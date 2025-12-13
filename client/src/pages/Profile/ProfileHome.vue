@@ -1,160 +1,177 @@
-<script lang="ts">
-import AuthAPI, { type Types } from "auth-api";
+<script setup lang="ts">
+import type { User, UserPublic } from "@darco2903/auth-api/client";
+import { computed, onMounted, ref, useId, watch, type ComputedRef } from "vue";
 import { useRoute } from "vue-router";
-import { IS_MOBILE } from "web-common";
-import { useStore } from "vuex";
-import { key } from "@/store/store";
+import { IS_MOBILE } from "@darco2903/web-common";
+import { authApi } from "@mod/api";
+import { store } from "@store/store";
+import { useI18n } from "vue-i18n";
 
 import LoadingSpinner from "@comp/LoadingSpinner.vue";
 import UserIcon from "@comp/UserIcon.vue";
 
-import { origin } from "@config/auth-server.json";
+const location = useRoute();
+const { t } = useI18n();
 
-export default {
-    name: "ProfileHome",
+const verifyUrl = ref(import.meta.env.VITE_AUTH_SERVER_ORIGIN + "/verify-request");
+const userIcon = ref("");
+const user = ref<UserPublic | User | null>(null);
+const ready = ref(false);
+const profileGap = ref(IS_MOBILE ? "30px" : "80px");
+const userIconSize = ref(IS_MOBILE ? "64px" : "128px");
+const userIconBorderSize = ref(IS_MOBILE ? "3px" : "5px");
+const errorMessage = ref("");
 
-    components: {
-        LoadingSpinner,
-        UserIcon,
-    },
+const userId = computed(() => {
+    return location.params.id === "me" ? store.state.user?.public_id : (location.params.id as string);
+});
 
-    setup() {
-        const store = useStore(key);
-        // const user = store.state.user;
+const ownProfile = computed(() => {
+    return userId?.value === store.state.user?.public_id;
+});
 
-        return {
-            // user,
-            store,
-        };
-    },
+// const loginUrl = computed(() => {
+//     const url = new URL(import.meta.env.VITE_AUTH_SERVER_ORIGIN + "/login");
+//     url.searchParams.append("redirect", window.location.href);
+//     return url.href;
+// });
 
-    data() {
-        return {
-            verifyUrl: origin + "/verify-request",
-
-            userId: "",
-            userIcon: "",
-            /** @type {import("vue").Ref<import("auth-api").Types.User>} */
-            user: {
-                name: "Username",
-                round_border: false,
-            } as Types.UserPublic | Types.User,
-            userBoxImageContainerStyle: {},
-            ready: false,
-
-            profileGap: IS_MOBILE ? "30px" : "80px",
-            userIconSize: IS_MOBILE ? "64px" : "128px",
-            userIconBorderSize: IS_MOBILE ? "3px" : "5px",
-        };
-    },
-
-    computed: {
-        ownProfile() {
-            return this.userId && this.userId === this.store.state.user?.public_id;
-        },
-
-        loginUrl() {
-            const url = new URL(origin + "/login");
-            url.searchParams.append("redirect", window.location.href);
-            return url.href;
-        },
-    },
-
-    methods: {
-        async init() {
-            let p1;
-            if (this.ownProfile) {
-                this.user = this.store.state.user as Types.User;
-                document.title = "My Profile";
+async function init() {
+    if (!userId.value) {
+        if (location.params.id === "me") {
+            console.error("You must be logged in to view your profile");
+            errorMessage.value = t("profileHome.loginRequired");
+            // alert("You must be logged in to view your profile");
+            // window.location.href = loginUrl.value;
+        } else {
+            console.error("No user id found");
+            errorMessage.value = t("profileHome.noUserId");
+        }
+        return;
+    } else if (ownProfile.value) {
+        user.value = store.state.user;
+        document.title = t("profileHome.myProfile");
+    } else {
+        const res = await authApi.user.fromId({ params: { userId: userId.value } });
+        if (res.status === 200) {
+            user.value = res.body;
+            document.title = t("profileHome.otherProfile", { username: user.value.name });
+            // console.log("user", user.value);
+        } else {
+            if (res.status === 400) {
+                console.error("Invalid user ID", res.body.issues.find((issue) => issue.message)?.message);
+                errorMessage.value = t("profileHome.invalidUserId");
+                // alert("Invalid user ID");
+            } else if (res.status === 404 || res.status === 500) {
+                errorMessage.value = res.body.error;
+                // console.error(res.body.error);
+                // alert(res.body.error);
             } else {
-                p1 = AuthAPI.user.getFromId(this.userId).then((res) => {
-                    if (res.error) {
-                        console.error(res.error);
-                        alert("An error occurred while loading the profile");
-                        return;
-                    }
-                    if (!res.result) {
-                        console.error("No user found");
-                        alert("No user found");
-                        return;
-                    }
-                    this.user = res.user as Types.UserPublic;
-                    document.title = `${this.user.name}'s Profile`;
-                    // console.log("user", this.user);
-                });
+                errorMessage.value = t("profileHome.failedToLoadUser");
+                // alert("Error loading user");
             }
-
-            const p2 = AuthAPI.user.picture.profile
-                .get(this.userId)
-                .then((blob) => {
-                    if (blob.size !== 0) {
-                        this.userIcon = URL.createObjectURL(blob);
-                        // console.log("userIcon", this.userIcon);
-                    }
-                })
-                .catch((err) => {
-                    console.error("Unable to load profile picture", err);
-                });
-
-            await Promise.allSettled([p1, p2]);
-            this.ready = true;
-            // console.log("ready", this.ready);
-        },
-    },
-
-    async mounted() {
-        const location = useRoute();
-        this.userId = location.params.id === "me" ? this.store.state.user?.public_id || "" : (location.params.id as string);
-
-        if (!this.userId) {
-            if (location.params.id === "me") {
-                console.error("Not logged in");
-                alert("You must be logged in to view your profile");
-                window.location.href = this.loginUrl;
-            } else {
-                console.error("No user id found");
-                alert("No user id found");
-            }
-            this.ready = true;
             return;
         }
+    }
 
-        // window.addEventListener("storage", async (e) => {
-        //     if (!e.key) {
-        //         return;
-        //     }
+    console.log(user.value);
+    if (user.value?.assets.avatar) {
+        // V2
+        // await cdnApi
+        //     .profilePictureGet({ params: { userId: user.value.public_id } })
+        //     .then((res) => (res.status === 200 && res.body ? new URL(res.body, import.meta.env.VITE_CDN_SERVER_ORIGIN).href : userIconDark))
+        //     .catch((err) => {
+        //         console.error("Unable to load profile picture", err);
+        //         return userIconDark;
+        //     })
+        //     .then((icon) => {
+        //         userIcon.value = icon;
+        //     });
+        userIcon.value = user.value.assets.avatar;
+    }
 
-        //     console.log("storage", e.key, e.newValue, e.oldValue);
+    ready.value = true;
+    // console.log("ready", ready.value);
+}
 
-        //     if (e.key === "reloadUser") {
-        //         if (this.ready) {
-        //             await this.init();
-        //             console.log("User reloaded");
-        //         }
-        //     }
-        // });
+// const user: ComputedRef<Promise<UserPublic | null>> = computed(async () => {
+//     const id = Array.isArray(location.params.id) ? location.params.id[0] : location.params.id;
+//     console.log("Route param id:", id);
+//     if (id === "me") {
+//         return store.state.user;
+//     } else {
+//         return authApi.user
+//             .fromId({ params: { userId: id } })
+//             .then((res) => (res.status === 200 ? res.body : null))
+//             .catch(() => null);
+//     }
+// });
+// watch(
+//     () => user.value,
+//     (newVal) => {
+//         console.log("Route changed", newVal);
+//     }
+// );
 
-        await this.init();
-    },
-};
+watch(
+    () => userId.value,
+    async (newId, oldId) => {
+        if (newId !== oldId) {
+            // console.log("Route param id changed:", newId);
+            ready.value = false;
+            errorMessage.value = "";
+            await init();
+        }
+    }
+);
+
+onMounted(async () => {
+    console.log("Mounted ProfileHome with id:", userId.value);
+    // userId.value = location.params.id === "me" ? store.state.user?.public_id || "" : (location.params.id as string);
+    // if (!userId.value) {
+    //     if (location.params.id === "me") {
+    //         console.error("Not logged in");
+    //         alert("You must be logged in to view your profile");
+    //         window.location.href = loginUrl.value;
+    //     } else {
+    //         console.error("No user id found");
+    //         alert("No user id found");
+    //     }
+    //     ready.value = true;
+    //     return;
+    // }
+    // window.addEventListener("storage", async (e) => {
+    //     if (!e.key) {
+    //         return;
+    //     }
+    //     console.log("storage", e.key, e.newValue, e.oldValue);
+    //     if (e.key === "reloadUser") {
+    //         if (ready.value) {
+    //             await init();
+    //             console.log("User reloaded");
+    //         }
+    //     }
+    // });
+    await init();
+});
 </script>
 
 <template>
     <div>
-        <LoadingSpinner class="user-edit-loading" :loading="!ready" v-show="!ready" />
+        <LoadingSpinner class="user-edit-loading" :loading="!ready" v-if="!ready && !errorMessage" />
 
-        <div class="user-profile-content" v-show="ready && userId">
+        <div class="user-profile-content" v-else-if="userId && !errorMessage">
             <div id="profile">
                 <div class="profile-first-row">
                     <UserIcon
-                        :user-icon="userIcon"
-                        :round-border="user.round_border"
+                        :iconUrl="userIcon"
+                        :round-border="user?.round_border"
                         :size="userIconSize"
                         :border-size="userIconBorderSize"
                     />
 
                     <div style="display: flex; flex-direction: row; gap: 10px; align-items: center">
-                        <label id="user-name">{{ user.name }}</label>
+                        <label id="user-name">{{ user?.name }}</label>
                         <img
                             class="verified-icon"
                             src="@icons/verified-96px.png"
@@ -162,18 +179,22 @@ export default {
                             title="Verified"
                             width="32"
                             height="32"
-                            v-if="ownProfile && (user as Types.User).verified"
+                            v-if="ownProfile && (user as User).verified"
                         />
                     </div>
 
-                    <RouterLink id="edit-profile" to="/profile/edit" v-if="ownProfile">Edit Profile</RouterLink>
+                    <RouterLink id="edit-profile" to="/profile/edit" v-if="ownProfile">{{ t("profileHome.editProfile") }}</RouterLink>
                 </div>
 
-                <div class="user-profile-verified" v-if="ownProfile && !(user as Types.User).verified ">
-                    <span>Email Non Verifié</span>
-                    <a class="verify-link" :href="verifyUrl" target="_blank">Vérifier Maintenant</a>
+                <div class="user-profile-verified" v-if="ownProfile && !(user as User).verified ">
+                    <span>{{ t("profileHome.emailUnverified") }}</span>
+                    <a class="verify-link" :href="verifyUrl" target="_blank">{{ t("profileHome.verifyNow") }}</a>
                 </div>
             </div>
+        </div>
+
+        <div class="user-profile-error-container" v-else>
+            <div class="user-profile-error">{{ errorMessage }}</div>
         </div>
     </div>
 </template>
@@ -262,5 +283,20 @@ body[mobile] #edit-profile {
     border-radius: 5px;
     color: #eee;
     background-color: #0004;
+}
+
+.user-profile-error-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 200px;
+}
+
+.user-profile-error {
+    color: #a80016;
+    font-size: 1.2em;
+    font-weight: 600;
+    text-align: center;
 }
 </style>

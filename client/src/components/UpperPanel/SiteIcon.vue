@@ -1,44 +1,39 @@
-<script>
+<script setup lang="ts">
 import { RouterLink } from "vue-router";
 
-export default {
-    name: "SiteIcon",
-
-    components: {
-        RouterLink,
+const { icon, size, url, external, target } = defineProps({
+    icon: {
+        type: String,
+        required: true,
     },
-
-    props: {
-        icon: {
-            type: String,
-            required: true,
-        },
-        internal: {
-            type: String,
-            default: "",
-        },
-        external: {
-            type: String,
-            default: "",
-        },
-        size: {
-            type: String,
-            default: "64px",
-        },
-        target: {
-            type: String,
-            default: "_self",
-        },
+    size: {
+        type: String,
+        required: false,
+        default: "64px",
     },
-};
+    url: {
+        type: String,
+        required: true,
+    },
+    external: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
+    target: {
+        type: String,
+        required: false,
+        default: "_self",
+    },
+});
 </script>
 
 <template>
     <div class="site-icon">
-        <a class="site-icon-redirect" :href="external" :target="target" v-if="external">
+        <a class="site-icon-redirect" :href="url" :target="target" v-if="external">
             <img class="site-icon-img" :src="icon" alt="Site icon" />
         </a>
-        <RouterLink :to="internal" v-if="internal">
+        <RouterLink :to="url" v-else>
             <img class="site-icon-img" :src="icon" alt="Site icon" />
         </RouterLink>
     </div>
@@ -61,6 +56,33 @@ body[mobile] .site-icon {
     /* width: 32px; */
     /* height: 32px; */
 }
+
+/* .site-icon::before {
+    content: "";
+    position: absolute;
+    transform: scale(0.99) translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #eeeeee02, #ffffff18);
+    z-index: 1;
+} */
+
+/* .site-icon::after {
+    content: "";
+    position: absolute;
+    transform: scale(1.01) translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #fffc, #fff2, #fffc);
+    background: linear-gradient(135deg, #b19fd3dd, #fff2, #b19fd3dd);
+    z-index: -1;
+} */
 
 .site-icon:hover {
     filter: drop-shadow(2px 2px 5px var(--hover-color-light)) brightness(1.01);

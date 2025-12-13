@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
 
 const router = useRouter();
+const { t } = useI18n();
 
 function goBack() {
     if (window.history.length <= 2) {
@@ -15,8 +17,8 @@ function goBack() {
 <template>
     <div class="container">
         <span class="title">404</span>
-        <span class="message">La page que vous cherchez n'existe pas.</span>
-        <span class="link" @click="goBack">Revenir en arrière</span>
+        <span class="message">{{ t("notFound.message") }}</span>
+        <span class="link" @click="goBack">{{ t("notFound.goBack") }}</span>
     </div>
 </template>
 
