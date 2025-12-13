@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { IS_MOBILE, wait } from "web-common";
+import { IS_MOBILE, wait } from "@darco2903/web-common";
 import { gradient } from "@utils/gradient";
 import { useI18n } from "vue-i18n";
 

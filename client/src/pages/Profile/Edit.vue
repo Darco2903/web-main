@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, type ComputedRef, type CSSProperties, type Ref } from "vue";
-import { IS_MOBILE, wait } from "web-common";
+import { IS_MOBILE, wait } from "@darco2903/web-common";
 import { authApi, cdnApi } from "@mod/api";
 import { router } from "@/router";
 import { store } from "@store/store";

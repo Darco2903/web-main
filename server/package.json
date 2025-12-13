@@ -1,5 +1,5 @@
 {
-    "name": "server",
+    "name": "@workspace/server",
     "version": "1.0.0",
     "description": "",
     "main": "dist/index.js",
@@ -8,19 +8,19 @@
     "license": "ISC",
     "private": true,
     "type": "module",
-    "packageManager": "pnpm@10.16.1",
+    "packageManager": "pnpm@10.25.0",
     "scripts": {
         "build": "tsc",
-        "start": "node dist/index.js",
+        "start": "node .",
         "dev": "tsx src/index.ts --dev",
         "clean": "rimraf dist"
     },
     "dependencies": {
-        "auth-api": "file:../../npm_packs/auth-api-2.0.0-pre-1.tgz",
+        "@darco2903/auth-api": "^2.0.0",
+        "@darco2903/web-common": "^0.6.2",
         "dotenv": "^17.2.1",
         "express": "^4.21.2",
-        "pino": "^9.8.0",
-        "web-common": "file:../../npm_packs/web-common-0.6.2.tgz"
+        "pino": "^9.8.0"
     },
     "devDependencies": {
         "@types/express": "^5.0.3",

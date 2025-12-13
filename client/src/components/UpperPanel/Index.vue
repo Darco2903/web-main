@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { CSSProperties } from "vue";
-import { IS_MOBILE } from "web-common";
+import { IS_MOBILE } from "@darco2903/web-common";
 
 import SiteIcon from "@comp/UpperPanel/SiteIcon.vue";
 import UserAccount from "@comp/UpperPanel/Account/Index.vue";

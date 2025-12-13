@@ -1,5 +1,5 @@
 import { createApp } from "vue";
-import { IS_MOBILE } from "web-common";
+import { IS_MOBILE } from "@darco2903/web-common";
 import { authApi } from "@/modules/api";
 import { router } from "@router/index";
 import { store, key } from "@store/store";

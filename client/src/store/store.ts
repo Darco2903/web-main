@@ -1,6 +1,6 @@
 import { type InjectionKey } from "vue";
 import { createStore, Store } from "vuex";
-import type { User } from "auth-api/client";
+import type { User } from "@darco2903/auth-api/client";
 
 export interface State {
     user: User | null;

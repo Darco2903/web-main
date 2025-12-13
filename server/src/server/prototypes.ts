@@ -1,5 +1,5 @@
 import { IncomingMessage, ServerResponse } from "http";
-import { createCookie, type Cookie } from "web-common";
+import { createCookie, type Cookie } from "@darco2903/web-common";
 import { Cookies } from "../types/cookie.js";
 
 declare module "http" {

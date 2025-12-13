@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { User, UserPublic } from "auth-api/client";
+import type { User, UserPublic } from "@darco2903/auth-api/client";
 import { computed, onMounted, ref, useId, watch, type ComputedRef } from "vue";
 import { useRoute } from "vue-router";
-import { IS_MOBILE } from "web-common";
+import { IS_MOBILE } from "@darco2903/web-common";
 import { authApi } from "@mod/api";
 import { store } from "@store/store";
 import { useI18n } from "vue-i18n";
