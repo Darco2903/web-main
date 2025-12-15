@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, type ComputedRef, type CSSProperties, type Ref } from "vue";
 import { IS_MOBILE, wait } from "@darco2903/web-common";
-import { authApi, cdnApi } from "@mod/api";
+import { authApi, cdnApi } from "@/modules/api";
 import { router } from "@/router";
-import { store } from "@store/store";
+import { useStore as useUserStore } from "@store/user";
 import { useI18n } from "vue-i18n";
 
 import LoadingSpinner from "@comp/LoadingSpinner.vue";
 import UserIcon from "@comp/UserIcon.vue";
 
+const userStore = useUserStore();
 const { t } = useI18n();
-const { user } = store.state;
 
-if (!user) {
+if (!userStore.info) {
     alert("You must be logged in to view this page");
     router.push("/");
 }
@@ -35,7 +35,7 @@ const roundBorderContainerStyle: CSSProperties = {
 };
 
 const borderEdited = computed(() => {
-    return !!user && user.round_border !== border.value;
+    return !!userStore.info && userStore.info.round_border !== border.value;
 });
 
 const iconEdited = computed(() => {
@@ -47,7 +47,7 @@ const iconRemoved = computed(() => {
 });
 
 const nameEdited: ComputedRef<boolean> = computed(() => {
-    return !!user && user.name !== userName.value;
+    return !!userStore.info && userStore.info.name !== userName.value;
 });
 
 function buttonStyle(state: boolean): CSSProperties {
@@ -104,7 +104,7 @@ function removeIcon() {
 
 function cancelIcon() {
     userIcon.value = restoreUserIcon.value;
-    border.value = !!user?.round_border;
+    border.value = !!userStore.info?.round_border;
 }
 
 async function saveIcon() {
@@ -233,8 +233,8 @@ async function saveIcon() {
         const resBorder = await authApi.user.updateBorder({ body: { roundBorder: border.value } });
         if (resBorder.status === 200) {
             console.log("Profile picture border updated");
-            if (user) {
-                user.round_border = border.value;
+            if (userStore.info) {
+                userStore.info.round_border = border.value;
             }
             reload = true;
         } else if (resBorder.status === 400) {
@@ -252,14 +252,14 @@ async function saveIcon() {
 }
 
 function cancelUsername() {
-    if (!user) {
+    if (!userStore.info) {
         return;
     }
-    userName.value = user.name;
+    userName.value = userStore.info.name;
 }
 
 async function saveUsername() {
-    if (savingUsername || !user) {
+    if (savingUsername || !userStore.info) {
         return;
     }
     savingUsername = true;
@@ -286,7 +286,7 @@ async function saveUsername() {
     }
 
     // userName.value = user.name;
-    user.name = userName.value;
+    userStore.info.name = userName.value;
     console.log("Username updated");
     await sendReload();
 
@@ -301,12 +301,12 @@ async function sendReload() {
 }
 
 onMounted(() => {
-    if (!user) {
+    if (!userStore.info) {
         return;
     }
 
-    userName.value = user.name;
-    border.value = user.round_border;
+    userName.value = userStore.info.name;
+    border.value = userStore.info.round_border;
 
     // V2
     // await cdnApi
@@ -322,7 +322,7 @@ onMounted(() => {
     //         restoreUserIcon.value = icon;
     //     });
 
-    userIcon.value = user.assets.avatar || undefined;
+    userIcon.value = userStore.info.assets.avatar || undefined;
     restoreUserIcon.value = userIcon.value;
     // console.log("UserIcon:", userIcon);
     // console.log("RestoreUserIcon:", restoreUserIcon);

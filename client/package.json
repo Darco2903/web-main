@@ -21,14 +21,15 @@
     },
     "dependencies": {
         "@darco2903/auth-api": "^2.0.0",
-        "@darco2903/cdn-api": "^1.0.0",
+        "@darco2903/cdn-api": "1.0.1",
         "@darco2903/web-common": "^0.6.2",
         "@intlify/unplugin-vue-i18n": "^11.0.1",
         "@ts-rest/core": "^3.52.1",
+        "neverthrow": "^8.2.0",
+        "pinia": "^3.0.4",
         "vue": "^3.5.18",
         "vue-i18n": "^11.1.12",
-        "vue-router": "^4.5.0",
-        "vuex": "^4.1.0"
+        "vue-router": "^4.5.0"
     },
     "devDependencies": {
         "@tsconfig/node22": "^22.0.2",

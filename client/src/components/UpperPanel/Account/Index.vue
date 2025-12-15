@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, type CSSProperties, type Ref } from "vue";
 import { RouterLink } from "vue-router";
-import { store } from "@store/store";
+import { useStore as useUserStore } from "@store/user";
 import { useI18n } from "vue-i18n";
-import { loadUser } from "@/main";
 
 import UserIcon from "@comp/UserIcon.vue";
 import LoginButton from "@comp/UpperPanel/Account/LoginButton.vue";
@@ -14,6 +13,7 @@ const SESSION_ANIM_UPDATE_TIME = 100;
 
 let sessionInterval: ReturnType<typeof setInterval> | null = null;
 
+const userStore = useUserStore();
 const { t } = useI18n();
 const ready = ref(false);
 const noSession = ref(true);
@@ -22,7 +22,7 @@ const deg = ref(135);
 const userBoxImageContainerStyle: Ref<CSSProperties> = ref({});
 
 const border = computed(() => {
-    return store.state.user?.round_border || false;
+    return userStore.info?.round_border || false;
 });
 
 const sessionStyles = computed(() => {
@@ -64,14 +64,13 @@ function stopSession() {
 }
 
 async function init() {
-    console.log("init user", store.state.user);
-    if (store.state.user) {
+    console.log("init user", userStore.info);
+    if (userStore.info) {
         noSession.value = false;
-        userBoxImageContainerStyle.value["border-radius"] = store.state.user.round_border ? "50%" : "0%";
+        userBoxImageContainerStyle.value["border-radius"] = userStore.info.round_border ? "50%" : "0%";
 
-        await loadUser();
-        console.log("avatar", store.state.user.assets.avatar);
-        const url = store.state.user.assets.avatar || userIconDark;
+        console.log("avatar", userStore.getUserIconUrl());
+        const url = userStore.getUserIconUrl() || userIconDark;
         userIcon.value = url + "?" + Date.now(); // Add cache-busting query parameter
         // userIcon.value = url;
         console.log("UserIcon:", userIcon.value);
@@ -133,7 +132,7 @@ onUnmounted(async () => {
 
                     <UserIcon :iconUrl="userIcon" :roundBorder="border" size="48px" border-size="3px" />
 
-                    <label id="user-account-name">{{ store.state.user?.name || "Unknown" }}</label>
+                    <label id="user-account-name">{{ userStore.info?.name || "Unknown" }}</label>
                 </div>
 
                 <div id="user-links">

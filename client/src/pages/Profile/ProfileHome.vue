@@ -1,19 +1,20 @@
 <script setup lang="ts">
 import type { User, UserPublic } from "@darco2903/auth-api/client";
-import { computed, onMounted, ref, useId, watch, type ComputedRef } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { IS_MOBILE } from "@darco2903/web-common";
-import { authApi } from "@mod/api";
-import { store } from "@store/store";
+import { authApi } from "@/modules/api";
+import { useStore as useUserStore } from "@store/user";
 import { useI18n } from "vue-i18n";
 
 import LoadingSpinner from "@comp/LoadingSpinner.vue";
 import UserIcon from "@comp/UserIcon.vue";
 
 const location = useRoute();
+const userStore = useUserStore();
 const { t } = useI18n();
 
-const verifyUrl = ref(import.meta.env.VITE_AUTH_SERVER_ORIGIN + "/verify-request");
+const verifyUrl = import.meta.env.VITE_AUTH_SERVER_ORIGIN + "/verify-request";
 const userIcon = ref("");
 const user = ref<UserPublic | User | null>(null);
 const ready = ref(false);
@@ -23,18 +24,12 @@ const userIconBorderSize = ref(IS_MOBILE ? "3px" : "5px");
 const errorMessage = ref("");
 
 const userId = computed(() => {
-    return location.params.id === "me" ? store.state.user?.public_id : (location.params.id as string);
+    return location.params.id === "me" ? userStore.getPublicId() : (location.params.id as string);
 });
 
 const ownProfile = computed(() => {
-    return userId?.value === store.state.user?.public_id;
+    return userId?.value === userStore.getPublicId();
 });
-
-// const loginUrl = computed(() => {
-//     const url = new URL(import.meta.env.VITE_AUTH_SERVER_ORIGIN + "/login");
-//     url.searchParams.append("redirect", window.location.href);
-//     return url.href;
-// });
 
 async function init() {
     if (!userId.value) {
@@ -49,7 +44,7 @@ async function init() {
         }
         return;
     } else if (ownProfile.value) {
-        user.value = store.state.user;
+        user.value = userStore.info;
         document.title = t("profileHome.myProfile");
     } else {
         const res = await authApi.user.fromId({ params: { userId: userId.value } });
@@ -76,42 +71,12 @@ async function init() {
 
     console.log(user.value);
     if (user.value?.assets.avatar) {
-        // V2
-        // await cdnApi
-        //     .profilePictureGet({ params: { userId: user.value.public_id } })
-        //     .then((res) => (res.status === 200 && res.body ? new URL(res.body, import.meta.env.VITE_CDN_SERVER_ORIGIN).href : userIconDark))
-        //     .catch((err) => {
-        //         console.error("Unable to load profile picture", err);
-        //         return userIconDark;
-        //     })
-        //     .then((icon) => {
-        //         userIcon.value = icon;
-        //     });
         userIcon.value = user.value.assets.avatar;
     }
 
     ready.value = true;
     // console.log("ready", ready.value);
 }
-
-// const user: ComputedRef<Promise<UserPublic | null>> = computed(async () => {
-//     const id = Array.isArray(location.params.id) ? location.params.id[0] : location.params.id;
-//     console.log("Route param id:", id);
-//     if (id === "me") {
-//         return store.state.user;
-//     } else {
-//         return authApi.user
-//             .fromId({ params: { userId: id } })
-//             .then((res) => (res.status === 200 ? res.body : null))
-//             .catch(() => null);
-//     }
-// });
-// watch(
-//     () => user.value,
-//     (newVal) => {
-//         console.log("Route changed", newVal);
-//     }
-// );
 
 watch(
     () => userId.value,
@@ -126,32 +91,6 @@ watch(
 );
 
 onMounted(async () => {
-    console.log("Mounted ProfileHome with id:", userId.value);
-    // userId.value = location.params.id === "me" ? store.state.user?.public_id || "" : (location.params.id as string);
-    // if (!userId.value) {
-    //     if (location.params.id === "me") {
-    //         console.error("Not logged in");
-    //         alert("You must be logged in to view your profile");
-    //         window.location.href = loginUrl.value;
-    //     } else {
-    //         console.error("No user id found");
-    //         alert("No user id found");
-    //     }
-    //     ready.value = true;
-    //     return;
-    // }
-    // window.addEventListener("storage", async (e) => {
-    //     if (!e.key) {
-    //         return;
-    //     }
-    //     console.log("storage", e.key, e.newValue, e.oldValue);
-    //     if (e.key === "reloadUser") {
-    //         if (ready.value) {
-    //             await init();
-    //             console.log("User reloaded");
-    //         }
-    //     }
-    // });
     await init();
 });
 </script>
