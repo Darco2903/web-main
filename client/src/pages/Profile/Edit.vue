@@ -117,16 +117,6 @@ async function saveIcon() {
     let reload;
 
     if (iconEdited.value) {
-        // console.error("Temporary disable icon editing");
-        // return;
-
-        // if (!iconRemoved) {
-        //     const blob = await fetch(userIcon as string).then((res) => res.blob());
-        //     res = await AuthAPI.user.picture.profile.update(blob);
-        // } else {
-        //     res = await AuthAPI.user.picture.profile.delete();
-        // }
-
         const r = await authApi.assets.token({ body: { type: "avatar" } });
         if (r.status !== 200) {
             console.error("Unable to get assets token", r.status, r.body);
@@ -138,10 +128,10 @@ async function saveIcon() {
         const authorization = `Bearer ${r.body.cdnToken}`;
         // console.log("restoreUserIcon", restoreUserIcon.value);
         // console.log("iconRemoved", iconRemoved.value);
+
         try {
             if (iconRemoved.value && restoreUserIcon.value !== undefined) {
                 console.log("Deleting profile picture");
-                // res = await cdnApi.profilePictureDelete();
                 res = await cdnApi.service.delete({ headers: { authorization } });
                 if (res.status !== 200) {
                     alert("Error deleting profile picture");
@@ -150,7 +140,6 @@ async function saveIcon() {
                 console.log("Updating profile picture");
                 const blob = await fetch(userIcon.value).then((res) => res.blob());
                 const file = new File([blob], "profile.jpg", { type: blob.type });
-                // res = await cdnApi.profilePictureUpdate({ body: { picture: file } });
                 res = await cdnApi.service.update({
                     headers: { authorization },
                     body: { file },
@@ -180,6 +169,8 @@ async function saveIcon() {
             console.log("Profile picture updated");
             restoreUserIcon.value = userIcon.value;
             reload = true;
+        } else {
+            alert("An error occurred while updating the profile picture");
         }
 
         // if (res?.error) {
@@ -221,15 +212,6 @@ async function saveIcon() {
     }
 
     if (borderEdited) {
-        // const resBorder = await AuthAPI.user.picture.profile.border(border);
-        // if (resBorder?.error) {
-        //     console.error(resBorder.error);
-        // } else if (resBorder?.result) {
-        //     console.log("Profile picture border updated");
-        //     user.round_border = border;
-        //     reload = true;
-        // }
-
         const resBorder = await authApi.user.updateBorder({ body: { roundBorder: border.value } });
         if (resBorder.status === 200) {
             console.log("Profile picture border updated");
@@ -263,13 +245,6 @@ async function saveUsername() {
         return;
     }
     savingUsername = true;
-
-    // const res = await AuthAPI.user.updateUsername(user.name, "");
-    // if (res.error) {
-    //     console.error("Update username error", res.error);
-    //     alert("Unable to update username");
-    //     return;
-    // }
 
     const res = await authApi.user.updateUsername({ body: { username: userName.value } });
 
@@ -307,20 +282,6 @@ onMounted(() => {
 
     userName.value = userStore.info.name;
     border.value = userStore.info.round_border;
-
-    // V2
-    // await cdnApi
-    //     .profilePictureGet({ params: { userId: user.public_id } })
-    //     .then((res) => (res.status === 200 && res.body ? new URL(res.body, import.meta.env.VITE_CDN_SERVER_ORIGIN).href : null))
-    //     .catch((err) => {
-    //         console.error("Unable to load profile picture", err);
-    //         return null;
-    //     })
-    //     .then((icon) => {
-    //         console.log("UserIcon:", icon);
-    //         userIcon.value = icon;
-    //         restoreUserIcon.value = icon;
-    //     });
 
     userIcon.value = userStore.info.assets.avatar || undefined;
     restoreUserIcon.value = userIcon.value;

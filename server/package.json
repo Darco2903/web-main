@@ -16,8 +16,6 @@
         "clean": "rimraf dist"
     },
     "dependencies": {
-        "@darco2903/auth-api": "^2.0.0",
-        "@darco2903/cdn-api": "^1.0.1",
         "@darco2903/web-common": "^0.6.2",
         "dotenv": "^17.2.1",
         "express": "^4.21.2",

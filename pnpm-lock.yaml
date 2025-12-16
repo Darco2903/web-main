@@ -11,11 +11,11 @@ importers:
   client:
     dependencies:
       '@darco2903/auth-api':
-        specifier: ^2.0.0
-        version: 2.0.0(@types/node@22.19.2)
+        specifier: ^2.0.2
+        version: 2.0.2(@types/node@22.19.2)
       '@darco2903/cdn-api':
-        specifier: 1.0.1
-        version: 1.0.1(@types/node@22.19.2)
+        specifier: 1.0.5
+        version: 1.0.5(@types/node@22.19.2)
       '@darco2903/web-common':
         specifier: ^0.6.2
         version: 0.6.2
@@ -74,12 +74,6 @@ importers:
 
   server:
     dependencies:
-      '@darco2903/auth-api':
-        specifier: ^2.0.0
-        version: 2.0.0(@types/node@24.10.3)
-      '@darco2903/cdn-api':
-        specifier: ^1.0.1
-        version: 1.0.1(@types/node@24.10.3)
       '@darco2903/web-common':
         specifier: ^0.6.2
         version: 0.6.2
@@ -263,11 +257,11 @@ packages:
     resolution: {integrity: sha512-qQ5m48eI/MFLQ5PxQj4PFaprjyCTLI37ElWMmNs0K8Lk3dVeOdNpB3ks8jc7yM5CDmVC73eMVk/trk3fgmrUpA==}
     engines: {node: '>=6.9.0'}
 
-  '@darco2903/auth-api@2.0.0':
-    resolution: {integrity: sha512-uAiabGoPezN0YxkLJCsBmxl/3QuYJ5c15HY8iEqstzeGt0cFwyHHEGulJRc7Bgasgc4P9XFCcN03ju5EYoEfIw==, tarball: https://npm.pkg.github.com/download/@darco2903/auth-api/2.0.0/a184e103b6e07c4ec8f0640d6f3a9b0ae896d81b}
+  '@darco2903/auth-api@2.0.2':
+    resolution: {integrity: sha512-eRPc0vzvZPpkN+DPtrvKcXGVKiM7sFOZUnbBjEH64RLvriL3Cxe7xZYNT1U8Yk8+2MejvhDcbUN+xI6uxiHERQ==, tarball: https://npm.pkg.github.com/download/@darco2903/auth-api/2.0.2/7669e3863a37cd5073a815a1205b208445b9a67a}
 
-  '@darco2903/cdn-api@1.0.1':
-    resolution: {integrity: sha512-zjYUldOuZhtDyVrbs/k9hN5E2UaS6PJTUuRFsQBw3booYo2NMO4w+KoSwGs3ZGfSn+VeepehDh5HC5cVRJ6Tfg==, tarball: https://npm.pkg.github.com/download/@darco2903/cdn-api/1.0.1/e614418d815df780ec994af8574ecf8ce405a8cf}
+  '@darco2903/cdn-api@1.0.5':
+    resolution: {integrity: sha512-NL1CjBnFpMqduwV9fbZRtltLdxcazPfJgXGDzNH5ElnZoo37qu6DBd+0fDg7Bd8NwImizUGOw8jwjIUArGdrxg==, tarball: https://npm.pkg.github.com/download/@darco2903/cdn-api/1.0.5/b06153cba1cc1a86b19895aedba86dbe92322cad}
 
   '@darco2903/web-common@0.6.2':
     resolution: {integrity: sha512-Vzb0yUhuoJaT4Lzy5h9JYwM1wzapstSm7fQmh1ZGwHLvXZj/qFj/f04cGGdNotyZD2c+fUDBx4QjmMtiEhMtuw==, tarball: https://npm.pkg.github.com/download/@darco2903/web-common/0.6.2/3c5236b05d232eb5fd08808e0c64d424bedc90e7}
@@ -2580,32 +2574,13 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.28.5
 
-  '@darco2903/auth-api@2.0.0(@types/node@22.19.2)':
+  '@darco2903/auth-api@2.0.2(@types/node@22.19.2)':
     dependencies:
+      '@darco2903/cdn-api': 1.0.5(@types/node@22.19.2)
       '@ts-rest/core': 3.52.1(@types/node@22.19.2)(zod@3.25.76)
       '@ts-rest/open-api': 3.52.1(@ts-rest/core@3.52.1(@types/node@22.19.2)(zod@3.25.76))(zod@3.25.76)
       jsonwebtoken: 9.0.3
-      zod: 3.25.76
-    transitivePeerDependencies:
-      - '@types/node'
-
-  '@darco2903/auth-api@2.0.0(@types/node@24.10.3)':
-    dependencies:
-      '@ts-rest/core': 3.52.1(@types/node@24.10.3)(zod@3.25.76)
-      '@ts-rest/open-api': 3.52.1(@ts-rest/core@3.52.1(@types/node@24.10.3)(zod@3.25.76))(zod@3.25.76)
-      jsonwebtoken: 9.0.3
-      zod: 3.25.76
-    transitivePeerDependencies:
-      - '@types/node'
-
-  '@darco2903/cdn-api@1.0.1(@types/node@22.19.2)':
-    dependencies:
-      '@darco2903/auth-api': 2.0.0(@types/node@22.19.2)
-      '@ts-rest/core': 3.52.1(@types/node@22.19.2)(zod@3.25.76)
-      '@ts-rest/open-api': 3.52.1(@ts-rest/core@3.52.1(@types/node@22.19.2)(zod@3.25.76))(zod@3.25.76)
-      axios: 1.13.2
-      jsonwebtoken: 9.0.3
-      socket.io-client: 4.8.1
+      neverthrow: 8.2.0
       zod: 3.25.76
     transitivePeerDependencies:
       - '@types/node'
@@ -2614,13 +2589,14 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@darco2903/cdn-api@1.0.1(@types/node@24.10.3)':
+  '@darco2903/cdn-api@1.0.5(@types/node@22.19.2)':
     dependencies:
-      '@darco2903/auth-api': 2.0.0(@types/node@24.10.3)
-      '@ts-rest/core': 3.52.1(@types/node@24.10.3)(zod@3.25.76)
-      '@ts-rest/open-api': 3.52.1(@ts-rest/core@3.52.1(@types/node@24.10.3)(zod@3.25.76))(zod@3.25.76)
+      '@darco2903/auth-api': 2.0.2(@types/node@22.19.2)
+      '@ts-rest/core': 3.52.1(@types/node@22.19.2)(zod@3.25.76)
+      '@ts-rest/open-api': 3.52.1(@ts-rest/core@3.52.1(@types/node@22.19.2)(zod@3.25.76))(zod@3.25.76)
       axios: 1.13.2
       jsonwebtoken: 9.0.3
+      neverthrow: 8.2.0
       socket.io-client: 4.8.1
       zod: 3.25.76
     transitivePeerDependencies:
@@ -3028,22 +3004,10 @@ snapshots:
       '@types/node': 22.19.2
       zod: 3.25.76
 
-  '@ts-rest/core@3.52.1(@types/node@24.10.3)(zod@3.25.76)':
-    optionalDependencies:
-      '@types/node': 24.10.3
-      zod: 3.25.76
-
   '@ts-rest/open-api@3.52.1(@ts-rest/core@3.52.1(@types/node@22.19.2)(zod@3.25.76))(zod@3.25.76)':
     dependencies:
       '@anatine/zod-openapi': 1.14.2(openapi3-ts@2.0.2)(zod@3.25.76)
       '@ts-rest/core': 3.52.1(@types/node@22.19.2)(zod@3.25.76)
-      openapi3-ts: 2.0.2
-      zod: 3.25.76
-
-  '@ts-rest/open-api@3.52.1(@ts-rest/core@3.52.1(@types/node@24.10.3)(zod@3.25.76))(zod@3.25.76)':
-    dependencies:
-      '@anatine/zod-openapi': 1.14.2(openapi3-ts@2.0.2)(zod@3.25.76)
-      '@ts-rest/core': 3.52.1(@types/node@24.10.3)(zod@3.25.76)
       openapi3-ts: 2.0.2
       zod: 3.25.76
 
