@@ -40,11 +40,10 @@ export const useStore = defineStore("user", {
                     const res = await refreshAccessToken();
                     if (res.isOk()) {
                         console.log("Access token refreshed successfully.");
+                        this.autoRefresh();
                     } else {
                         console.error("Failed to refresh access token:", res.error);
                     }
-
-                    this.autoRefresh();
                 }, refreshIn);
             }
         },
