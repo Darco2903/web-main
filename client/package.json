@@ -20,8 +20,8 @@
         "clean": "rimraf dist"
     },
     "dependencies": {
-        "@darco2903/auth-api": "^2.0.2",
-        "@darco2903/cdn-api": "1.0.5",
+        "@darco2903/auth-api": "2.0.3",
+        "@darco2903/cdn-api": "1.0.6",
         "@darco2903/web-common": "^0.6.2",
         "@intlify/unplugin-vue-i18n": "^11.0.1",
         "@ts-rest/core": "^3.52.1",
