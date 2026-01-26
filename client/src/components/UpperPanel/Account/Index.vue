@@ -3,6 +3,7 @@ import { computed, onMounted, onUnmounted, ref, type CSSProperties, type Ref } f
 import { RouterLink } from "vue-router";
 import { useStore as useUserStore } from "@store/user";
 import { useI18n } from "vue-i18n";
+import { VITE_AUTH_SERVER_ORIGIN } from "@mod/config";
 
 import UserIcon from "@comp/UserIcon.vue";
 import LoginButton from "@comp/UpperPanel/Account/LoginButton.vue";
@@ -32,7 +33,7 @@ const sessionStyles = computed(() => {
 });
 
 const logoutURL = computed(() => {
-    const url = new URL(import.meta.env.VITE_AUTH_SERVER_ORIGIN + "/logout");
+    const url = new URL(VITE_AUTH_SERVER_ORIGIN + "/logout");
     url.searchParams.append("redirect", window.location.origin);
     return url.href;
 });
@@ -229,7 +230,9 @@ body[mobile] #user-session:not([active]) #user-links {
     position: relative;
     cursor: pointer;
     color: var(--text-color);
-    transition: color var(--theme-time) ease, background-color var(--theme-time) ease;
+    transition:
+        color var(--theme-time) ease,
+        background-color var(--theme-time) ease;
 }
 
 #user-links a:not(:last-child) {

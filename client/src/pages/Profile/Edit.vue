@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, type ComputedRef, type CSSProperties, type Ref } from "vue";
-import { IS_MOBILE, wait } from "@darco2903/web-common";
-import { authApi, cdnApi } from "@/modules/api";
-import { router } from "@/router";
-import { useStore as useUserStore } from "@store/user";
 import { useI18n } from "vue-i18n";
+import { router } from "@/router";
+import { IS_MOBILE, wait } from "@darco2903/web-common";
+import { authApi, cdnApi } from "@api/index";
+import { useStore as useUserStore } from "@store/user";
+import { VITE_AUTH_SERVER_ORIGIN } from "@mod/config";
 
 import LoadingSpinner from "@comp/LoadingSpinner.vue";
 import UserIcon from "@comp/UserIcon.vue";
@@ -17,7 +18,7 @@ if (!userStore.info) {
     router.push("/");
 }
 
-const editPasswordURL = ref(import.meta.env.VITE_AUTH_SERVER_ORIGIN + "/password/edit");
+const editPasswordURL = ref(VITE_AUTH_SERVER_ORIGIN + "/password/edit");
 const ready: Ref<boolean> = ref(false);
 const userIcon: Ref<string | undefined> = ref(undefined);
 const restoreUserIcon: Ref<string | undefined> = ref(undefined);
@@ -421,7 +422,10 @@ input[type="password"] {
     color: #eee;
     background-color: #25254d;
     font-size: 16px;
-    transition: border var(--theme-time) ease, background-color var(--theme-time) ease, color var(--theme-time) ease;
+    transition:
+        border var(--theme-time) ease,
+        background-color var(--theme-time) ease,
+        color var(--theme-time) ease;
 }
 
 input[type="text"]::placeholder,
@@ -495,7 +499,9 @@ body[mobile] #user-image-content {
     height: 96px;
     /* border: 2px dashed #222245; */
     border: 2px dashed #eee;
-    transition: background-color 0.3s ease, border var(--theme-time) ease;
+    transition:
+        background-color 0.3s ease,
+        border var(--theme-time) ease;
 }
 
 body[mobile] #image-input-container {
@@ -620,7 +626,10 @@ body[mobile] #image-round-border-label {
     height: 100%;
     /* border: 4px solid #222245; */
     border: 4px solid #56568f;
-    transition: border-radius 0.2s, border-color var(--theme-time) ease, background-color 0.2s;
+    transition:
+        border-radius 0.2s,
+        border-color var(--theme-time) ease,
+        background-color 0.2s;
 }
 
 body:not([mobile]) #image-round-border:hover #image-round-border-box {

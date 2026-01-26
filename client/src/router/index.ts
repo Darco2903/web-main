@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router";
 import { useStore as useUserStore } from "@store/user";
+import { VITE_AUTH_SERVER_ORIGIN } from "@mod/config";
 
 const NotFound = () => import("@pages/NotFound.vue");
 const Layout = () => import("@pages/Layout.vue");
@@ -68,7 +69,7 @@ router.beforeEach(async (to) => {
             console.log("User not logged in");
             alert("You need to be logged in to access this page");
 
-            const url = new URL("/login", import.meta.env.VITE_AUTH_SERVER_ORIGIN);
+            const url = new URL("/login", VITE_AUTH_SERVER_ORIGIN);
             url.searchParams.append("redirect", window.location.origin + to.fullPath);
             // console.log("Redirecting to", url.href);
             window.location.replace(url.href);

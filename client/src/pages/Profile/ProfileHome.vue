@@ -2,10 +2,11 @@
 import type { User, UserPublic } from "@darco2903/auth-api/client";
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import { IS_MOBILE } from "@darco2903/web-common";
-import { authApi } from "@/modules/api";
-import { useStore as useUserStore } from "@store/user";
 import { useI18n } from "vue-i18n";
+import { IS_MOBILE } from "@darco2903/web-common";
+import { authApi } from "@api/index";
+import { useStore as useUserStore } from "@store/user";
+import { VITE_AUTH_SERVER_ORIGIN } from "@mod/config";
 
 import LoadingSpinner from "@comp/LoadingSpinner.vue";
 import UserIcon from "@comp/UserIcon.vue";
@@ -14,7 +15,7 @@ const location = useRoute();
 const userStore = useUserStore();
 const { t } = useI18n();
 
-const verifyUrl = import.meta.env.VITE_AUTH_SERVER_ORIGIN + "/verify-request";
+const verifyUrl = VITE_AUTH_SERVER_ORIGIN + "/verify-request";
 const userIcon = ref("");
 const user = ref<UserPublic | User | null>(null);
 const ready = ref(false);
@@ -87,7 +88,7 @@ watch(
             errorMessage.value = "";
             await init();
         }
-    }
+    },
 );
 
 onMounted(async () => {
@@ -125,7 +126,7 @@ onMounted(async () => {
                     <RouterLink id="edit-profile" to="/profile/edit" v-if="ownProfile">{{ t("profileHome.editProfile") }}</RouterLink>
                 </div>
 
-                <div class="user-profile-verified" v-if="ownProfile && !(user as User).verified ">
+                <div class="user-profile-verified" v-if="ownProfile && !(user as User).verified">
                     <span>{{ t("profileHome.emailUnverified") }}</span>
                     <a class="verify-link" :href="verifyUrl" target="_blank">{{ t("profileHome.verifyNow") }}</a>
                 </div>
@@ -192,7 +193,10 @@ body[mobile] #user-name {
     text-decoration: none;
     cursor: pointer;
     font-weight: bold;
-    transition: background-color var(--theme-time) ease, color var(--theme-time) ease, filter var(--hover-time) ease;
+    transition:
+        background-color var(--theme-time) ease,
+        color var(--theme-time) ease,
+        filter var(--hover-time) ease;
 }
 
 body[mobile] #edit-profile {
