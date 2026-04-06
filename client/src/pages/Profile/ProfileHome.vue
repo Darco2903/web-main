@@ -129,7 +129,7 @@ onMounted(async () => {
                         />
                     </div>
 
-                    <RouterLink class="usr-btn no-underline" to="/profile/edit" v-if="ownProfile">{{
+                    <RouterLink class="usr-btn no-underline" to="/profile/edit" :disabled="true" v-if="ownProfile">{{
                         t("profileHome.editProfile")
                     }}</RouterLink>
                 </div>
