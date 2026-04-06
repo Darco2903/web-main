@@ -172,10 +172,8 @@ onUnmounted(async () => {
 #user-session-container {
     border-radius: 14px;
     overflow: hidden;
-    /* background-color: #fff; */
-    /* background-color: var(--background-color-light); */
-    background-color: var(--background-color);
-    transition: background-color var(--theme-time) ease;
+    background-color: var(--bg);
+    transition: background-color 200ms ease;
 }
 
 #user-account-info {
@@ -197,8 +195,8 @@ onUnmounted(async () => {
     text-overflow: ellipsis;
     overflow: hidden;
     /* text-align: center; */
-    color: var(--text-color);
-    transition: color var(--theme-time) ease;
+    color: var(--text);
+    transition: color 200ms ease;
 }
 
 body[mobile] #user-account-name {
@@ -229,10 +227,10 @@ body[mobile] #user-session:not([active]) #user-links {
     border-top: 2px solid var(--border-color);
     position: relative;
     cursor: pointer;
-    color: var(--text-color);
+    color: var(--text);
     transition:
-        color var(--theme-time) ease,
-        background-color var(--theme-time) ease;
+        color 200ms ease,
+        background-color 200ms ease;
 }
 
 #user-links a:not(:last-child) {

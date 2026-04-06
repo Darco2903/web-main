@@ -1,17 +1,13 @@
 <script setup lang="ts">
 import type { CSSProperties } from "vue";
 import { IS_MOBILE } from "@darco2903/web-common";
-import { VITE_CDN_SERVER_ORIGIN, VITE_MANAGER_SERVER_ORIGIN } from "@mod/config";
+import { VITE_CDN_SERVER_ORIGIN } from "@mod/config";
 
-import SiteIcon from "@comp/UpperPanel/SiteIcon.vue";
+import SiteIcon from "@comp/SiteIcon.vue";
 import UserAccount from "@comp/UpperPanel/Account/Index.vue";
 
-import mainIcon from "@assets/icon-main.svg";
-import cdnIcon from "@assets/icon-cdn.svg";
-import managerIcon from "@assets/icon-manager.svg";
-
-const cdnOrigin = VITE_CDN_SERVER_ORIGIN;
-const managerOrigin = VITE_MANAGER_SERVER_ORIGIN;
+import MainIcon from "@assets/icon-main.svg";
+import CdnIcon from "@assets/icon-cdn.svg";
 
 const padding = IS_MOBILE ? "10px" : "20px 30px";
 const siteIconSize = IS_MOBILE ? "64px" : "128px";
@@ -26,9 +22,13 @@ const upperPanelRowStyle: CSSProperties = {
     <div id="upper-panel">
         <div class="upper-panel-row" id="panel-first-row" :style="upperPanelRowStyle">
             <div id="upper-panel-left">
-                <SiteIcon :icon="mainIcon" :size="siteIconSize" url="/" />
-                <SiteIcon :icon="cdnIcon" :size="siteIconSize" :url="`${cdnOrigin}/app/`" :external="true" target="_blank" />
-                <SiteIcon :icon="managerIcon" :size="siteIconSize" :url="managerOrigin" :external="true" target="_blank" />
+                <!-- <SiteIcon :size="siteIconSize" url="/" :clickable="true">
+                    <MainIcon />
+                </SiteIcon>
+
+                <SiteIcon :size="siteIconSize" :url="`${VITE_CDN_SERVER_ORIGIN}/app/`" :clickable="true" :external="true" target="_blank">
+                    <CdnIcon />
+                </SiteIcon> -->
             </div>
 
             <div id="upper-panel-right">

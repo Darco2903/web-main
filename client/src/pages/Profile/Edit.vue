@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, type ComputedRef, type CSSProperties, type Ref } from "vue";
+import { computed, onMounted, ref, type CSSProperties } from "vue";
 import { useI18n } from "vue-i18n";
 import { router } from "@/router";
 import { IS_MOBILE, wait } from "@darco2903/web-common";
@@ -9,6 +9,7 @@ import { VITE_AUTH_SERVER_ORIGIN } from "@mod/config";
 
 import LoadingSpinner from "@comp/LoadingSpinner.vue";
 import UserIcon from "@comp/UserIcon.vue";
+import { err, ok, ResultAsync } from "neverthrow";
 
 const userStore = useUserStore();
 const { t } = useI18n();
@@ -18,15 +19,15 @@ if (!userStore.info) {
     router.push("/");
 }
 
-const editPasswordURL = ref(VITE_AUTH_SERVER_ORIGIN + "/password/edit");
-const ready: Ref<boolean> = ref(false);
-const userIcon: Ref<string | undefined> = ref(undefined);
-const restoreUserIcon: Ref<string | undefined> = ref(undefined);
-const border: Ref<boolean> = ref(false);
-const userName: Ref<string> = ref("");
-let iconDragOver = false;
-const savingIcon = ref(false);
-let savingUsername = false;
+const editPasswordURL = ref<string>(VITE_AUTH_SERVER_ORIGIN + "/password/edit");
+const ready = ref<boolean>(false);
+const userIcon = ref<string | undefined>(undefined);
+const restoreUserIcon = ref<string | undefined>(undefined);
+const border = ref<boolean>(false);
+const userName = ref<string>("");
+let iconDragOver: boolean = false;
+const savingIcon = ref<boolean>(false);
+let savingUsername: boolean = false;
 
 const userIconSize = IS_MOBILE ? "128px" : "192px";
 const userIconBorderSize = IS_MOBILE ? "3px" : "6px";
@@ -35,19 +36,19 @@ const roundBorderContainerStyle: CSSProperties = {
     gap: IS_MOBILE ? "0.8em" : "15px",
 };
 
-const borderEdited = computed(() => {
-    return !!userStore.info && userStore.info.round_border !== border.value;
+const borderEdited = computed<boolean>(() => {
+    return userStore.info !== null && userStore.info.round_border !== border.value;
 });
 
-const iconEdited = computed(() => {
+const iconEdited = computed<boolean>(() => {
     return userIcon.value !== restoreUserIcon.value;
 });
 
-const iconRemoved = computed(() => {
+const iconRemoved = computed<boolean>(() => {
     return userIcon.value === undefined;
 });
 
-const nameEdited: ComputedRef<boolean> = computed(() => {
+const nameEdited = computed<boolean>(() => {
     return !!userStore.info && userStore.info.name !== userName.value;
 });
 
@@ -58,17 +59,17 @@ function buttonStyle(state: boolean): CSSProperties {
     };
 }
 
-function onIconDragover() {
+function onIconDragover(): void {
     // console.log("dragover");
     iconDragOver = true;
 }
 
-function onIconDragleave() {
+function onIconDragleave(): void {
     // console.log("dragleave");
     iconDragOver = false;
 }
 
-function loadIcon(file: File) {
+function loadIcon(file: File): void {
     const reader = new FileReader();
     reader.onload = (e) => {
         if (typeof e.target?.result !== "string") {
@@ -76,11 +77,12 @@ function loadIcon(file: File) {
             return;
         }
         userIcon.value = e.target?.result;
+        // console.log("Loaded icon:", userIcon.value);
     };
     reader.readAsDataURL(file);
 }
 
-function onIconInput(e: Event) {
+function onIconInput(e: Event): void {
     const input = e.target as HTMLInputElement;
     const file: File | undefined = input.files ? input.files[0] : undefined;
     input.value = "";
@@ -90,7 +92,7 @@ function onIconInput(e: Event) {
     loadIcon(file);
 }
 
-function onIconDrop(e: DragEvent) {
+function onIconDrop(e: DragEvent): void {
     iconDragOver = false;
     const file = e.dataTransfer?.files[0];
     if (!file) {
@@ -99,11 +101,11 @@ function onIconDrop(e: DragEvent) {
     loadIcon(file);
 }
 
-function removeIcon() {
+function removeIcon(): void {
     userIcon.value = undefined;
 }
 
-function cancelIcon() {
+function cancelIcon(): void {
     userIcon.value = restoreUserIcon.value;
     border.value = !!userStore.info?.round_border;
 }
@@ -213,18 +215,33 @@ async function saveIcon() {
     }
 
     if (borderEdited) {
-        const resBorder = await authApi.user.updateBorder({ body: { roundBorder: border.value } });
-        if (resBorder.status === 200) {
-            console.log("Profile picture border updated");
-            if (userStore.info) {
-                userStore.info.round_border = border.value;
-            }
-            reload = true;
-        } else if (resBorder.status === 400) {
-            console.error("Invalid border radius", resBorder.body.issues.find((issue) => issue.message)?.message);
-        } else if (resBorder.status === 401 || resBorder.status === 500) {
-            console.error("Internal server error", resBorder.body.error);
-        }
+        await ResultAsync.fromPromise(
+            authApi.user.updateBorder({ body: { roundBorder: border.value } }),
+            (e) => `Failed to update profile picture border: ${e instanceof Error ? e.message : String(e)}`,
+        )
+            .andThen((res) => {
+                console.log("Profile picture border response", res);
+                if (res.status === 204) {
+                    return ok();
+                    reload = true;
+                } else if (res.status === 400) {
+                    console.error("Invalid border radius", res.body.issues.find((issue) => issue.message)?.message);
+                    return err("Invalid border radius");
+                } else if (res.status === 401 || res.status === 500) {
+                    console.error("Internal server error", res.body.error);
+                    return err("Internal server error");
+                } else {
+                    console.error("Unexpected response", res);
+                    return err("An error occurred while updating the profile picture border");
+                }
+            })
+            .andTee(() => {
+                console.log("Profile picture border updated");
+
+                if (userStore.info) {
+                    userStore.info.round_border = border.value;
+                }
+            });
     }
 
     if (reload) {
@@ -289,7 +306,7 @@ onMounted(() => {
     // console.log("UserIcon:", userIcon);
     // console.log("RestoreUserIcon:", restoreUserIcon);
 
-    // ready.value = true;
+    ready.value = true;
 });
 </script>
 
@@ -319,7 +336,9 @@ onMounted(() => {
                             >
                                 <div id="image-input-div">
                                     <div id="drag-drop">Drag & Drop</div>
-                                    <label id="image-input-but" for="image-input">Upload</label>
+                                    <label class="usr-btn" id="image-input-but" style="transform: translateY(15%)" for="image-input">
+                                        Upload
+                                    </label>
                                     <input type="file" name="profile-pic" id="image-input" accept="image/*" @input="onIconInput" />
                                 </div>
                             </div>
@@ -335,11 +354,13 @@ onMounted(() => {
                                     </label>
                                 </div>
                             </div>
-                            <button class="but-option on-edit" id="image-remove" @click="removeIcon" :style="buttonStyle(!iconRemoved)">
+
+                            <button class="usr-btn" id="image-remove" @click="removeIcon" :style="buttonStyle(!iconRemoved)">
                                 {{ t("edit.remove") }}
                             </button>
+
                             <button
-                                class="but-option on-edit"
+                                class="usr-btn"
                                 id="image-cancel"
                                 :style="buttonStyle(iconEdited || borderEdited)"
                                 :disabled="savingIcon"
@@ -347,8 +368,9 @@ onMounted(() => {
                             >
                                 {{ t("edit.cancel") }}
                             </button>
+
                             <button
-                                class="but-option on-edit"
+                                class="usr-btn"
                                 id="image-save"
                                 :style="buttonStyle(iconEdited || borderEdited)"
                                 :disabled="savingIcon"
@@ -366,11 +388,24 @@ onMounted(() => {
                             <input type="text" :placeholder="t('edit.username')" v-model="userName" />
                         </div>
 
-                        <div class="on-edit" id="username-options" :style="buttonStyle(nameEdited)">
-                            <button class="but-option" id="username-cancel" :disabled="savingUsername" @click="cancelUsername">
+                        <div id="username-options">
+                            <button
+                                class="usr-btn"
+                                id="username-cancel"
+                                :style="buttonStyle(nameEdited)"
+                                :disabled="savingUsername"
+                                @click="cancelUsername"
+                            >
                                 {{ t("edit.cancel") }}
                             </button>
-                            <button class="but-option" id="username-save" :disabled="savingUsername" @click="saveUsername">
+
+                            <button
+                                class="usr-btn"
+                                id="username-save"
+                                :style="buttonStyle(nameEdited)"
+                                :disabled="savingUsername"
+                                @click="saveUsername"
+                            >
                                 {{ t("edit.save") }}
                             </button>
                         </div>
@@ -379,7 +414,7 @@ onMounted(() => {
 
                 <div class="data-section" id="password">
                     <div style="text-align: center; user-select: none">
-                        <a class="edit-password-but but-option" :href="editPasswordURL">{{ t("edit.changePassword") }}</a>
+                        <a class="edit-password-but usr-btn" :href="editPasswordURL">{{ t("edit.changePassword") }}</a>
                     </div>
                 </div>
 
@@ -423,20 +458,20 @@ input[type="password"] {
     background-color: #25254d;
     font-size: 16px;
     transition:
-        border var(--theme-time) ease,
-        background-color var(--theme-time) ease,
-        color var(--theme-time) ease;
+        border 200ms ease,
+        background-color 200ms ease,
+        color 200ms ease;
 }
 
 input[type="text"]::placeholder,
 input[type="password"]::placeholder {
     /* color: #555; */
     color: #bbb;
-    transition: color var(--theme-time) ease;
+    transition: color 200ms ease;
 }
 
 .on-edit {
-    transition: opacity 0.3s ease;
+    /* transition: opacity 0.3s ease; */
 }
 
 .user-edit-loading {
@@ -501,7 +536,7 @@ body[mobile] #user-image-content {
     border: 2px dashed #eee;
     transition:
         background-color 0.3s ease,
-        border var(--theme-time) ease;
+        border 200ms ease;
 }
 
 body[mobile] #image-input-container {
@@ -531,14 +566,6 @@ body[mobile] #image-input-container {
 
 #image-input-container[drag-over="true"] #drag-drop {
     color: #fff;
-}
-
-#image-input-but {
-    padding: 8px;
-    border: 2px solid #56568f;
-    background-color: #1e1e3f;
-    color: #fff;
-    user-select: none;
 }
 
 #image-input-but:hover {
@@ -571,8 +598,8 @@ body[mobile] #image-input-container {
 
 #image-round-border-label {
     user-select: none;
-    color: var(--text-color);
-    transition: color var(--theme-time) ease;
+    color: var(--text);
+    transition: color 200ms ease;
 }
 
 body[mobile] #image-round-border-label {
@@ -584,19 +611,9 @@ body[mobile] #image-round-border-label {
     transition: opacity 0.3s ease;
 }
 
-.data-section[disabled],
-.but-option:disabled {
+.data-section[disabled] {
     opacity: 0.7 !important;
     pointer-events: none !important;
-}
-
-.but-option {
-    padding: 8px;
-    border: 2px solid #56568f;
-    background-color: #1e1e3f;
-    color: #fff;
-    user-select: none;
-    cursor: pointer;
 }
 
 #image-round-border-input {
@@ -625,10 +642,10 @@ body[mobile] #image-round-border-label {
     width: 100%;
     height: 100%;
     /* border: 4px solid #222245; */
-    border: 4px solid #56568f;
+    border: 4px solid var(--border);
     transition:
         border-radius 0.2s,
-        border-color var(--theme-time) ease,
+        border-color 200ms ease,
         background-color 0.2s;
 }
 
@@ -638,8 +655,7 @@ body:not([mobile]) #image-round-border:hover #image-round-border-box {
 
 input:checked + label #image-round-border-box {
     border-radius: 50%;
-    /* background-color: var(--background-color-dark); */
-    background-color: #222245;
+    background-color: var(--color-primary);
 }
 
 .edit-password-but {

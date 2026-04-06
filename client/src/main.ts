@@ -3,7 +3,6 @@ import { IS_MOBILE, wait } from "@darco2903/web-common";
 import { router } from "@router/index";
 import { createPinia } from "pinia";
 import { i18n } from "@loc/index";
-// import { getTheme, setTheme } from "@mod/themes";
 
 import "@styles/style.css";
 
@@ -11,10 +10,6 @@ import App from "@/App.vue";
 
 window.addEventListener("DOMContentLoaded", async () => {
     document.body.toggleAttribute("mobile", IS_MOBILE);
-
-    // const theme = getTheme();
-    // console.log("Applying theme:", theme);
-    // setTheme(theme);
 
     createApp(App)
         //
@@ -36,7 +31,7 @@ if (import.meta.hot) {
         const middle = " ".repeat(Math.floor((n - message.length) / 2));
         console.log(
             "%c" + "-".repeat(n) + `\n${middle}${message}\n` + "-".repeat(n),
-            "color: #42b983; font-weight: bold; font-size: 1.5em;"
+            "color: #42b983; font-weight: bold; font-size: 1.5em;",
         );
     });
 }

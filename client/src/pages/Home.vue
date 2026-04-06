@@ -1,13 +1,22 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
+import { IS_MOBILE } from "@darco2903/web-common";
+import { VITE_CDN_SERVER_ORIGIN, VITE_MANAGER_SERVER_ORIGIN } from "@mod/config";
+
+import SiteIcon from "@comp/SiteIcon.vue";
+
+import CdnIcon from "@assets/icon-cdn.svg";
+import ManagerIcon from "@assets/icon-manager.svg";
 
 const { t } = useI18n();
+
+const siteIconSize = IS_MOBILE ? "128px" : "192px";
 </script>
 
 <template>
     <div id="home-content">
-        <div class="category-content">
-            <span
+        <div class="flex center" :class="IS_MOBILE ? 'col' : 'row'" style="margin: 40px; gap: 40px">
+            <!-- <span
                 :style="{
                     color: '#bbbb',
                     fontWeight: 'bold',
@@ -18,79 +27,65 @@ const { t } = useI18n();
                     pointerEvents: 'none',
                 }"
                 >{{ t("home.welcomeMessage") }}</span
-            >
+            > -->
+
+            <div class="flex row center redirect-elem">
+                <SiteIcon
+                    style="position: relative"
+                    :size="siteIconSize"
+                    :url="`${VITE_CDN_SERVER_ORIGIN}/app/`"
+                    :clickable="true"
+                    :external="true"
+                    target="_blank"
+                >
+                    <CdnIcon style="position: absolute; width: 100%; height: 100%" />
+                    <span class="redirect-elem-label">CDN</span>
+                </SiteIcon>
+            </div>
+
+            <div class="flex row center redirect-elem">
+                <SiteIcon
+                    style="position: relative"
+                    :size="siteIconSize"
+                    :url="VITE_MANAGER_SERVER_ORIGIN"
+                    :clickable="true"
+                    :external="true"
+                    target="_blank"
+                >
+                    <ManagerIcon style="position: absolute; width: 100%; height: 100%" />
+                    <span class="redirect-elem-label">Server Manager</span>
+                </SiteIcon>
+            </div>
         </div>
     </div>
 </template>
 
 <style scoped>
-body {
-    font-family: Arial, sans-serif;
+.redirect-elem {
+    border-radius: 10px;
+    padding: 20px;
+    border: 2px solid transparent;
     user-select: none;
-}
+    background-color: var(--bg-card);
+    transition:
+        border 2000ms ease,
+        box-shadow 100ms ease;
 
-#home-content {
-    margin: 50px;
-    display: flex;
-    flex-direction: column;
-    gap: 50px;
-}
+    &:hover {
+        border: 2px solid var(--input);
+        box-shadow: 5px 5px 30px -15px var(--input);
+    }
 
-.category {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
+    .redirect-elem-label {
+        position: absolute;
+        bottom: 0;
+        transform: translateY(25%);
 
-.category-title {
-    font-size: 24px;
-    font-weight: bold;
-    /* color: #333; */
-    color: #eee;
-    text-transform: uppercase;
-    padding: 10px 0;
-    /* border-bottom: 2px solid #ddd; */
-    border-bottom: 2px solid #555;
-    /* border-color: #555; */
-    transition: color var(--theme-time) ease, border-color var(--theme-time) ease;
+        width: 100%;
+        color: var(--text);
+        font-weight: bold;
+        font-size: 1.2em;
+        text-align: center;
+    }
 }
-
-.category-content {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 100px;
-}
-
-.redirect {
-    position: relative;
-    padding: 15px 20px;
-    border-radius: 7px;
-    text-decoration: none;
-    color: #fff;
-    background-color: #0af;
-    transition: filter var(--hover-time) ease;
-}
-
-.redirect:hover {
-    filter: drop-shadow(3px 3px 3px var(--hover-color)) brightness(1.01);
-}
-
-.redirect-name {
-}
-
-.redirect-icon {
-    position: absolute;
-}
-
-/* #filetransfert .redirect-icon {
-    top: 75%;
-    right: 0;
-    transform: translate(-50%, -50%);
-    background-image: var(--transfert-icon);
-    background-size: contain;
-    background-repeat: no-repeat;
-    width: 24px;
-    height: 24px;
-} */
 </style>

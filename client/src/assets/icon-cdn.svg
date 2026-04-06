@@ -1,1 +1,15 @@
-<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 772.8 443.56"><defs><style>.cls-1{stroke:#fff;stroke-miterlimit:10;stroke-width:32px;fill:url(#linear-gradient);}</style><linearGradient id="linear-gradient" x1="137.11" y1="322.36" x2="668.43" y2="694.4" gradientUnits="userSpaceOnUse"><stop offset="0.07" stop-color="#00a5ff"/><stop offset="0.93" stop-color="#c5007f"/></linearGradient></defs><path class="cls-1" d="M677.8,426.71c-12.35,0-24.69,2.05-37,8.23,4.12-8.23,6.17-18.52,6.17-28.81a82.55,82.55,0,0,0-82.31-82.31c-18.52,0-32.92,6.17-47.33,14.4-20.57-78.19-92.6-137.87-179-137.87a184.43,184.43,0,0,0-185.2,185.2c0,8.23,0,16.46,2.05,22.64-8.23-2.06-14.4-2.06-22.63-2.06C74.87,406.13,29.6,451.4,29.6,509S74.87,611.91,132.49,611.91H677.8a92.6,92.6,0,1,0,0-185.2Z" transform="translate(-13.6 -184.35)"/></svg>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 772.8 443.56">
+    <defs>
+        <style>
+            .cls-1{stroke:#fff;stroke-miterlimit:10;stroke-width:32px;fill:url(#linear-gradient);}</style>
+        <linearGradient id="linear-gradient" x1="137.11" y1="322.36" x2="668.43" y2="694.4"
+            gradientUnits="userSpaceOnUse">
+            <stop offset="0.07" stop-color="#00a5ff" />
+            <stop offset="0.93" stop-color="#c5007f" />
+        </linearGradient>
+    </defs>
+    <path class="cls-1"
+        d="M677.8,426.71c-12.35,0-24.69,2.05-37,8.23,4.12-8.23,6.17-18.52,6.17-28.81a82.55,82.55,0,0,0-82.31-82.31c-18.52,0-32.92,6.17-47.33,14.4-20.57-78.19-92.6-137.87-179-137.87a184.43,184.43,0,0,0-185.2,185.2c0,8.23,0,16.46,2.05,22.64-8.23-2.06-14.4-2.06-22.63-2.06C74.87,406.13,29.6,451.4,29.6,509S74.87,611.91,132.49,611.91H677.8a92.6,92.6,0,1,0,0-185.2Z"
+        transform="translate(-13.6 -184.35)" />
+</svg>

@@ -98,6 +98,12 @@ onMounted(async () => {
 
 <template>
     <div>
+        <div class="flex row" style="margin: 24px 16px" v-if="!errorMessage">
+            <div class="go-home usr-btn">
+                <RouterLink to="/" class="text" style="text-decoration: none"><-</RouterLink>
+            </div>
+        </div>
+
         <LoadingSpinner class="user-edit-loading" :loading="!ready" v-if="!ready && !errorMessage" />
 
         <div class="user-profile-content" v-else-if="userId && !errorMessage">
@@ -111,7 +117,7 @@ onMounted(async () => {
                     />
 
                     <div style="display: flex; flex-direction: row; gap: 10px; align-items: center">
-                        <label id="user-name">{{ user?.name }}</label>
+                        <label class="user-name text">{{ user?.name }}</label>
                         <img
                             class="verified-icon"
                             src="@icons/verified-96px.png"
@@ -123,7 +129,9 @@ onMounted(async () => {
                         />
                     </div>
 
-                    <RouterLink id="edit-profile" to="/profile/edit" v-if="ownProfile">{{ t("profileHome.editProfile") }}</RouterLink>
+                    <RouterLink class="usr-btn no-underline" to="/profile/edit" v-if="ownProfile">{{
+                        t("profileHome.editProfile")
+                    }}</RouterLink>
                 </div>
 
                 <div class="user-profile-verified" v-if="ownProfile && !(user as User).verified">
@@ -133,8 +141,12 @@ onMounted(async () => {
             </div>
         </div>
 
-        <div class="user-profile-error-container" v-else>
+        <div class="flex col center user-profile-error-container" style="gap: 24px" v-else>
             <div class="user-profile-error">{{ errorMessage }}</div>
+
+            <div class="go-home usr-btn">
+                <RouterLink to="/" class="text" style="text-decoration: none">{{ t("common.goHome.goHome") }}</RouterLink>
+            </div>
         </div>
     </div>
 </template>
@@ -174,38 +186,13 @@ onMounted(async () => {
     align-items: center;
 }
 
-#user-name {
+.user-name {
     font-size: 24px;
     font-weight: bold;
-    color: var(--text-color);
-    transition: color var(--theme-time) ease;
 }
 
-body[mobile] #user-name {
+body[mobile] .user-name {
     font-size: 20px;
-}
-
-#edit-profile {
-    padding: 10px 20px;
-    border-radius: 5px;
-    background-color: var(--primary-color);
-    color: #222;
-    text-decoration: none;
-    cursor: pointer;
-    font-weight: bold;
-    transition:
-        background-color var(--theme-time) ease,
-        color var(--theme-time) ease,
-        filter var(--hover-time) ease;
-}
-
-body[mobile] #edit-profile {
-    padding: 0.5em 1em;
-    font-size: 0.9em;
-}
-
-#edit-profile:hover {
-    filter: drop-shadow(2px 2px 3px var(--hover-color));
 }
 
 .user-profile-verified {
@@ -216,7 +203,7 @@ body[mobile] #edit-profile {
     margin-top: 10px;
     font-weight: bold;
     font-size: 1.2em;
-    color: #ff9900;
+    color: var(--color-warning);
 }
 
 .verify-link {
@@ -229,10 +216,10 @@ body[mobile] #edit-profile {
 }
 
 .user-profile-error-container {
-    display: flex;
+    /* display: flex;
     justify-content: center;
-    align-items: center;
-    width: 100%;
+    align-items: center; */
+    /* width: 100%; */
     height: 200px;
 }
 

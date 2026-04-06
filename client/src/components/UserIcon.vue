@@ -1,39 +1,25 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref, type CSSProperties } from "vue";
 
-import userIconDark from "@icons/profile/user-default-dark.jpg";
+import UserSvg from "@icons/user.svg";
 
-const { iconUrl, roundBorder, size, borderSize } = defineProps({
-    iconUrl: {
-        type: String,
-        required: false,
-        default: userIconDark,
-    },
+const {
+    iconUrl,
+    roundBorder = false,
+    size = "128px",
+    borderSize = "4px",
+} = defineProps<{
+    iconUrl?: string;
+    roundBorder?: boolean;
+    size?: string;
+    borderSize?: string;
+}>();
 
-    roundBorder: {
-        type: Boolean,
-        required: false,
-        default: false,
-    },
+// const iconUrl = ref<string | undefined>(undefined);
+const useFallback = computed<boolean>(() => iconUrl === undefined);
+const errored = ref<boolean>(false);
 
-    size: {
-        type: String,
-        required: false,
-        default: "128px",
-    },
-
-    borderSize: {
-        type: String,
-        required: false,
-        default: "4px",
-    },
-});
-
-const imageSrc = computed(() => {
-    return iconUrl || userIconDark;
-});
-
-const userBoxImageStyle = computed(() => {
+const userBoxImageStyle = computed<CSSProperties>(() => {
     return {
         "border-radius": roundBorder ? "50%" : "0%",
     };
@@ -44,22 +30,35 @@ const emit = defineEmits<{
     (e: "error", event: Event): void;
 }>();
 
+// function setIconUrl(url: string | undefined): void {
+//     iconUrl.value = url;
+//     useFallback.value = url === undefined;
+// }
+
 function onLoad(event: Event) {
+    errored.value = false;
     emit("load", event);
+    console.log("User icon loaded successfully.");
 }
 
 function onError(event: Event) {
+    errored.value = true;
+    emit("error", event);
+
     const elem = event.target as HTMLImageElement;
     console.error(`Error loading user icon at ${elem.src}, using default icon.`);
-    emit("error", event);
-    elem.src = userIconDark;
 }
+
+// defineExpose({
+//     setIconUrl,
+// });
 </script>
 
 <template>
     <div class="user-image-container">
         <div class="user-image-box" :style="userBoxImageStyle">
-            <img class="user-image" :src="imageSrc" @load="onLoad" @error="onError" />
+            <UserSvg class="user-image" v-show="useFallback || errored" />
+            <img class="user-image" :src="iconUrl" @load="onLoad" @error="onError" v-show="!useFallback && !errored" />
         </div>
     </div>
 </template>
@@ -79,7 +78,9 @@ function onError(event: Event) {
     outline: v-bind(borderSize) solid #eee;
     outline-offset: -1px;
     overflow: hidden;
-    transition: outline var(--theme-time) ease, border-radius 0.2s ease;
+    transition:
+        outline 200ms ease,
+        border-radius 200ms ease;
 }
 
 .user-image {
