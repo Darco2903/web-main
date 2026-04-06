@@ -28,6 +28,11 @@ export const useThemeStore = defineStore("theme", () => {
         return "system";
     }
 
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+        if (theme.value !== "system") return;
+        setTheme("system");
+    });
+
     return {
         // state
         theme: readonly(theme),
