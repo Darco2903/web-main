@@ -1,7 +1,1 @@
--   [x] rework AuthAPI to use the new API
--   [ ] rework profile /profile/<username> or /profile/<id> (abandoned)
--   [ ] loading animation while account checks (?)
--   [x] add email verif to profile page
--   [x] remove `document.body.classList.remove("no-transition");`
--   [x] rework app layout (UpperPanel)
--   [ ] rework app style
+- [ ] rework app styles
