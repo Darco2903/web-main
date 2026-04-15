@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, type CSSProperties } from "vue";
 import { useI18n } from "vue-i18n";
+import { err, ok, ResultAsync } from "neverthrow";
+import type { User } from "@darco2903/auth-api";
+import { IS_MOBILE } from "@darco2903/web-common";
 import { router } from "@/router";
-import { IS_MOBILE, wait } from "@darco2903/web-common";
 import { authApi, cdnApi } from "@api/index";
 import { useStore as useUserStore } from "@store/user";
 import { VITE_AUTH_SERVER_ORIGIN } from "@mod/config";
 
 import LoadingSpinner from "@comp/LoadingSpinner.vue";
 import UserIcon from "@comp/UserIcon.vue";
-import { err, ok, ResultAsync } from "neverthrow";
 
 const userStore = useUserStore();
 const { t } = useI18n();
@@ -245,7 +246,7 @@ async function saveIcon() {
     }
 
     if (reload) {
-        await sendReload();
+        await refreshUser();
     }
 
     savingIcon.value = false;
@@ -278,19 +279,15 @@ async function saveUsername() {
         return;
     }
 
-    // userName.value = user.name;
     userStore.info.name = userName.value;
     console.log("Username updated");
-    await sendReload();
+    await refreshUser();
 
     savingUsername = false;
 }
 
-async function sendReload() {
-    window.dispatchEvent(new StorageEvent("storage", { key: "reloadUser" })); // internal event
-    localStorage.setItem("reloadUser", "true");
-    await wait(500);
-    localStorage.removeItem("reloadUser");
+function refreshUser(): ResultAsync<User, string> {
+    return userStore.refresh();
 }
 
 onMounted(() => {
@@ -385,7 +382,7 @@ onMounted(() => {
                 <div class="data-section" id="username-section">
                     <div class="data-edit">
                         <div class="username-content">
-                            <input type="text" :placeholder="t('edit.username')" v-model="userName" />
+                            <input type="text" class="usr-input" :placeholder="t('edit.username')" v-model="userName" />
                         </div>
 
                         <div id="username-options">
@@ -414,25 +411,12 @@ onMounted(() => {
 
                 <div class="data-section" id="password">
                     <div style="text-align: center; user-select: none">
-                        <a class="edit-password-but usr-btn" :href="editPasswordURL">{{ t("edit.changePassword") }}</a>
+                        <a class="edit-password-but usr-btn" :href="editPasswordURL" style="text-decoration: none">
+                            {{ t("edit.changePassword") }}
+                        </a>
                     </div>
                 </div>
-
-                <!-- <div class="data-section" id="email-password">
-                    <div class="data-edit">
-                        <input type="text" id="email-input" placeholder="Email" />
-                        <input type="password" id="new-password" placeholder="New Password" />
-                        <input type="password" id="confirm-new-password" placeholder="Confirm New Password" />
-                    </div>
-
-                    <input type="password" id="current-password" placeholder="Current Password" />
-                </div> -->
             </div>
-
-            <!-- <div id="buttons">
-                <button id="save">Save</button>
-                <button id="cancel">Cancel</button>
-            </div> -->
         </div>
     </div>
 </template>
@@ -441,33 +425,6 @@ onMounted(() => {
 body {
     overflow-y: auto;
     overflow-x: hidden;
-}
-
-input[type="text"],
-input[type="password"] {
-    width: 100%;
-    padding: 10px 8px;
-    display: inline-block;
-    border-radius: 0;
-    /* border: 2px solid #222245; */
-    border: 2px solid #eee;
-    box-sizing: border-box;
-    outline: none;
-    /* color: #222; */
-    color: #eee;
-    background-color: #25254d;
-    font-size: 16px;
-    transition:
-        border 200ms ease,
-        background-color 200ms ease,
-        color 200ms ease;
-}
-
-input[type="text"]::placeholder,
-input[type="password"]::placeholder {
-    /* color: #555; */
-    color: #bbb;
-    transition: color 200ms ease;
 }
 
 .on-edit {
@@ -656,10 +613,5 @@ body:not([mobile]) #image-round-border:hover #image-round-border-box {
 input:checked + label #image-round-border-box {
     border-radius: 50%;
     background-color: var(--color-primary);
-}
-
-.edit-password-but {
-    padding: 8px 12px;
-    text-decoration: none;
 }
 </style>

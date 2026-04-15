@@ -10,25 +10,26 @@ import { VITE_AUTH_SERVER_ORIGIN } from "@mod/config";
 
 import LoadingSpinner from "@comp/LoadingSpinner.vue";
 import UserIcon from "@comp/UserIcon.vue";
+import { err, ok, ResultAsync } from "neverthrow";
 
 const location = useRoute();
 const userStore = useUserStore();
 const { t } = useI18n();
 
 const verifyUrl = VITE_AUTH_SERVER_ORIGIN + "/verify-request";
-const userIcon = ref("");
+const userIcon = ref<string>("");
 const user = ref<UserPublic | User | null>(null);
-const ready = ref(false);
-const profileGap = ref(IS_MOBILE ? "30px" : "80px");
-const userIconSize = ref(IS_MOBILE ? "64px" : "128px");
-const userIconBorderSize = ref(IS_MOBILE ? "3px" : "5px");
-const errorMessage = ref("");
+const ready = ref<boolean>(false);
+const profileGap = ref<string>(IS_MOBILE ? "30px" : "80px");
+const userIconSize = ref<string>(IS_MOBILE ? "64px" : "128px");
+const userIconBorderSize = ref<string>(IS_MOBILE ? "3px" : "5px");
+const errorMessage = ref<string>("");
 
-const userId = computed(() => {
+const userId = computed<string | null>(() => {
     return location.params.id === "me" ? userStore.getPublicId() : (location.params.id as string);
 });
 
-const ownProfile = computed(() => {
+const ownProfile = computed<boolean>(() => {
     return userId?.value === userStore.getPublicId();
 });
 
@@ -48,26 +49,31 @@ async function init() {
         user.value = userStore.info;
         document.title = t("profileHome.myProfile");
     } else {
-        const res = await authApi.user.fromId({ params: { userId: userId.value } });
-        if (res.status === 200) {
-            user.value = res.body;
-            document.title = t("profileHome.otherProfile", { username: user.value.name });
-            // console.log("user", user.value);
-        } else {
-            if (res.status === 400) {
-                console.error("Invalid user ID", res.body.issues.find((issue) => issue.message)?.message);
-                errorMessage.value = t("profileHome.invalidUserId");
-                // alert("Invalid user ID");
-            } else if (res.status === 404 || res.status === 500) {
-                errorMessage.value = res.body.error;
-                // console.error(res.body.error);
-                // alert(res.body.error);
+        await ResultAsync.fromPromise(
+            authApi.user.fromId({ params: { userId: userId.value } }),
+            (e) => new Error("Failed to load user: " + (e instanceof Error ? e.message : String(e))),
+        ).andThen((res) => {
+            if (res.status === 200) {
+                user.value = res.body;
+                document.title = t("profileHome.otherProfile", { username: user.value.name });
+                // console.log("user", user.value);
+                return ok();
             } else {
-                errorMessage.value = t("profileHome.failedToLoadUser");
-                // alert("Error loading user");
+                if (res.status === 400) {
+                    console.error("Invalid user ID", res.body.issues.find((issue) => issue.message)?.message);
+                    errorMessage.value = t("profileHome.invalidUserId");
+                    // alert("Invalid user ID");
+                } else if (res.status === 404 || res.status === 500) {
+                    errorMessage.value = res.body.error;
+                    // console.error(res.body.error);
+                    // alert(res.body.error);
+                } else {
+                    errorMessage.value = t("profileHome.failedToLoadUser");
+                    // alert("Error loading user");
+                }
+                return err();
             }
-            return;
-        }
+        });
     }
 
     console.log(user.value);
@@ -129,9 +135,9 @@ onMounted(async () => {
                         />
                     </div>
 
-                    <RouterLink class="usr-btn no-underline" to="/profile/edit" :disabled="true" v-if="ownProfile">{{
-                        t("profileHome.editProfile")
-                    }}</RouterLink>
+                    <RouterLink class="usr-btn no-underline" to="/profile/edit" v-if="ownProfile">
+                        {{ t("profileHome.editProfile") }}
+                    </RouterLink>
                 </div>
 
                 <div class="user-profile-verified" v-if="ownProfile && !(user as User).verified">

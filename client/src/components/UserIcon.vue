@@ -15,7 +15,6 @@ const {
     borderSize?: string;
 }>();
 
-// const iconUrl = ref<string | undefined>(undefined);
 const useFallback = computed<boolean>(() => iconUrl === undefined);
 const errored = ref<boolean>(false);
 
@@ -30,11 +29,6 @@ const emit = defineEmits<{
     (e: "error", event: Event): void;
 }>();
 
-// function setIconUrl(url: string | undefined): void {
-//     iconUrl.value = url;
-//     useFallback.value = url === undefined;
-// }
-
 function onLoad(event: Event) {
     errored.value = false;
     emit("load", event);
@@ -48,10 +42,6 @@ function onError(event: Event) {
     const elem = event.target as HTMLImageElement;
     console.error(`Error loading user icon at ${elem.src}, using default icon.`);
 }
-
-// defineExpose({
-//     setIconUrl,
-// });
 </script>
 
 <template>

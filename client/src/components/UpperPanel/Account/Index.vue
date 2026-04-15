@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, type CSSProperties, type Ref } from "vue";
+import { computed, onMounted, onUnmounted, ref, type CSSProperties } from "vue";
 import { RouterLink } from "vue-router";
 import { useStore as useUserStore } from "@store/user";
 import { useI18n } from "vue-i18n";
@@ -8,23 +8,16 @@ import { VITE_AUTH_SERVER_ORIGIN } from "@mod/config";
 import UserIcon from "@comp/UserIcon.vue";
 import LoginButton from "@comp/UpperPanel/Account/LoginButton.vue";
 
-import userIconDark from "@icons/profile/user-default-dark.jpg";
-
 const SESSION_ANIM_UPDATE_TIME = 100;
 
 let sessionInterval: ReturnType<typeof setInterval> | null = null;
 
 const userStore = useUserStore();
 const { t } = useI18n();
-const ready = ref(false);
-const noSession = ref(true);
-const userIcon: Ref<string | undefined> = ref(undefined);
-const deg = ref(135);
-const userBoxImageContainerStyle: Ref<CSSProperties> = ref({});
 
-const border = computed(() => {
-    return userStore.info?.round_border || false;
-});
+const ready = ref<boolean>(false);
+const noSession = ref<boolean>(true);
+const deg = ref<number>(135);
 
 const sessionStyles = computed(() => {
     return {
@@ -64,56 +57,30 @@ function stopSession() {
     }
 }
 
-async function init() {
-    console.log("init user", userStore.info);
+function init() {
     if (userStore.info) {
         noSession.value = false;
-        userBoxImageContainerStyle.value["border-radius"] = userStore.info.round_border ? "50%" : "0%";
-
-        console.log("avatar", userStore.getUserIconUrl());
-        const url = userStore.getUserIconUrl() || userIconDark;
-        userIcon.value = url + "?" + Date.now(); // Add cache-busting query parameter
-        // userIcon.value = url;
-        console.log("UserIcon:", userIcon.value);
-        console.log("User loaded");
-    }
-    ready.value = true;
-}
-
-async function onStorage(e: StorageEvent) {
-    if (!e.key) {
-        return;
-    }
-
-    // console.log("storage", e.key, e.newValue, e.oldValue);
-
-    if (e.key === "reloadUser") {
-        if (ready.value) {
-            await init();
-            // console.log("User reloaded");
-        }
     }
 }
 
-onMounted(async () => {
+onMounted(() => {
+    console.log("UserAccount mounted");
     // console.log("userId", user.value);
 
-    console.log("UserAccount mounted");
-
-    await init();
+    init();
 
     loadSessionDeg();
     startSession();
 
     window.addEventListener("beforeunload", saveSessionDeg);
-    window.addEventListener("storage", onStorage);
+
+    ready.value = true;
 });
 
-onUnmounted(async () => {
+onUnmounted(() => {
     console.log("UserAccount unmounted");
 
     window.removeEventListener("beforeunload", saveSessionDeg);
-    window.removeEventListener("storage", onStorage);
 
     stopSession();
     saveSessionDeg();
@@ -127,11 +94,12 @@ onUnmounted(async () => {
         <div id="user-session" v-else :style="sessionStyles">
             <div id="user-session-container">
                 <div id="user-account-info">
-                    <!-- <div id="user-account-icon-container">
-                        <img id="user-account-icon" />
-                    </div> -->
-
-                    <UserIcon :iconUrl="userIcon" :roundBorder="border" size="48px" border-size="3px" />
+                    <UserIcon
+                        :iconUrl="userStore.getUserIconUrlNoCache()"
+                        :roundBorder="userStore.info?.round_border"
+                        size="48px"
+                        border-size="3px"
+                    />
 
                     <label id="user-account-name">{{ userStore.info?.name || "Unknown" }}</label>
                 </div>

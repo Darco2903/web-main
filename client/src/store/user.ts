@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import type { ResultAsync } from "neverthrow";
 import { accessTokenExpiresAt, type User } from "@darco2903/auth-api/client";
 import { getUserInfo, refreshAccessToken } from "@api/user";
 
@@ -6,20 +7,30 @@ export const useStore = defineStore("user", {
     state: () => ({
         info: null as User | null,
         refreshTimeoutId: null as number | null,
+        refreshTimestamp: 0,
     }),
     actions: {
-        async init(): Promise<boolean> {
-            const res = await getUserInfo();
-            console.log("getUserInfo result:", res);
-            if (res.isOk()) {
-                this.info = res.value;
-                this.autoRefresh();
-            } else {
-                this.info = null;
-            }
-            return res.isOk();
+        refresh(): ResultAsync<User, string> {
+            return getUserInfo()
+                .andTee((res) => {
+                    this.info = res;
+                    this.refreshTimestamp = Date.now();
+                })
+                .orTee((e) => {
+                    this.info = null;
+                });
         },
-        autoRefresh() {
+        async init(): Promise<boolean> {
+            return this.refresh()
+                .andTee(() => {
+                    this.autoSessionRefresh();
+                })
+                .match(
+                    () => true,
+                    () => false,
+                );
+        },
+        autoSessionRefresh() {
             const expiresAt = accessTokenExpiresAt();
             console.log(`User info loaded. Access token expires at ${expiresAt}`);
 
@@ -40,7 +51,7 @@ export const useStore = defineStore("user", {
                     const res = await refreshAccessToken();
                     if (res.isOk()) {
                         console.log("Access token refreshed successfully.");
-                        this.autoRefresh();
+                        this.autoSessionRefresh();
                     } else {
                         console.error("Failed to refresh access token:", res.error);
                     }
@@ -52,6 +63,13 @@ export const useStore = defineStore("user", {
         },
         getUserIconUrl(): string | undefined {
             return this.info?.assets.avatar || undefined;
+        },
+        getUserIconUrlNoCache(): string | undefined {
+            const url = this.getUserIconUrl();
+            if (url) {
+                return `${url}?t=${this.refreshTimestamp}`;
+            }
+            return undefined;
         },
     },
 });
