@@ -20,7 +20,11 @@ if (!userStore.info) {
     router.push("/");
 }
 
-const editPasswordURL = ref<string>(VITE_AUTH_SERVER_ORIGIN + "/password/edit");
+const currentUrl = window.location.href;
+
+const editPasswordURL = ref<string>(VITE_AUTH_SERVER_ORIGIN + "/password/edit?redirect=" + encodeURIComponent(currentUrl));
+const setupTOTPURL = ref<string>(VITE_AUTH_SERVER_ORIGIN + "/two-factor/setup?redirect=" + encodeURIComponent(currentUrl));
+const manageTOTPURL = ref<string>(VITE_AUTH_SERVER_ORIGIN + "/two-factor/manage?redirect=" + encodeURIComponent(currentUrl));
 const ready = ref<boolean>(false);
 const userIcon = ref<string | undefined>(undefined);
 const restoreUserIcon = ref<string | undefined>(undefined);
@@ -409,10 +413,24 @@ onMounted(() => {
                     </div>
                 </div>
 
-                <div class="data-section" id="password">
-                    <div style="text-align: center; user-select: none">
+                <div class="data-section flex col" style="gap: 38px">
+                    <div class="password-change" style="text-align: center; user-select: none">
                         <a class="edit-password-but usr-btn" :href="editPasswordURL" style="text-decoration: none">
                             {{ t("edit.changePassword") }}
+                        </a>
+                    </div>
+
+                    <div class="totp-change" style="text-align: center; user-select: none">
+                        <a
+                            class="edit-password-but usr-btn"
+                            :href="setupTOTPURL"
+                            v-if="userStore.info?.totp_enabled === false"
+                            style="text-decoration: none"
+                        >
+                            {{ t("edit.setupTOTP") }}
+                        </a>
+                        <a class="edit-password-but usr-btn" :href="manageTOTPURL" v-else style="text-decoration: none">
+                            {{ t("edit.disableTOTP") }}
                         </a>
                     </div>
                 </div>
