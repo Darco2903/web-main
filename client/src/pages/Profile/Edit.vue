@@ -413,7 +413,7 @@ onMounted(() => {
                     </div>
                 </div>
 
-                <div class="data-section flex col" style="gap: 38px">
+                <div class="data-section flex col" style="gap: 42px">
                     <div class="password-change" style="text-align: center; user-select: none">
                         <a class="edit-password-but usr-btn" :href="editPasswordURL" style="text-decoration: none">
                             {{ t("edit.changePassword") }}
