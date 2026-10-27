@@ -141,7 +141,7 @@ async function saveIcon() {
             if (iconRemoved.value && restoreUserIcon.value !== undefined) {
                 console.log("Deleting profile picture");
                 res = await cdnApi.service.delete({ headers: { authorization } });
-                if (res.status !== 200) {
+                if (res.status !== 204) {
                     alert("Error deleting profile picture");
                 }
             } else if (userIcon.value) {
@@ -173,7 +173,7 @@ async function saveIcon() {
 
         console.log("Profile picture response", res);
 
-        if (res.status === 200) {
+        if (res.status === 204) {
             console.log("Profile picture updated");
             restoreUserIcon.value = userIcon.value;
             reload = true;
