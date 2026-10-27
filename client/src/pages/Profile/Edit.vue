@@ -219,16 +219,16 @@ async function saveIcon() {
         // }
     }
 
-    if (borderEdited) {
+    if (borderEdited.value) {
+        const roundBorder = border.value;
         await ResultAsync.fromPromise(
-            authApi.user.updateBorder({ body: { roundBorder: border.value } }),
+            authApi.user.updateBorder({ body: { roundBorder } }),
             (e) => `Failed to update profile picture border: ${e instanceof Error ? e.message : String(e)}`,
         )
             .andThen((res) => {
                 console.log("Profile picture border response", res);
                 if (res.status === 204) {
                     return ok();
-                    reload = true;
                 } else if (res.status === 400) {
                     console.error("Invalid border radius", res.body.issues.find((issue) => issue.message)?.message);
                     return err("Invalid border radius");
@@ -243,9 +243,13 @@ async function saveIcon() {
             .andTee(() => {
                 console.log("Profile picture border updated");
 
+                // Updated locally, no need to reload the user for it
                 if (userStore.info) {
-                    userStore.info.round_border = border.value;
+                    userStore.info.round_border = roundBorder;
                 }
+            })
+            .orTee((e) => {
+                alert(e);
             });
     }
 
