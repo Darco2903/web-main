@@ -1,4 +1,4 @@
-import "./loadEnv.js";
+import "./config.js";
 import { IS_PROD } from "./utils.js";
 import { startServer, stopServer } from "./server/index.js";
 import { logger } from "./logger.js";

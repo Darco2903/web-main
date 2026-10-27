@@ -6,7 +6,7 @@ import { useI18n } from "vue-i18n";
 import { IS_MOBILE } from "@darco2903/web-common";
 import { authApi } from "@api/index";
 import { useStore as useUserStore } from "@store/user";
-import { VITE_AUTH_SERVER_ORIGIN } from "@mod/config";
+import { AUTH_SERVER_ORIGIN } from "@mod/config";
 
 import LoadingSpinner from "@comp/LoadingSpinner.vue";
 import UserIcon from "@comp/UserIcon.vue";
@@ -16,7 +16,7 @@ const location = useRoute();
 const userStore = useUserStore();
 const { t } = useI18n();
 
-const verifyUrl = VITE_AUTH_SERVER_ORIGIN + "/verify-request";
+const verifyUrl = AUTH_SERVER_ORIGIN + "/verify-request";
 const userIcon = ref<string>("");
 const user = ref<UserPublic | User | null>(null);
 const ready = ref<boolean>(false);

@@ -5,5 +5,7 @@ node_modules/
 
 # Ignored
 .env*
-!.env.template
 dist/
+**/ssl
+
+!.env.example

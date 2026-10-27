@@ -1,44 +1,39 @@
+import fs from "fs";
 import path from "path";
 import express from "express";
-
-import { fileURLToPath } from "url";
 import { app } from "./app.js";
 import { logger } from "../logger.js";
-import { IS_PROD } from "../utils.js";
+import { IS_PROD, rootPath } from "../utils.js";
+import { TRUST_PROXY } from "../config.js";
+import { clientConfigPlugin, injectClientConfig } from "./clientConfig.js";
+import { getClientIP } from "./utils.js";
 
-app.use((req, res, next) => {
-    let clientIP = req.header("CF-Connecting-IP");
-    if (!clientIP) {
-        clientIP = req.header("X-Forwarded-For")?.split(",")[0];
-    }
-    logger.info(`${req.method.padEnd(6, " ")} ${clientIP} ${req.url}`);
-    next();
-});
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const clientPath = path.join(__dirname, "../../../client");
-
-if (!IS_PROD) {
-    const { createServer: createViteServer } = await import("vite");
-    const vite = await createViteServer({
-        root: path.resolve(clientPath),
+export async function registerRoutes() {
+    app.use((req, res, next) => {
+        const clientIP = getClientIP(req.headers, req.socket.remoteAddress, TRUST_PROXY);
+        logger.info(`${req.method.padEnd(6, " ")} ${clientIP} ${req.url}`);
+        next();
     });
-    app.use(vite.middlewares);
-} else {
-    const distPath = path.resolve(clientPath, "dist");
-    const p = path.resolve(distPath, "index.html");
 
-    app.use(express.static(distPath));
-    app.get("*", (req, res) => {
-        res.sendFile(p, (err) => {
-            if (err) {
-                logger.info(err);
-                res.status(500).send(err);
-            }
+    const clientPath = path.resolve(rootPath, "client");
+    if (!IS_PROD) {
+        const { createServer: createViteServer } = await import("vite");
+        const vite = await createViteServer({
+            root: clientPath,
+            // Merged with the plugins of client/vite.config.ts
+            plugins: [clientConfigPlugin()],
         });
-    });
-}
+        app.use(vite.middlewares);
+    } else {
+        const distPath = path.resolve(clientPath, "dist");
+        // Read once: the config doesn't change while the server runs
+        const indexHtmlContent = await fs.promises.readFile(path.resolve(distPath, "index.html"), "utf8");
+        const indexHtml = injectClientConfig(indexHtmlContent);
 
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));
+        app.use(express.static(distPath, { index: false }));
+        app.get("*", (req, res) => {
+            res.setHeader("Cache-Control", "no-cache");
+            res.type("html").send(indexHtml);
+        });
+    }
+}

@@ -7,7 +7,7 @@ import { IS_MOBILE } from "@darco2903/web-common";
 import { router } from "@/router";
 import { authApi, cdnApi } from "@api/index";
 import { useStore as useUserStore } from "@store/user";
-import { VITE_AUTH_SERVER_ORIGIN } from "@mod/config";
+import { AUTH_SERVER_ORIGIN } from "@mod/config";
 
 import LoadingSpinner from "@comp/LoadingSpinner.vue";
 import UserIcon from "@comp/UserIcon.vue";
@@ -22,9 +22,9 @@ if (!userStore.info) {
 
 const currentUrl = window.location.href;
 
-const editPasswordURL = ref<string>(VITE_AUTH_SERVER_ORIGIN + "/password/edit?redirect=" + encodeURIComponent(currentUrl));
-const setupTOTPURL = ref<string>(VITE_AUTH_SERVER_ORIGIN + "/two-factor/setup?redirect=" + encodeURIComponent(currentUrl));
-const manageTOTPURL = ref<string>(VITE_AUTH_SERVER_ORIGIN + "/two-factor/manage?redirect=" + encodeURIComponent(currentUrl));
+const editPasswordURL = ref<string>(AUTH_SERVER_ORIGIN + "/password/edit?redirect=" + encodeURIComponent(currentUrl));
+const setupTOTPURL = ref<string>(AUTH_SERVER_ORIGIN + "/two-factor/setup?redirect=" + encodeURIComponent(currentUrl));
+const manageTOTPURL = ref<string>(AUTH_SERVER_ORIGIN + "/two-factor/manage?redirect=" + encodeURIComponent(currentUrl));
 const ready = ref<boolean>(false);
 const userIcon = ref<string | undefined>(undefined);
 const restoreUserIcon = ref<string | undefined>(undefined);

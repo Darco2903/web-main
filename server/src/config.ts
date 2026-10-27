@@ -6,52 +6,81 @@ import { rootPath } from "./utils.js";
 
 dotenv.config({ path: path.join(rootPath, ".env") });
 
-function configError(message: string) {
+function configError(message: string): never {
     logger.error(message);
     process.exit(1);
 }
 
-logger.info("Checking config...");
-
-if (!process.env.SERVER_LISTEN) {
-    configError("Missing SERVER_LISTEN in environment variables");
+/** Relative paths are resolved from the root folder, absolute ones are kept */
+function resolvePath(p: string) {
+    return path.resolve(rootPath, p);
 }
 
-const port = parseInt(process.env.SERVER_PORT);
-if (isNaN(port) || port < 0 || port > 65535) {
+function requireEnv(name: string) {
+    const value = process.env[name];
+    if (!value) {
+        configError(`Missing ${name} in environment variables`);
+    }
+    return value;
+}
+
+function requireFile(name: string) {
+    const filePath = resolvePath(requireEnv(name));
+    if (!fs.existsSync(filePath)) {
+        configError(`Invalid ${name} in environment variables: ${filePath} not found`);
+    }
+    return filePath;
+}
+
+/** A URL or a bare host (https:// is assumed), normalized to an origin like https://example.com */
+function requireOrigin(name: string) {
+    const value = requireEnv(name);
+    try {
+        return new URL(value.includes("://") ? value : `https://${value}`).origin;
+    } catch {
+        configError(`Invalid ${name} in environment variables: not a URL`);
+    }
+}
+
+logger.info("Checking config...");
+
+const listen = requireEnv("SERVER_LISTEN");
+
+const port = Number(process.env.SERVER_PORT);
+if (!Number.isInteger(port) || port < 0 || port > 65535) {
     configError("Invalid SERVER_PORT in environment variables");
 }
 
-const sslKeyPath = path.join(rootPath, process.env.SSL_KEY_PATH);
-if (!fs.existsSync(sslKeyPath)) {
-    configError("Invalid SSL_KEY_PATH in environment variables");
+interface SSLConfig {
+    keyPath: string;
+    certPath: string;
+    caPath: string;
 }
 
-const sslCertPath = path.join(rootPath, process.env.SSL_CERT_PATH);
-if (!fs.existsSync(sslCertPath)) {
-    configError("Invalid SSL_CERT_PATH in environment variables");
+const ssl: SSLConfig = {
+    keyPath: requireFile("SSL_KEY_PATH"),
+    certPath: requireFile("SSL_CERT_PATH"),
+    caPath: requireFile("SSL_CA_PATH"),
+};
+
+const trustProxy = process.env.TRUST_PROXY ?? "false";
+if (trustProxy !== "true" && trustProxy !== "false") {
+    configError("Invalid TRUST_PROXY in environment variables, expected true or false");
 }
 
-const sslCaPath = path.join(rootPath, process.env.SSL_CA_PATH);
-if (!fs.existsSync(sslCaPath)) {
-    configError("Invalid SSL_CA_PATH in environment variables");
-}
-
-if (!process.env.SERVER_ORIGIN) {
-    configError("Missing SERVER_ORIGIN in environment variables");
-}
-
-if (!process.env.AUTH_SERVER_ORIGIN) {
-    configError("Missing AUTH_SERVER_ORIGIN in environment variables");
-}
+const serverOrigin = requireOrigin("SERVER_ORIGIN");
+const authServerOrigin = requireOrigin("AUTH_SERVER_ORIGIN");
+const cdnServerOrigin = requireOrigin("CDN_SERVER_ORIGIN");
+const managerServerOrigin = requireOrigin("MANAGER_SERVER_ORIGIN");
 
 logger.info("Config OK");
 
-export const SERVER_LISTEN = process.env.SERVER_LISTEN;
+export const SERVER_LISTEN = listen;
 export const SERVER_PORT = port;
-export const SSL_KEY_PATH = sslKeyPath;
-export const SSL_CERT_PATH = sslCertPath;
-export const SSL_CA_PATH = sslCaPath;
+export const SSL: SSLConfig = ssl;
+export const TRUST_PROXY = trustProxy === "true";
 
-export const SERVER_ORIGIN = process.env.SERVER_ORIGIN;
-export const AUTH_SERVER_ORIGIN = process.env.AUTH_SERVER_ORIGIN;
+export const SERVER_ORIGIN = serverOrigin;
+export const AUTH_SERVER_ORIGIN = authServerOrigin;
+export const CDN_SERVER_ORIGIN = cdnServerOrigin;
+export const MANAGER_SERVER_ORIGIN = managerServerOrigin;

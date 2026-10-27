@@ -1,0 +1,12 @@
+# Local files that must not end up in the image (secrets, builds)
+**/node_modules
+**/dist
+**/.env
+**/.env.*
+**/ssl
+**/.DS_Store
+.git
+*_
+config*.json
+Dockerfile
+compose.yml

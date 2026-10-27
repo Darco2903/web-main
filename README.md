@@ -73,13 +73,27 @@ pnpm install
 pnpm dev
 ```
 
-> Make sure the auth service is reachable and that both your `.env` files are configured properly (see [`./server/.env.template`](./server/.env.template) and [`./client/.env.template`](./client/.env.template)).
+> Make sure the auth service is reachable and that the root `.env` is configured (see [Configuration](#configuration)).
+
+---
+
+## Configuration
+
+Copy [`.env.example`](./.env.example) to `.env` in the root folder and fill it in. The server and the client both use it: the client config (service origins) is put in `index.html` by the server when it is served, so one client build works with any environment.
 
 ---
 
 ## Deployment
 
-Runs on a VPS. No containerization at the moment — started with systemd services.
+Runs on a VPS with Docker.
+
+1. Copy `.env.example` to `.env` and fill it in, with `SERVER_LISTEN=0.0.0.0` and `SERVER_PORT=8080` (the port published in [`compose.yml`](./compose.yml)). Put the SSL certificates in `ssl/`, they are mounted read-only.
+
+2. Start it
+
+   ```bash
+   docker compose up -d --build
+   ```
 
 ---
 

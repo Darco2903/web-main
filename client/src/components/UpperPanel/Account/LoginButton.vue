@@ -3,6 +3,7 @@ import { computed, ref } from "vue";
 import { IS_MOBILE, wait } from "@darco2903/web-common";
 import { gradient } from "@utils/gradient";
 import { useI18n } from "vue-i18n";
+import { AUTH_SERVER_ORIGIN } from "@mod/config";
 
 const ANGLE = 60;
 const STEPS = 100;
@@ -22,7 +23,7 @@ const loginHandlers = IS_MOBILE
           mouseleave: loginUnhover,
       };
 const loginURL = computed(() => {
-    const url = new URL(import.meta.env.VITE_AUTH_SERVER_ORIGIN + "/login");
+    const url = new URL(AUTH_SERVER_ORIGIN + "/login");
     url.searchParams.append("redirect", window.location.href);
     return url.href;
 });

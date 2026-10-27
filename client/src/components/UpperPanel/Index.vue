@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CSSProperties } from "vue";
 import { IS_MOBILE } from "@darco2903/web-common";
-import { VITE_CDN_SERVER_ORIGIN } from "@mod/config";
+import { CDN_SERVER_ORIGIN } from "@mod/config";
 
 import SiteIcon from "@comp/SiteIcon.vue";
 import UserAccount from "@comp/UpperPanel/Account/Index.vue";
@@ -26,7 +26,7 @@ const upperPanelRowStyle: CSSProperties = {
                     <MainIcon />
                 </SiteIcon>
 
-                <SiteIcon :size="siteIconSize" :url="`${VITE_CDN_SERVER_ORIGIN}/app/`" :clickable="true" :external="true" target="_blank">
+                <SiteIcon :size="siteIconSize" :url="`${CDN_SERVER_ORIGIN}/app/`" :clickable="true" :external="true" target="_blank">
                     <CdnIcon />
                 </SiteIcon> -->
             </div>

@@ -8,9 +8,10 @@
     "license": "ISC",
     "private": true,
     "type": "module",
-    "packageManager": "pnpm@10.33.0",
+    "packageManager": "pnpm@12.15.0",
     "scripts": {
         "build": "tsc",
+        "check": "tsc --noEmit",
         "start": "node .",
         "dev": "tsx src/index.ts --dev",
         "clean": "rimraf dist"

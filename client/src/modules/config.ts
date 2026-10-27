@@ -1,24 +1,31 @@
-function configError(message: string) {
-    throw new Error(message);
+import { z } from "zod";
+
+/**
+ * Runtime config, put in index.html by the server (server/src/server/clientConfig.ts) so one
+ * build works with any environment.
+ */
+const configSchema = z.object({
+    serverOrigin: z.string().url(),
+    authServerOrigin: z.string().url(),
+    cdnServerOrigin: z.string().url(),
+    managerServerOrigin: z.string().url(),
+});
+
+function readConfig() {
+    const el = document.getElementById("app-config");
+    if (!el?.textContent) {
+        throw new Error("Missing #app-config in index.html, it is added by the server");
+    }
+    const parsed = configSchema.safeParse(JSON.parse(el.textContent));
+    if (!parsed.success) {
+        throw new Error(`Invalid #app-config: ${parsed.error.message}`);
+    }
+    return parsed.data;
 }
 
-if (!import.meta.env.VITE_MAIN_SERVER_ORIGIN) {
-    configError("VITE_MAIN_SERVER_ORIGIN is not defined");
-}
+const config = readConfig();
 
-if (!import.meta.env.VITE_AUTH_SERVER_ORIGIN) {
-    configError("VITE_AUTH_SERVER_ORIGIN is not defined");
-}
-
-if (!import.meta.env.VITE_CDN_SERVER_ORIGIN) {
-    configError("VITE_CDN_SERVER_ORIGIN is not defined");
-}
-
-if (!import.meta.env.VITE_MANAGER_SERVER_ORIGIN) {
-    configError("VITE_MANAGER_SERVER_ORIGIN is not defined");
-}
-
-export const VITE_MAIN_SERVER_ORIGIN = import.meta.env.VITE_MAIN_SERVER_ORIGIN;
-export const VITE_AUTH_SERVER_ORIGIN = import.meta.env.VITE_AUTH_SERVER_ORIGIN;
-export const VITE_CDN_SERVER_ORIGIN = import.meta.env.VITE_CDN_SERVER_ORIGIN;
-export const VITE_MANAGER_SERVER_ORIGIN = import.meta.env.VITE_MANAGER_SERVER_ORIGIN;
+export const SERVER_ORIGIN = config.serverOrigin;
+export const AUTH_SERVER_ORIGIN = config.authServerOrigin;
+export const CDN_SERVER_ORIGIN = config.cdnServerOrigin;
+export const MANAGER_SERVER_ORIGIN = config.managerServerOrigin;

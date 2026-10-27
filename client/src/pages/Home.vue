@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 import { IS_MOBILE } from "@darco2903/web-common";
-import { VITE_CDN_SERVER_ORIGIN, VITE_MANAGER_SERVER_ORIGIN } from "@mod/config";
+import { CDN_SERVER_ORIGIN, MANAGER_SERVER_ORIGIN } from "@mod/config";
 
 import SiteIcon from "@comp/SiteIcon.vue";
 
@@ -33,7 +33,7 @@ const siteIconSize = IS_MOBILE ? "128px" : "192px";
                 <SiteIcon
                     style="position: relative"
                     :size="siteIconSize"
-                    :url="`${VITE_CDN_SERVER_ORIGIN}/app/`"
+                    :url="`${CDN_SERVER_ORIGIN}/app/`"
                     :clickable="true"
                     :external="true"
                     target="_blank"
@@ -47,7 +47,7 @@ const siteIconSize = IS_MOBILE ? "128px" : "192px";
                 <SiteIcon
                     style="position: relative"
                     :size="siteIconSize"
-                    :url="VITE_MANAGER_SERVER_ORIGIN"
+                    :url="MANAGER_SERVER_ORIGIN"
                     :clickable="true"
                     :external="true"
                     target="_blank"
