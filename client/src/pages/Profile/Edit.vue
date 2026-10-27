@@ -2,9 +2,8 @@
 import { computed, onMounted, ref, type CSSProperties } from "vue";
 import { useI18n } from "vue-i18n";
 import { err, ok, ResultAsync } from "neverthrow";
-import type { User } from "@darco2903/auth-api";
+import type { User } from "@darco2903/auth-api/client";
 import { IS_MOBILE } from "@darco2903/web-common";
-import { router } from "@/router";
 import { authApi, cdnApi } from "@api/index";
 import { useStore as useUserStore } from "@store/user";
 import { useConfirmStore } from "@store/ui";
@@ -16,12 +15,6 @@ import UserIcon from "@comp/UserIcon.vue";
 const confirmStore = useConfirmStore();
 const userStore = useUserStore();
 const { t } = useI18n();
-
-if (!userStore.info) {
-  confirmStore.alert("You must be logged in to view this page").then(() => {
-    router.push("/");
-  });
-}
 
 const currentUrl = window.location.href;
 

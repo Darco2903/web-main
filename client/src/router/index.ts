@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router";
-import { UserRole } from "@darco2903/auth-api";
+import { UserRole } from "@darco2903/auth-api/client";
 import { useStore as useUserStore } from "@store/user";
 import { useConfirmStore } from "@store/ui";
 import { AUTH_SERVER_ORIGIN } from "@mod/config";
