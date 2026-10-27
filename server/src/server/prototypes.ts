@@ -16,7 +16,7 @@ IncomingMessage.prototype.getCookies = function () {
         this.headers?.cookie?.split("; ").map((cookie) => {
             const [key, value] = cookie.split("=");
             return [key, value];
-        }) ?? []
+        }) ?? [],
     );
 };
 

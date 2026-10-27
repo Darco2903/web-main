@@ -20,97 +20,97 @@ const noSession = ref<boolean>(true);
 const deg = ref<number>(135);
 
 const sessionStyles = computed(() => {
-    return {
-        background: `linear-gradient(${deg.value}deg, #00a6ff, #c5007f)`,
-    };
+  return {
+    background: `linear-gradient(${deg.value}deg, #00a6ff, #c5007f)`,
+  };
 });
 
 const logoutURL = computed(() => {
-    const url = new URL(AUTH_SERVER_ORIGIN + "/logout");
-    url.searchParams.append("redirect", window.location.origin);
-    return url.href;
+  const url = new URL(AUTH_SERVER_ORIGIN + "/logout");
+  url.searchParams.append("redirect", window.location.origin);
+  return url.href;
 });
 
 function loadSessionDeg() {
-    const sessionDeg = window.localStorage.getItem("session-deg");
-    if (sessionDeg) {
-        deg.value = parseInt(sessionDeg);
-    }
+  const sessionDeg = window.localStorage.getItem("session-deg");
+  if (sessionDeg) {
+    deg.value = parseInt(sessionDeg);
+  }
 }
 
 function saveSessionDeg() {
-    window.localStorage.setItem("session-deg", deg.value.toString());
+  window.localStorage.setItem("session-deg", deg.value.toString());
 }
 
 function startSession() {
-    sessionInterval = setInterval(() => {
-        deg.value += 1;
-        if (deg.value >= 360) {
-            deg.value = 0;
-        }
-    }, SESSION_ANIM_UPDATE_TIME);
+  sessionInterval = setInterval(() => {
+    deg.value += 1;
+    if (deg.value >= 360) {
+      deg.value = 0;
+    }
+  }, SESSION_ANIM_UPDATE_TIME);
 }
 
 function stopSession() {
-    if (sessionInterval) {
-        clearInterval(sessionInterval);
-    }
+  if (sessionInterval) {
+    clearInterval(sessionInterval);
+  }
 }
 
 function init() {
-    if (userStore.info) {
-        noSession.value = false;
-    }
+  if (userStore.info) {
+    noSession.value = false;
+  }
 }
 
 onMounted(() => {
-    console.log("UserAccount mounted");
-    // console.log("userId", user.value);
+  console.log("UserAccount mounted");
+  // console.log("userId", user.value);
 
-    init();
+  init();
 
-    loadSessionDeg();
-    startSession();
+  loadSessionDeg();
+  startSession();
 
-    window.addEventListener("beforeunload", saveSessionDeg);
+  window.addEventListener("beforeunload", saveSessionDeg);
 
-    ready.value = true;
+  ready.value = true;
 });
 
 onUnmounted(() => {
-    console.log("UserAccount unmounted");
+  console.log("UserAccount unmounted");
 
-    window.removeEventListener("beforeunload", saveSessionDeg);
+  window.removeEventListener("beforeunload", saveSessionDeg);
 
-    stopSession();
-    saveSessionDeg();
+  stopSession();
+  saveSessionDeg();
 });
 </script>
 
 <template>
-    <div id="user-account" v-show="ready">
-        <LoginButton v-if="noSession" />
+  <div id="user-account" v-show="ready">
+    <LoginButton v-if="noSession" />
 
-        <div id="user-session" v-else :style="sessionStyles">
-            <div id="user-session-container">
-                <div id="user-account-info">
-                    <UserIcon
-                        :iconUrl="userStore.getUserIconUrlNoCache()"
-                        :roundBorder="userStore.info?.round_border"
-                        size="48px"
-                        border-size="3px"
-                    />
+    <div id="user-session" v-else :style="sessionStyles">
+      <div id="user-session-container">
+        <div id="user-account-info">
+          <UserIcon
+            :iconUrl="userStore.getUserIconUrlNoCache()"
+            :roundBorder="userStore.info?.round_border"
+            size="48px"
+            border-size="3px"
+          />
 
-                    <label id="user-account-name">{{ userStore.info?.name || "Unknown" }}</label>
-                </div>
-
-                <div id="user-links">
-                    <RouterLink to="/profile/me">{{ t("accountIndex.myProfile") }}</RouterLink>
-                    <a id="user-account-logout" :href="logoutURL">{{ t("accountIndex.logout") }}</a>
-                </div>
-            </div>
+          <label id="user-account-name">{{ userStore.info?.name || "Unknown" }}</label>
         </div>
+
+        <div id="user-links">
+          <RouterLink to="/profile/me">{{ t("accountIndex.myProfile") }}</RouterLink>
+          <a id="user-account-logout" :href="logoutURL">{{ t("accountIndex.logout") }}</a>
+        </div>
+      </div>
     </div>
+  </div>
 </template>
 
 <style scoped>
@@ -118,16 +118,16 @@ onUnmounted(() => {
 }
 
 #user-account a {
-    text-decoration: none;
+  text-decoration: none;
 }
 
 #user-session {
-    display: flex;
-    flex-direction: column;
-    /* background: var(--user-gradient-anim); */
-    padding: 5px;
-    border-radius: 18px;
-    /* animation: user-gradient 60s infinite ease-in-out; */
+  display: flex;
+  flex-direction: column;
+  /* background: var(--user-gradient-anim); */
+  padding: 5px;
+  border-radius: 18px;
+  /* animation: user-gradient 60s infinite ease-in-out; */
 }
 
 /* #user-session[loading],
@@ -138,89 +138,89 @@ onUnmounted(() => {
 } */
 
 #user-session-container {
-    border-radius: 14px;
-    overflow: hidden;
-    background-color: var(--bg);
-    transition: background-color 200ms ease;
+  border-radius: 14px;
+  overflow: hidden;
+  background-color: var(--bg);
+  transition: background-color 200ms ease;
 }
 
 #user-account-info {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-    padding: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
 }
 
 #user-account-my-account {
 }
 
 #user-account-name {
-    /* max-width: 120px; */
-    width: 120px;
-    font-size: 14px;
-    font-weight: bold;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    /* text-align: center; */
-    color: var(--text);
-    transition: color 200ms ease;
+  /* max-width: 120px; */
+  width: 120px;
+  font-size: 14px;
+  font-weight: bold;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  /* text-align: center; */
+  color: var(--text);
+  transition: color 200ms ease;
 }
 
 body[mobile] #user-account-name {
-    /* display: none; */
-    /* width: 60px; */
-    /* font-size: 10px; */
+  /* display: none; */
+  /* width: 60px; */
+  /* font-size: 10px; */
 }
 
 #user-account-icon:not([src]) {
-    display: none;
+  display: none;
 }
 
 #user-links {
-    display: flex;
-    flex-direction: row;
+  display: flex;
+  flex-direction: row;
 }
 
 body[mobile] #user-session:not([active]) #user-links {
-    /* display: none; */
+  /* display: none; */
 }
 
 #user-links a {
-    --border-color: #222;
-    --side-padding: 10px;
-    width: 100px;
-    text-align: center;
-    padding: 10px 5px;
-    border-top: 2px solid var(--border-color);
-    position: relative;
-    cursor: pointer;
-    color: var(--text);
-    transition:
-        color 200ms ease,
-        background-color 200ms ease;
+  --border-color: #222;
+  --side-padding: 10px;
+  width: 100px;
+  text-align: center;
+  padding: 10px 5px;
+  border-top: 2px solid var(--border-color);
+  position: relative;
+  cursor: pointer;
+  color: var(--text);
+  transition:
+    color 200ms ease,
+    background-color 200ms ease;
 }
 
 #user-links a:not(:last-child) {
-    border-right: 2px solid var(--border-color);
+  border-right: 2px solid var(--border-color);
 }
 
 #user-links a:first-child {
-    padding-left: var(--side-padding);
+  padding-left: var(--side-padding);
 }
 
 #user-links a:last-child {
-    padding-right: var(--side-padding);
+  padding-right: var(--side-padding);
 }
 
 #user-links a:hover {
-    background-color: #5552;
+  background-color: #5552;
 }
 
 body[mobile] #user-links a {
-    /* width: 80px; */
-    /* padding: 5px 2px; */
-    /* font-size: 10px; */
+  /* width: 80px; */
+  /* padding: 5px 2px; */
+  /* font-size: 10px; */
 }
 
 #user-account-my-account {

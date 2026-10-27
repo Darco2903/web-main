@@ -14,20 +14,20 @@ themeStore.setTheme(currentTheme);
 </script>
 
 <template>
-    <div>
-        <Confirm />
-        <!-- <NotifyContainer /> -->
+  <div>
+    <Confirm />
+    <!-- <NotifyContainer /> -->
 
-        <RouterView class="router-view" :inert="ui.isBodyInert()" />
-    </div>
+    <RouterView class="router-view" :inert="ui.isBodyInert()" />
+  </div>
 </template>
 
 <style scoped>
 .router-view {
-    /* --margin: 8px; */
-    /* height: calc(100vh - 2 * var(--margin)); */
-    /* width: calc(100vw - 2 * var(--margin)); */
-    /* margin: var(--margin); */
-    /* overflow: auto; */
+  /* --margin: 8px; */
+  /* height: calc(100vh - 2 * var(--margin)); */
+  /* width: calc(100vw - 2 * var(--margin)); */
+  /* margin: var(--margin); */
+  /* overflow: auto; */
 }
 </style>

@@ -4,11 +4,11 @@ import UpperPanel from "@comp/UpperPanel/Index.vue";
 </script>
 
 <template>
-    <div>
-        <UpperPanel />
+  <div>
+    <UpperPanel />
 
-        <RouterView />
-    </div>
+    <RouterView />
+  </div>
 </template>
 
 <style scoped>
