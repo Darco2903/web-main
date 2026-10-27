@@ -1,44 +1,44 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta property="og:url" content="https://darco2903.fr/" />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="Main Server" />
-        <meta property="og:description" content="Main server" />
-        <meta property="og:image" content="/icon-main.png" />
+  <head>
+    <meta property="og:url" content="https://darco2903.fr/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Main Server" />
+    <meta property="og:description" content="Main server" />
+    <meta property="og:image" content="/icon-main.png" />
 
-        <meta charset="UTF-8" />
-        <link rel="icon" type="image/png" href="/icon-main.svg" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/icon-main.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <script>
-            // Early theme detection to prevent FOUC
+    <script>
+      // Early theme detection to prevent FOUC
 
-            function getCookie(name) {
-                return document.cookie
-                    .split("; ")
-                    .find((row) => row.startsWith(name))
-                    ?.split("=")[1];
-            }
+      function getCookie(name) {
+        return document.cookie
+          .split("; ")
+          .find((row) => row.startsWith(name))
+          ?.split("=")[1];
+      }
 
-            const light = "#f9fafb";
-            const dark = "#0f1115";
-            const theme = localStorage.getItem("theme") || getCookie("theme");
-            const preferDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const light = "#f9fafb";
+      const dark = "#0f1115";
+      const theme = localStorage.getItem("theme") || getCookie("theme");
+      const preferDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
-            if (theme === "dark" || ((!theme || theme === "system") && preferDark)) {
-                document.documentElement.style.background = dark;
-            } else {
-                document.documentElement.style.background = light;
-            }
-        </script>
+      if (theme === "dark" || ((!theme || theme === "system") && preferDark)) {
+        document.documentElement.style.background = dark;
+      } else {
+        document.documentElement.style.background = light;
+      }
+    </script>
 
-        <title>Main Server</title>
-    </head>
+    <title>Main Server</title>
+  </head>
 
-    <body>
-        <div id="app"></div>
+  <body class="no-transition">
+    <div id="app"></div>
 
-        <script type="module" src="/src/main.ts"></script>
-    </body>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>

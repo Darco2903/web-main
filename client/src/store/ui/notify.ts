@@ -44,7 +44,7 @@ export const useNotifyStore = defineStore("notify", () => {
 
         setTimeout(() => {
             notifyRemove(notification.id);
-        }, notification.duration ?? NOTIFICATION_DEFAULT_TIME);
+        }, notification.duration ?? NOTIFICATION_DEFAULT_TIME.toMillisecond().time);
     }
 
     function notifyRemove(id: string): void {
@@ -55,7 +55,7 @@ export const useNotifyStore = defineStore("notify", () => {
                     const next = notificationQueue.shift()!;
                     _p(next);
                 }
-            }, NOTIFICATION_LEAVE_TIME);
+            }, NOTIFICATION_LEAVE_TIME.toMillisecond().time);
         }
     }
 

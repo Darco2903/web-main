@@ -7,17 +7,20 @@ import { IS_MOBILE } from "@darco2903/web-common";
 import { router } from "@/router";
 import { authApi, cdnApi } from "@api/index";
 import { useStore as useUserStore } from "@store/user";
+import { useConfirmStore } from "@store/ui";
 import { AUTH_SERVER_ORIGIN } from "@mod/config";
 
 import LoadingSpinner from "@comp/LoadingSpinner.vue";
 import UserIcon from "@comp/UserIcon.vue";
 
+const confirmStore = useConfirmStore();
 const userStore = useUserStore();
 const { t } = useI18n();
 
 if (!userStore.info) {
-    alert("You must be logged in to view this page");
-    router.push("/");
+    confirmStore.alert("You must be logged in to view this page").then(() => {
+        router.push("/");
+    });
 }
 
 const currentUrl = window.location.href;
@@ -128,7 +131,7 @@ async function saveIcon() {
         const r = await authApi.assets.token({ body: { type: "avatar" } });
         if (r.status !== 200) {
             console.error("Unable to get assets token", r.status, r.body);
-            alert("Unable to get assets token");
+            await confirmStore.alert("Unable to get assets token");
             savingIcon.value = false;
             return;
         }
@@ -142,7 +145,7 @@ async function saveIcon() {
                 console.log("Deleting profile picture");
                 res = await cdnApi.service.delete({ headers: { authorization } });
                 if (res.status !== 204) {
-                    alert("Error deleting profile picture");
+                    await confirmStore.alert("Error deleting profile picture");
                 }
             } else if (userIcon.value) {
                 console.log("Updating profile picture");
@@ -154,19 +157,19 @@ async function saveIcon() {
                 });
 
                 if (res.status === 400) {
-                    alert(`Failed to update profile picture: ${res.body.error}`);
+                    await confirmStore.alert(`Failed to update profile picture: ${res.body.error}`);
                 }
             }
         } catch (error) {
             console.error("Error updating profile picture", error);
-            alert("Error updating profile picture");
+            await confirmStore.alert("Error updating profile picture");
             savingIcon.value = false;
             return;
         }
 
         if (!res) {
             console.error("No response from profile picture update");
-            alert("No response from profile picture update");
+            await confirmStore.alert("No response from profile picture update");
             savingIcon.value = false;
             return;
         }
@@ -178,38 +181,38 @@ async function saveIcon() {
             restoreUserIcon.value = userIcon.value;
             reload = true;
         } else {
-            alert("An error occurred while updating the profile picture");
+            await confirmStore.alert("An error occurred while updating the profile picture");
         }
 
         // if (res?.error) {
         //     console.error(res.error);
         //     switch (res.error) {
         //         case "FILE_TOO_LARGE":
-        //             alert("File too large");
+        //             await confirmStore.alert("File too large");
         //             break;
 
         //         case "IMAGE_DIMENSIONS_TOO_LARGE":
-        //             alert("Image dimensions too large");
+        //             await confirmStore.alert("Image dimensions too large");
         //             break;
 
         //         case "UNSUPPORTED_FILE_TYPE":
-        //             alert("Unsupported file type");
+        //             await confirmStore.alert("Unsupported file type");
         //             break;
 
         //         case "INVALID_SESSION_ID":
-        //             alert("Unauthorized");
+        //             await confirmStore.alert("Unauthorized");
         //             break;
 
         //         case "INTERNAL_SERVER_ERROR":
-        //             alert("Internal server error");
+        //             await confirmStore.alert("Internal server error");
         //             break;
 
         //         case "CONNECTION_ERROR":
-        //             alert("Error connecting to the auth server");
+        //             await confirmStore.alert("Error connecting to the auth server");
         //             break;
 
         //         default:
-        //             alert("An error occurred while updating the profile picture");
+        //             await confirmStore.alert("An error occurred while updating the profile picture");
         //             break;
         //     }
         // } else if (res?.result) {
@@ -248,9 +251,7 @@ async function saveIcon() {
                     userStore.info.round_border = roundBorder;
                 }
             })
-            .orTee((e) => {
-                alert(e);
-            });
+            .orTee((e) => confirmStore.alert(e));
     }
 
     if (reload) {
@@ -277,21 +278,20 @@ async function saveUsername() {
     const res = await ResultAsync.fromPromise(
         authApi.user.updateUsername({ body: { username } }),
         (e) => `Failed to update username: ${e instanceof Error ? e.message : String(e)}`,
-    )
-        .andThen((res) => {
-            if (res.status === 204) {
-                return ok();
-            } else if (res.status === 400) {
-                console.error("Invalid username", res.body.issues.find((issue) => issue.message)?.message);
-                return err("Invalid username");
-            } else if (res.status === 401 || res.status === 500) {
-                console.error("Failed to update username", res.body.error);
-                return err("Failed to update username");
-            } else {
-                console.error("Unexpected response", res);
-                return err("An error occurred while updating the username");
-            }
-        });
+    ).andThen((res) => {
+        if (res.status === 204) {
+            return ok();
+        } else if (res.status === 400) {
+            console.error("Invalid username", res.body.issues.find((issue) => issue.message)?.message);
+            return err("Invalid username");
+        } else if (res.status === 401 || res.status === 500) {
+            console.error("Failed to update username", res.body.error);
+            return err("Failed to update username");
+        } else {
+            console.error("Unexpected response", res);
+            return err("An error occurred while updating the username");
+        }
+    });
 
     if (res.isOk()) {
         if (userStore.info) {
@@ -301,7 +301,7 @@ async function saveUsername() {
         // The username is saved, a failed refresh only leaves the store stale
         await refreshUser();
     } else {
-        alert(res.error);
+        await confirmStore.alert(res.error);
     }
 
     savingUsername.value = false;
@@ -354,10 +354,21 @@ onMounted(() => {
                             >
                                 <div id="image-input-div">
                                     <div id="drag-drop">Drag & Drop</div>
-                                    <label class="usr-btn" id="image-input-but" style="transform: translateY(15%)" for="image-input">
+                                    <label
+                                        class="usr-btn"
+                                        id="image-input-but"
+                                        style="transform: translateY(15%)"
+                                        for="image-input"
+                                    >
                                         Upload
                                     </label>
-                                    <input type="file" name="profile-pic" id="image-input" accept="image/*" @input="onIconInput" />
+                                    <input
+                                        type="file"
+                                        name="profile-pic"
+                                        id="image-input"
+                                        accept="image/*"
+                                        @input="onIconInput"
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -373,7 +384,12 @@ onMounted(() => {
                                 </div>
                             </div>
 
-                            <button class="usr-btn" id="image-remove" @click="removeIcon" :style="buttonStyle(!iconRemoved)">
+                            <button
+                                class="usr-btn"
+                                id="image-remove"
+                                @click="removeIcon"
+                                :style="buttonStyle(!iconRemoved)"
+                            >
                                 {{ t("edit.remove") }}
                             </button>
 

@@ -53,7 +53,7 @@ export const useConfirmStore = defineStore("confirm", () => {
                     setTimeout(() => {
                         const next = queue.shift()!;
                         _c(next);
-                    }, CONFIRM_LEAVE_TIME);
+                    }, CONFIRM_LEAVE_TIME.toMillisecond().time);
                 } else {
                     cleanup();
                 }
@@ -86,11 +86,11 @@ export const useConfirmStore = defineStore("confirm", () => {
     }
 
     async function alert(message: string, subMessage?: string): Promise<void> {
-        return confirm({
+        await confirm({
             message,
             subMessage,
             isAlert: true,
-        }).then(() => undefined);
+        });
     }
 
     function confirmOk() {

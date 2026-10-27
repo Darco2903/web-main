@@ -30,7 +30,7 @@ watch(
         } else {
             window.removeEventListener("keydown", onKeyDown);
         }
-    }
+    },
 );
 </script>
 
@@ -58,7 +58,11 @@ watch(
                     <button
                         ref="buttonOk"
                         class="confirm-btn usr-btn"
-                        :style="{ backgroundColor: confirmStore.currentOptions.danger ? 'var(--color-error)' : 'var(--color-primary)' }"
+                        :style="{
+                            backgroundColor: confirmStore.currentOptions.danger
+                                ? 'var(--color-error)'
+                                : 'var(--color-primary)',
+                        }"
                         @click="confirmStore.confirmOk"
                     >
                         {{ confirmStore.currentOptions.isAlert ? "OK" : "Confirm" }}
@@ -66,7 +70,7 @@ watch(
 
                     <button
                         ref="buttonCancel"
-                        class="confirm-btn usr-btn"
+                        class="cancel-btn usr-btn"
                         @click="confirmStore.confirmCancel"
                         v-if="!confirmStore.currentOptions.isAlert"
                     >
@@ -109,7 +113,7 @@ watch(
 .confirm-btn {
     &:hover,
     &:focus {
-        border: 2px solid #eee;
+        border: 2px solid var(--text);
     }
 }
 

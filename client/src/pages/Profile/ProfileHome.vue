@@ -38,7 +38,7 @@ async function init() {
         if (location.params.id === "me") {
             console.error("You must be logged in to view your profile");
             errorMessage.value = t("profileHome.loginRequired");
-            // alert("You must be logged in to view your profile");
+            // await confirmStore.alert("You must be logged in to view your profile");
             // window.location.href = loginUrl.value;
         } else {
             console.error("No user id found");
@@ -62,14 +62,14 @@ async function init() {
                 if (res.status === 400) {
                     console.error("Invalid user ID", res.body.issues.find((issue) => issue.message)?.message);
                     errorMessage.value = t("profileHome.invalidUserId");
-                    // alert("Invalid user ID");
+                    // await confirmStore.alert("Invalid user ID");
                 } else if (res.status === 404 || res.status === 500) {
                     errorMessage.value = res.body.error;
                     // console.error(res.body.error);
-                    // alert(res.body.error);
+                    // await confirmStore.alert(res.body.error);
                 } else {
                     errorMessage.value = t("profileHome.failedToLoadUser");
-                    // alert("Error loading user");
+                    // await confirmStore.alert("Error loading user");
                 }
                 return err();
             }
@@ -119,8 +119,7 @@ onMounted(async () => {
                         :iconUrl="userIcon"
                         :round-border="user?.round_border"
                         :size="userIconSize"
-                        :border-size="userIconBorderSize"
-                    />
+                        :border-size="userIconBorderSize" />
 
                     <div style="display: flex; flex-direction: row; gap: 10px; align-items: center">
                         <label class="user-name text">{{ user?.name }}</label>
@@ -131,8 +130,7 @@ onMounted(async () => {
                             title="Verified"
                             width="32"
                             height="32"
-                            v-if="ownProfile && (user as User).verified"
-                        />
+                            v-if="ownProfile && (user as User).verified" />
                     </div>
 
                     <RouterLink class="usr-btn no-underline" to="/profile/edit" v-if="ownProfile">
@@ -151,7 +149,9 @@ onMounted(async () => {
             <div class="user-profile-error">{{ errorMessage }}</div>
 
             <div class="go-home usr-btn">
-                <RouterLink to="/" class="text" style="text-decoration: none">{{ t("common.goHome.goHome") }}</RouterLink>
+                <RouterLink to="/" class="text" style="text-decoration: none">{{
+                    t("common.goHome.goHome")
+                }}</RouterLink>
             </div>
         </div>
     </div>
