@@ -32,7 +32,7 @@ const border = ref<boolean>(false);
 const userName = ref<string>("");
 let iconDragOver: boolean = false;
 const savingIcon = ref<boolean>(false);
-let savingUsername: boolean = false;
+const savingUsername = ref<boolean>(false);
 
 const userIconSize = IS_MOBILE ? "128px" : "192px";
 const userIconBorderSize = IS_MOBILE ? "3px" : "6px";
@@ -264,30 +264,43 @@ function cancelUsername() {
 }
 
 async function saveUsername() {
-    if (savingUsername || !userStore.info) {
+    if (savingUsername.value || !userStore.info) {
         return;
     }
-    savingUsername = true;
+    savingUsername.value = true;
 
-    const res = await authApi.user.updateUsername({ body: { username: userName.value } });
+    const username = userName.value;
+    const res = await ResultAsync.fromPromise(
+        authApi.user.updateUsername({ body: { username } }),
+        (e) => `Failed to update username: ${e instanceof Error ? e.message : String(e)}`,
+    )
+        .andThen((res) => {
+            if (res.status === 204) {
+                return ok();
+            } else if (res.status === 400) {
+                console.error("Invalid username", res.body.issues.find((issue) => issue.message)?.message);
+                return err("Invalid username");
+            } else if (res.status === 401 || res.status === 500) {
+                console.error("Failed to update username", res.body.error);
+                return err("Failed to update username");
+            } else {
+                console.error("Unexpected response", res);
+                return err("An error occurred while updating the username");
+            }
+        });
 
-    if (res.status === 200) {
-        // console.log("Username updated");
-    } else if (res.status === 400) {
-        console.error("Invalid username", res.body.issues.find((issue) => issue.message)?.message);
-        alert("Invalid username");
-        return;
-    } else if (res.status === 401 || res.status === 500) {
-        console.error("Internal server error", res.body.error);
-        alert("Internal server error");
-        return;
+    if (res.isOk()) {
+        if (userStore.info) {
+            userStore.info.name = username;
+        }
+        console.log("Username updated");
+        // The username is saved, a failed refresh only leaves the store stale
+        await refreshUser();
+    } else {
+        alert(res.error);
     }
 
-    userStore.info.name = userName.value;
-    console.log("Username updated");
-    await refreshUser();
-
-    savingUsername = false;
+    savingUsername.value = false;
 }
 
 function refreshUser(): ResultAsync<User, string> {
