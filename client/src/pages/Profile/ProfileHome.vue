@@ -20,7 +20,7 @@ const verifyUrl = AUTH_SERVER_ORIGIN + "/verify-request";
 const userIcon = ref<string>("");
 const user = ref<UserPublic | User | null>(null);
 const ready = ref<boolean>(false);
-const profileGap = ref<string>(IS_MOBILE ? "30px" : "80px");
+const profileGap = ref<string>(IS_MOBILE ? "20px" : "40px");
 const userIconSize = ref<string>(IS_MOBILE ? "64px" : "128px");
 const userIconBorderSize = ref<string>(IS_MOBILE ? "3px" : "5px");
 const errorMessage = ref<string>("");
@@ -103,17 +103,15 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>
-    <div class="flex row" style="margin: 24px 16px" v-if="!errorMessage">
-      <div class="go-home usr-btn">
-        <RouterLink to="/" class="text" style="text-decoration: none"><-</RouterLink>
-      </div>
+  <div class="profile-page">
+    <div class="back-row" v-if="!errorMessage">
+      <RouterLink to="/" class="g-btn g-btn-icon" :aria-label="t('common.goHome.goHome')">←</RouterLink>
     </div>
 
-    <LoadingSpinner class="user-edit-loading" :loading="!ready" v-if="!ready && !errorMessage" />
+    <LoadingSpinner class="profile-loading g-glass-strong" :loading="!ready" v-if="!ready && !errorMessage" />
 
     <div class="user-profile-content" v-else-if="userId && !errorMessage">
-      <div id="profile">
+      <div id="profile" class="g-glass g-card">
         <div class="profile-first-row">
           <UserIcon
             :iconUrl="userIcon"
@@ -122,69 +120,64 @@ onMounted(async () => {
             :border-size="userIconBorderSize"
           />
 
-          <div style="display: flex; flex-direction: row; gap: 10px; align-items: center">
-            <label class="user-name text">{{ user?.name }}</label>
+          <div class="profile-name">
+            <span class="user-name">{{ user?.name }}</span>
             <img
               class="verified-icon"
               src="@icons/verified-96px.png"
               alt="Verified"
               title="Verified"
-              width="32"
-              height="32"
+              width="28"
+              height="28"
               v-if="ownProfile && (user as User).verified"
             />
           </div>
 
-          <RouterLink class="usr-btn no-underline" to="/profile/edit" v-if="ownProfile">
+          <RouterLink class="g-btn g-btn-primary" to="/profile/edit" v-if="ownProfile">
             {{ t("profileHome.editProfile") }}
           </RouterLink>
         </div>
 
-        <div class="user-profile-verified" v-if="ownProfile && !(user as User).verified">
-          <span>{{ t("profileHome.emailUnverified") }}</span>
-          <a class="usr-btn" :href="verifyUrl" target="_blank" style="text-decoration: none">
+        <div class="user-profile-verified g-alert g-warning" v-if="ownProfile && !(user as User).verified">
+          <span class="user-profile-verified-text">{{ t("profileHome.emailUnverified") }}</span>
+          <a class="g-btn g-btn-sm" :href="verifyUrl" target="_blank">
             {{ t("profileHome.verifyNow") }}
           </a>
         </div>
       </div>
     </div>
 
-    <div class="flex col center user-profile-error-container" style="gap: 24px" v-else>
-      <div class="user-profile-error">{{ errorMessage }}</div>
+    <div class="user-profile-error-container g-glass g-card" v-else>
+      <div class="user-profile-error g-alert g-error">{{ errorMessage }}</div>
 
-      <div class="go-home usr-btn">
-        <RouterLink to="/" class="text" style="text-decoration: none">{{ t("common.goHome.goHome") }}</RouterLink>
-      </div>
+      <RouterLink to="/" class="g-btn">{{ t("common.goHome.goHome") }}</RouterLink>
     </div>
   </div>
 </template>
 
 <style scoped>
-.user-edit-loading {
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: #00000088;
-  z-index: 100;
+.profile-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.profile-loading {
+  align-self: center;
+  margin-top: 60px;
   padding: 20px;
-  border-radius: 6px;
+  border-radius: var(--g-radius-lg);
 }
 
 .user-profile-content {
   display: flex;
-  flex-direction: column;
   justify-content: center;
-  align-items: center;
-  margin-top: 50px;
 }
 
 #profile {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  align-items: center;
-  margin-top: 20px;
+  gap: 24px;
 }
 
 .profile-first-row {
@@ -194,9 +187,21 @@ onMounted(async () => {
   align-items: center;
 }
 
+body[mobile] .profile-first-row {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.profile-name {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+}
+
 .user-name {
-  font-size: 24px;
-  font-weight: bold;
+  font-size: 26px;
+  font-weight: 700;
 }
 
 body[mobile] .user-name {
@@ -204,28 +209,24 @@ body[mobile] .user-name {
 }
 
 .user-profile-verified {
-  display: flex;
-  flex-direction: row;
-  gap: 20px;
   align-items: center;
-  margin-top: 10px;
-  font-weight: bold;
-  font-size: 1.2em;
-  color: var(--color-warning);
+
+  &::before {
+    margin-top: 0;
+  }
+}
+
+.user-profile-verified-text {
+  flex: 1;
+  font-weight: 600;
 }
 
 .user-profile-error-container {
-  /* display: flex;
-    justify-content: center;
-    align-items: center; */
-  /* width: 100%; */
-  height: 200px;
-}
-
-.user-profile-error {
-  color: #a80016;
-  font-size: 1.2em;
-  font-weight: 600;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  align-self: center;
+  margin-top: 40px;
 }
 </style>

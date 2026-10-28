@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, type CSSProperties } from "vue";
+import { computed, ref } from "vue";
 
 import UserSvg from "@icons/user.svg";
 
@@ -8,21 +8,18 @@ const {
   roundBorder = false,
   size = "128px",
   borderSize = "4px",
+  ring,
 } = defineProps<{
   iconUrl?: string;
   roundBorder?: boolean;
   size?: string;
   borderSize?: string;
+  /** background of the ring, defaults to the brand gradient */
+  ring?: string;
 }>();
 
 const useFallback = computed<boolean>(() => iconUrl === undefined);
 const errored = ref<boolean>(false);
-
-const userBoxImageStyle = computed<CSSProperties>(() => {
-  return {
-    "border-radius": roundBorder ? "50%" : "0%",
-  };
-});
 
 const emit = defineEmits<{
   (e: "load", event: Event): void;
@@ -45,37 +42,18 @@ function onError(event: Event) {
 </script>
 
 <template>
-  <div class="user-image-container">
-    <div class="user-image-box" :style="userBoxImageStyle">
-      <UserSvg class="user-image" v-show="useFallback || errored" />
-      <img class="user-image" :src="iconUrl" @load="onLoad" @error="onError" v-show="!useFallback && !errored" />
-    </div>
+  <div
+    class="user-icon g-avatar"
+    :class="{ round: roundBorder }"
+    :style="{ '--size': size, padding: borderSize, background: ring }"
+  >
+    <UserSvg class="user-icon-fallback" v-show="useFallback || errored" />
+    <img :src="iconUrl" alt="" @load="onLoad" @error="onError" v-show="!useFallback && !errored" />
   </div>
 </template>
 
-<style>
-.user-image-container {
-  width: v-bind(size);
-  height: v-bind(size);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.user-image-box {
-  width: calc(v-bind(size) - v-bind(borderSize) * 2);
-  height: calc(v-bind(size) - v-bind(borderSize) * 2);
-  outline: v-bind(borderSize) solid #eee;
-  outline-offset: -1px;
-  overflow: hidden;
-  transition:
-    outline 200ms ease,
-    border-radius 200ms ease;
-}
-
-.user-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+<style scoped>
+.user-icon-fallback {
+  color: var(--g-text-muted);
 }
 </style>

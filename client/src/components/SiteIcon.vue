@@ -48,7 +48,7 @@ const {
     cursor: pointer;
 
     &:hover {
-      filter: drop-shadow(2px 2px 5px var(--hover));
+      filter: drop-shadow(0 4px 12px rgba(99, 102, 241, 0.35));
     }
   }
 }

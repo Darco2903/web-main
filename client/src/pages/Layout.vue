@@ -4,13 +4,27 @@ import UpperPanel from "@comp/UpperPanel/Index.vue";
 </script>
 
 <template>
-  <div>
+  <div class="layout">
     <UpperPanel />
 
-    <RouterView />
+    <main>
+      <RouterView />
+    </main>
   </div>
 </template>
 
 <style scoped>
-/*  */
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 16px 16px 48px;
+}
+
+body[mobile] .layout {
+  gap: 16px;
+  padding: 10px 10px 32px;
+}
 </style>

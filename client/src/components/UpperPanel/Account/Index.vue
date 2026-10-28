@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, type CSSProperties } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import { RouterLink } from "vue-router";
 import { useStore as useUserStore } from "@store/user";
 import { useI18n } from "vue-i18n";
@@ -19,11 +19,8 @@ const ready = ref<boolean>(false);
 const noSession = ref<boolean>(true);
 const deg = ref<number>(135);
 
-const sessionStyles = computed(() => {
-  return {
-    background: `linear-gradient(${deg.value}deg, #00a6ff, #c5007f)`,
-  };
-});
+// the avatar ring slowly rotates, its angle is kept across page loads
+const ringGradient = computed(() => `linear-gradient(${deg.value}deg, #00a6ff, #c5007f)`);
 
 const logoutURL = computed(() => {
   const url = new URL(AUTH_SERVER_ORIGIN + "/logout");
@@ -91,141 +88,80 @@ onUnmounted(() => {
   <div id="user-account" v-show="ready">
     <LoginButton v-if="noSession" />
 
-    <div id="user-session" v-else :style="sessionStyles">
-      <div id="user-session-container">
-        <div id="user-account-info">
-          <UserIcon
-            :iconUrl="userStore.getUserIconUrlNoCache()"
-            :roundBorder="userStore.info?.round_border"
-            size="48px"
-            border-size="3px"
-          />
+    <div id="user-session" class="g-glass-subtle" :class="{ round: userStore.info?.round_border }" v-else>
+      <RouterLink class="session-user" to="/profile/me" :title="t('accountIndex.myProfile')">
+        <UserIcon
+          :iconUrl="userStore.getUserIconUrlNoCache()"
+          :roundBorder="userStore.info?.round_border"
+          :ring="ringGradient"
+          size="40px"
+          border-size="3px"
+        />
 
-          <label id="user-account-name">{{ userStore.info?.name || "Unknown" }}</label>
-        </div>
+        <span class="session-name">{{ userStore.info?.name || "Unknown" }}</span>
+      </RouterLink>
 
-        <div id="user-links">
-          <RouterLink to="/profile/me">{{ t("accountIndex.myProfile") }}</RouterLink>
-          <a id="user-account-logout" :href="logoutURL">{{ t("accountIndex.logout") }}</a>
-        </div>
-      </div>
+      <span class="session-separator"></span>
+
+      <a class="g-btn g-btn-ghost g-btn-sm" :href="logoutURL">{{ t("accountIndex.logout") }}</a>
     </div>
   </div>
 </template>
 
 <style scoped>
-#user-account {
-}
-
-#user-account a {
-  text-decoration: none;
-}
-
 #user-session {
   display: flex;
-  flex-direction: column;
-  /* background: var(--user-gradient-anim); */
-  padding: 5px;
-  border-radius: 18px;
-  /* animation: user-gradient 60s infinite ease-in-out; */
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px 4px 4px;
+  /* avatar corner (22% of 40px) + padding, so both corners follow the same curve */
+  border-radius: 13px;
+  transition: border-radius var(--g-duration);
+
+  /* half the height (40px avatar + 2 * 4px padding): a pill radius like 999px would animate
+     almost entirely in the first frames and look like a jump */
+  &.round {
+    border-radius: 24px;
+  }
 }
 
-/* #user-session[loading],
-#user-session[loading] * {
-    opacity: 0;
-    animation: none;
-    transition: none;
-} */
-
-#user-session-container {
-  border-radius: 14px;
-  overflow: hidden;
-  background-color: var(--bg);
-  transition: background-color 200ms ease;
-}
-
-#user-account-info {
+.session-user {
   display: flex;
-  flex-direction: row;
   align-items: center;
   gap: 10px;
-  padding: 10px;
+  padding-right: 6px;
+  border-radius: inherit;
+  color: var(--g-text);
+  text-decoration: none;
+  outline: none;
+
+  &:hover .session-name {
+    color: var(--color-primary);
+  }
+
+  &:focus-visible {
+    box-shadow: var(--g-ring);
+  }
 }
 
-#user-account-my-account {
-}
-
-#user-account-name {
-  /* max-width: 120px; */
-  width: 120px;
+.session-name {
+  max-width: 140px;
   font-size: 14px;
-  font-weight: bold;
-  text-overflow: ellipsis;
+  font-weight: 600;
+  white-space: nowrap;
   overflow: hidden;
-  /* text-align: center; */
-  color: var(--text);
-  transition: color 200ms ease;
+  text-overflow: ellipsis;
+  transition: color var(--g-duration);
 }
 
-body[mobile] #user-account-name {
-  /* display: none; */
-  /* width: 60px; */
-  /* font-size: 10px; */
+.session-separator {
+  width: 1px;
+  height: 20px;
+  background: var(--g-border-strong);
 }
 
-#user-account-icon:not([src]) {
+body[mobile] .session-name,
+body[mobile] .session-separator {
   display: none;
-}
-
-#user-links {
-  display: flex;
-  flex-direction: row;
-}
-
-body[mobile] #user-session:not([active]) #user-links {
-  /* display: none; */
-}
-
-#user-links a {
-  --border-color: #222;
-  --side-padding: 10px;
-  width: 100px;
-  text-align: center;
-  padding: 10px 5px;
-  border-top: 2px solid var(--border-color);
-  position: relative;
-  cursor: pointer;
-  color: var(--text);
-  transition:
-    color 200ms ease,
-    background-color 200ms ease;
-}
-
-#user-links a:not(:last-child) {
-  border-right: 2px solid var(--border-color);
-}
-
-#user-links a:first-child {
-  padding-left: var(--side-padding);
-}
-
-#user-links a:last-child {
-  padding-right: var(--side-padding);
-}
-
-#user-links a:hover {
-  background-color: #5552;
-}
-
-body[mobile] #user-links a {
-  /* width: 80px; */
-  /* padding: 5px 2px; */
-  /* font-size: 10px; */
-}
-
-#user-account-my-account {
-}
-
-#user-account-logout {
 }
 </style>

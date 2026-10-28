@@ -26,16 +26,12 @@ const userIcon = ref<string | undefined>(undefined);
 const restoreUserIcon = ref<string | undefined>(undefined);
 const border = ref<boolean>(false);
 const userName = ref<string>("");
-let iconDragOver: boolean = false;
+const iconDragOver = ref<boolean>(false);
 const savingIcon = ref<boolean>(false);
 const savingUsername = ref<boolean>(false);
 
-const userIconSize = IS_MOBILE ? "128px" : "192px";
-const userIconBorderSize = IS_MOBILE ? "3px" : "6px";
-const roundBorderContainerStyle: CSSProperties = {
-  flexDirection: IS_MOBILE ? "column-reverse" : "row",
-  gap: IS_MOBILE ? "0.8em" : "15px",
-};
+const userIconSize = IS_MOBILE ? "112px" : "160px";
+const userIconBorderSize = IS_MOBILE ? "3px" : "5px";
 
 const borderEdited = computed<boolean>(() => {
   return userStore.info !== null && userStore.info.round_border !== border.value;
@@ -62,12 +58,12 @@ function buttonStyle(state: boolean): CSSProperties {
 
 function onIconDragover(): void {
   // console.log("dragover");
-  iconDragOver = true;
+  iconDragOver.value = true;
 }
 
 function onIconDragleave(): void {
   // console.log("dragleave");
-  iconDragOver = false;
+  iconDragOver.value = false;
 }
 
 function loadIcon(file: File): void {
@@ -94,7 +90,7 @@ function onIconInput(e: Event): void {
 }
 
 function onIconDrop(e: DragEvent): void {
-  iconDragOver = false;
+  iconDragOver.value = false;
   const file = e.dataTransfer?.files[0];
   if (!file) {
     return;
@@ -322,322 +318,197 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <LoadingSpinner class="user-edit-loading" :loading="true" v-show="!ready" />
+  <div class="user-edit">
+    <LoadingSpinner class="user-edit-loading g-glass-strong" :loading="true" v-show="!ready" />
 
-    <div class="user-edit-content" :style="{ opacity: 1 }">
-      <div id="user-data">
-        <div class="data-section" id="image-section">
-          <div class="data-edit">
-            <div id="user-image-content">
-              <UserIcon
-                :iconUrl="userIcon"
-                :round-border="border"
-                :size="userIconSize"
-                :border-size="userIconBorderSize"
-                @load="ready = true"
-              />
+    <section class="edit-section g-glass g-card" id="image-section">
+      <h2>{{ t("edit.avatar") }}</h2>
 
-              <div
-                id="image-input-container"
-                @dragover.prevent="onIconDragover"
-                @dragleave.prevent="onIconDragleave"
-                @drop.prevent="onIconDrop"
-                :drag-over="iconDragOver"
-              >
-                <div id="image-input-div">
-                  <div class="text" id="drag-drop">Drag & Drop</div>
-                  <label class="usr-btn" id="image-input-but" style="transform: translateY(15%)" for="image-input">
-                    Upload
-                  </label>
-                  <input type="file" name="profile-pic" id="image-input" accept="image/*" @input="onIconInput" />
-                </div>
-              </div>
-            </div>
+      <div id="user-image-content">
+        <UserIcon
+          :iconUrl="userIcon"
+          :round-border="border"
+          :size="userIconSize"
+          :border-size="userIconBorderSize"
+          @load="ready = true"
+        />
 
-            <div id="image-options">
-              <div id="image-round-border-container" :style="roundBorderContainerStyle">
-                <div id="image-round-border-label">{{ t("edit.roundBorder") }}</div>
-                <div id="image-round-border">
-                  <input type="checkbox" id="image-round-border-input" v-model="border" />
-                  <label for="image-round-border-input">
-                    <div id="image-round-border-box"></div>
-                  </label>
-                </div>
-              </div>
-
-              <button class="usr-btn" id="image-remove" @click="removeIcon" :style="buttonStyle(!iconRemoved)">
-                {{ t("edit.remove") }}
-              </button>
-
-              <button
-                class="usr-btn"
-                id="image-cancel"
-                :style="buttonStyle(iconEdited || borderEdited)"
-                :disabled="savingIcon"
-                @click="cancelIcon"
-              >
-                {{ t("edit.cancel") }}
-              </button>
-
-              <button
-                class="usr-btn"
-                id="image-save"
-                :style="buttonStyle(iconEdited || borderEdited)"
-                :disabled="savingIcon"
-                @click="saveIcon"
-              >
-                {{ t("edit.save") }}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="data-section" id="username-section">
-          <div class="data-edit">
-            <div class="username-content">
-              <input type="text" class="usr-input" :placeholder="t('edit.username')" v-model="userName" />
-            </div>
-
-            <div id="username-options">
-              <button
-                class="usr-btn"
-                id="username-cancel"
-                :style="buttonStyle(nameEdited)"
-                :disabled="savingUsername"
-                @click="cancelUsername"
-              >
-                {{ t("edit.cancel") }}
-              </button>
-
-              <button
-                class="usr-btn"
-                id="username-save"
-                :style="buttonStyle(nameEdited)"
-                :disabled="savingUsername"
-                @click="saveUsername"
-              >
-                {{ t("edit.save") }}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="data-section flex col" style="gap: 42px">
-          <div class="password-change" style="text-align: center; user-select: none">
-            <a class="edit-password-but usr-btn" :href="editPasswordURL" style="text-decoration: none">
-              {{ t("edit.changePassword") }}
-            </a>
-          </div>
-
-          <div class="totp-change" style="text-align: center; user-select: none">
-            <a
-              class="edit-password-but usr-btn"
-              :href="setupTOTPURL"
-              v-if="userStore.info?.totp_enabled === false"
-              style="text-decoration: none"
-            >
-              {{ t("edit.setupTOTP") }}
-            </a>
-            <a class="edit-password-but usr-btn" :href="manageTOTPURL" v-else style="text-decoration: none">
-              {{ t("edit.disableTOTP") }}
-            </a>
-          </div>
+        <div
+          id="image-input-container"
+          class="g-dropzone"
+          @dragover.prevent="onIconDragover"
+          @dragleave.prevent="onIconDragleave"
+          @drop.prevent="onIconDrop"
+          :data-over="iconDragOver"
+        >
+          <span>{{ t("edit.dragDrop") }}</span>
+          <label class="g-btn g-btn-sm" for="image-input">{{ t("edit.upload") }}</label>
+          <input type="file" name="profile-pic" id="image-input" accept="image/*" @input="onIconInput" />
         </div>
       </div>
-    </div>
+
+      <div class="section-footer">
+        <label class="g-field-row">
+          <input type="checkbox" class="g-shape-toggle" v-model="border" />
+          {{ t("edit.roundBorder") }}
+        </label>
+
+        <div class="section-actions">
+          <button class="g-btn" id="image-remove" @click="removeIcon" :style="buttonStyle(!iconRemoved)">
+            {{ t("edit.remove") }}
+          </button>
+
+          <button
+            class="g-btn"
+            id="image-cancel"
+            :style="buttonStyle(iconEdited || borderEdited)"
+            :disabled="savingIcon"
+            @click="cancelIcon"
+          >
+            {{ t("edit.cancel") }}
+          </button>
+
+          <button
+            class="g-btn g-btn-primary"
+            id="image-save"
+            :style="buttonStyle(iconEdited || borderEdited)"
+            :disabled="savingIcon"
+            @click="saveIcon"
+          >
+            <span class="g-spinner g-spinner-sm" v-if="savingIcon"></span>
+            {{ t("edit.save") }}
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="edit-section g-glass g-card" id="username-section">
+      <h2>{{ t("edit.username") }}</h2>
+
+      <div class="section-footer">
+        <input type="text" class="g-input username-input" :placeholder="t('edit.username')" v-model="userName" />
+
+        <div class="section-actions">
+          <button
+            class="g-btn"
+            id="username-cancel"
+            :style="buttonStyle(nameEdited)"
+            :disabled="savingUsername"
+            @click="cancelUsername"
+          >
+            {{ t("edit.cancel") }}
+          </button>
+
+          <button
+            class="g-btn g-btn-primary"
+            id="username-save"
+            :style="buttonStyle(nameEdited)"
+            :disabled="savingUsername"
+            @click="saveUsername"
+          >
+            <span class="g-spinner g-spinner-sm" v-if="savingUsername"></span>
+            {{ t("edit.save") }}
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="edit-section g-glass g-card" id="security-section">
+      <h2>{{ t("edit.security") }}</h2>
+
+      <div class="security-actions">
+        <a class="g-btn" :href="editPasswordURL">{{ t("edit.changePassword") }}</a>
+
+        <a class="g-btn" :href="setupTOTPURL" v-if="userStore.info?.totp_enabled === false">
+          {{ t("edit.setupTOTP") }}
+        </a>
+        <a class="g-btn" :href="manageTOTPURL" v-else>{{ t("edit.disableTOTP") }}</a>
+      </div>
+    </section>
   </div>
 </template>
 
 <style scoped>
-body {
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.on-edit {
-  /* transition: opacity 0.3s ease; */
+.user-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
 }
 
 .user-edit-loading {
-  position: absolute;
+  position: fixed;
   top: 40%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: #00000088;
   z-index: 100;
   padding: 20px;
-  border-radius: 6px;
+  border-radius: var(--g-radius-lg);
 }
 
-.user-edit-content {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin-top: 50px;
-}
-
-#user-data {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 80px;
-}
-
-.data-section {
+.edit-section {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  width: 100%;
-}
 
-.data-edit {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 30px;
-  width: 100%;
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+  }
 }
 
 #user-image-content {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 60px;
-}
-
-body[mobile] #user-image-content {
-  /* gap: 3em; */
+  gap: 32px;
 }
 
 #image-input-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 96px;
-  height: 96px;
-  /* border: 2px dashed #222245; */
-  border: 2px dashed var(--text);
-  transition:
-    background-color 0.3s ease,
-    border 200ms ease;
+  flex: 1;
+  align-self: stretch;
+}
+
+body[mobile] #user-image-content {
+  flex-direction: column;
+  gap: 20px;
 }
 
 body[mobile] #image-input-container {
-  /* width: 6em; */
-  /* height: 6em; */
-}
-
-#image-input-container[drag-over="true"] {
-  background-color: #222245bb;
-}
-
-#image-input-div {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  height: 65%;
-}
-
-#drag-drop {
-  font-size: 14px;
-  user-select: none;
-  transition: color 0.3s ease;
-}
-
-#image-input-container[drag-over="true"] #drag-drop {
-  color: #fff;
-}
-
-#image-input-but:hover {
-  cursor: pointer;
+  align-self: auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 #image-input {
   display: none;
 }
 
-#image-options,
-#username-options {
+.section-footer {
   display: flex;
-  flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 30px;
+  justify-content: space-between;
+  gap: 16px;
 }
 
-#image-round-border-container {
+.section-actions {
   display: flex;
-  /* flex-direction: row; */
-  align-items: center;
-  gap: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
-/* body[mobile] #image-round-border-container {
-    flex-direction: column;
-    gap: 0.8em;
-} */
-
-#image-round-border-label {
-  user-select: none;
-  color: var(--text);
-  transition: color 200ms ease;
+.username-input {
+  flex: 1;
+  min-width: 200px;
 }
 
-body[mobile] #image-round-border-label {
-  font-size: 0.9em;
-}
-
-.data-section {
-  opacity: 1;
-  transition: opacity 0.3s ease;
-}
-
-.data-section[disabled] {
-  opacity: 0.7 !important;
-  pointer-events: none !important;
-}
-
-#image-round-border-input {
-  display: none;
-}
-
-#image-round-border {
-  position: relative;
-  width: 24px;
-  height: 24px;
+.security-actions {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: row;
-}
-
-#image-round-border label {
-  cursor: pointer;
-}
-
-#image-round-border-box {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  height: 100%;
-  /* border: 4px solid #222245; */
-  border: 4px solid var(--border);
-  transition:
-    border-radius 0.2s,
-    border-color 200ms ease,
-    background-color 0.2s;
-}
-
-body:not([mobile]) #image-round-border:hover #image-round-border-box {
-  border-radius: 30%;
-}
-
-input:checked + label #image-round-border-box {
-  border-radius: 50%;
-  background-color: var(--color-primary);
+  flex-wrap: wrap;
+  gap: 12px;
 }
 </style>

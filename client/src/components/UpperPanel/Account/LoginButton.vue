@@ -55,23 +55,14 @@ async function loginUnhover(e: MouseEvent) {
 </script>
 
 <template>
-  <a class="user-account-login" :href="loginURL" v-on="loginHandlers" :style="loginStyles">{{
+  <!-- inline background-image overrides the static gradient of g-btn-brand to rotate it on hover -->
+  <a class="user-account-login g-btn g-btn-brand" :href="loginURL" v-on="loginHandlers" :style="loginStyles">{{
     t("loginButton.login")
   }}</a>
 </template>
 
 <style scoped>
 .user-account-login {
-  border-radius: 5px;
-  padding: 10px;
-  font-size: 12px;
-  cursor: pointer;
-  user-select: none;
-  color: #fff;
-  text-decoration: none;
-  display: inline-block;
   min-width: 50px;
-  text-align: center;
-  /* transition: filter v-bind(hoverTime) ease, animation v-bind(hoverTime) ease; */
 }
 </style>

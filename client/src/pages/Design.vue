@@ -451,8 +451,9 @@ const radii = ["sm", "md", "lg", "xl", "pill"];
   border-radius: 12px;
   transition: border-radius var(--g-duration);
 
+  /* half the height (36px avatar + 2 * 4px padding), so the radius animates smoothly */
   &.round {
-    border-radius: var(--g-radius-pill);
+    border-radius: 22px;
   }
 }
 

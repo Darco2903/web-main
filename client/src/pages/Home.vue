@@ -3,89 +3,80 @@ import { useI18n } from "vue-i18n";
 import { IS_MOBILE } from "@darco2903/web-common";
 import { CDN_SERVER_ORIGIN, MANAGER_SERVER_ORIGIN } from "@mod/config";
 
-import SiteIcon from "@comp/SiteIcon.vue";
-
 import CdnIcon from "@assets/icon-cdn.svg";
 import ManagerIcon from "@assets/icon-manager.svg";
 
 const { t } = useI18n();
 
-const siteIconSize = IS_MOBILE ? "128px" : "192px";
+const siteIconSize = IS_MOBILE ? "112px" : "160px";
+
+const sites = [
+  { label: "CDN", url: `${CDN_SERVER_ORIGIN}/app/`, icon: CdnIcon },
+  { label: "Server Manager", url: MANAGER_SERVER_ORIGIN, icon: ManagerIcon },
+];
 </script>
 
 <template>
   <div id="home-content">
-    <div class="flex center" :class="IS_MOBILE ? 'col' : 'row'" style="margin: 40px; gap: 40px">
-      <!-- <span
-                :style="{
-                    color: '#bbbb',
-                    fontWeight: 'bold',
-                    fontSize: '1.6em',
-                    textAlign: 'center',
-                    width: '100%',
-                    marginTop: '10px',
-                    pointerEvents: 'none',
-                }"
-                >{{ t("home.welcomeMessage") }}</span
-            > -->
+    <!-- <span class="g-text-muted">{{ t("home.welcomeMessage") }}</span> -->
 
-      <div class="flex row center redirect-elem">
-        <SiteIcon
-          style="position: relative"
-          :size="siteIconSize"
-          :url="`${CDN_SERVER_ORIGIN}/app/`"
-          :clickable="true"
-          :external="true"
-          target="_blank"
-        >
-          <CdnIcon style="position: absolute; width: 100%; height: 100%" />
-          <span class="redirect-elem-label">CDN</span>
-        </SiteIcon>
-      </div>
-
-      <div class="flex row center redirect-elem">
-        <SiteIcon
-          style="position: relative"
-          :size="siteIconSize"
-          :url="MANAGER_SERVER_ORIGIN"
-          :clickable="true"
-          :external="true"
-          target="_blank"
-        >
-          <ManagerIcon style="position: absolute; width: 100%; height: 100%" />
-          <span class="redirect-elem-label">Server Manager</span>
-        </SiteIcon>
-      </div>
+    <div class="sites">
+      <a
+        v-for="site in sites"
+        :key="site.label"
+        class="site g-glass g-card g-card-hover"
+        :href="site.url"
+        target="_blank"
+      >
+        <component :is="site.icon" class="site-icon" />
+        <span class="site-label">{{ site.label }}</span>
+      </a>
     </div>
   </div>
 </template>
 
 <style scoped>
-.redirect-elem {
-  border-radius: 10px;
-  padding: 20px;
-  border: 2px solid transparent;
+.sites {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 32px;
+  margin-top: 40px;
+}
+
+body[mobile] .sites {
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.site {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  min-width: 200px;
+  color: var(--g-text);
+  text-decoration: none;
   user-select: none;
-  background-color: var(--bg-card);
-  transition:
-    border 2000ms ease,
-    box-shadow 100ms ease;
+  outline: none;
 
-  &:hover {
-    border: 2px solid var(--input);
-    box-shadow: 5px 5px 30px -15px var(--input);
+  &:focus-visible {
+    box-shadow: var(--g-highlight), var(--g-ring);
   }
+}
 
-  .redirect-elem-label {
-    position: absolute;
-    bottom: 0;
-    transform: translateY(25%);
+body[mobile] .site {
+  min-width: 140px;
+  padding: 16px;
+}
 
-    width: 100%;
-    color: var(--text);
-    font-weight: bold;
-    font-size: 1.2em;
-    text-align: center;
-  }
+.site-icon {
+  width: v-bind(siteIconSize);
+  height: v-bind(siteIconSize);
+}
+
+.site-label {
+  font-size: 1.1em;
+  font-weight: 700;
 }
 </style>

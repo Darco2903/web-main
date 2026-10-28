@@ -12,6 +12,7 @@ export default {
     common: {
         myProfile: common.myProfile,
         goHome: common.goHome,
+        theme: common.theme,
     },
     accountIndex: AccountIndex,
     edit: Edit,

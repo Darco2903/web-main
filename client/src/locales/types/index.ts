@@ -10,6 +10,7 @@ export type LocalesSchema = {
     common: {
         myProfile: common.MyProfile;
         goHome: common.GoHome;
+        theme: common.Theme;
     };
     accountIndex: AccountIndex;
     edit: Edit;

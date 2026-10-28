@@ -16,7 +16,32 @@ export const useThemeStore = defineStore("theme", () => {
             const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
             newTheme = prefersDark ? "dark" : "light";
         }
-        document.documentElement.setAttribute("data-theme", newTheme);
+        applyTheme(newTheme);
+    }
+
+    /**
+     * Elements transition only some of their properties (background fades, text and gradients
+     * switch at once), so a theme change shows a mix of both themes for a moment.
+     * Transitions are turned off during the switch, and the page crossfades instead when supported.
+     */
+    function applyTheme(resolved: "light" | "dark") {
+        const root = document.documentElement;
+        const current = root.getAttribute("data-theme");
+        if (current === resolved) return;
+
+        const swap = () => root.setAttribute("data-theme", resolved);
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        root.classList.add("theme-switching");
+
+        if (current !== null && !reducedMotion && "startViewTransition" in document) {
+            document.startViewTransition(swap).finished.finally(() => root.classList.remove("theme-switching"));
+        } else {
+            swap();
+            // apply the new theme with transitions still off, then turn them back on
+            getComputedStyle(root).color;
+            requestAnimationFrame(() => root.classList.remove("theme-switching"));
+        }
     }
 
     function getTheme(): Theme {

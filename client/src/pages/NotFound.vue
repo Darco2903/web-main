@@ -15,48 +15,41 @@ function goBack() {
 </script>
 
 <template>
-  <div class="container">
-    <span class="title">404</span>
-    <span class="message">{{ t("notFound.message") }}</span>
-    <span class="link" @click="goBack">{{ t("notFound.goBack") }}</span>
+  <div class="not-found">
+    <div class="container g-glass g-card">
+      <span class="title">404</span>
+      <span class="message g-text-muted">{{ t("notFound.message") }}</span>
+      <button class="g-btn g-btn-primary" @click="goBack">{{ t("notFound.goBack") }}</button>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.container {
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+.not-found {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  padding: 16px;
+}
 
+.container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 30px;
-
-  color: #ddd;
+  gap: 20px;
+  padding: 40px 56px;
   text-align: center;
 }
 
 .title {
-  font-size: 64px;
-  font-weight: bold;
+  font-size: 72px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
 }
 
 .message {
-  /* margin-bottom: 20px; */
-  font-size: 1.4em;
-}
-
-.link {
-  color: #ddd;
-  text-decoration: none;
   font-size: 1.2em;
-}
-
-.link:hover {
-  text-decoration: underline;
-  cursor: pointer;
 }
 </style>

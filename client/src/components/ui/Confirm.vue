@@ -36,31 +36,29 @@ watch(
 
 <template>
   <Teleport to="body">
+    <Transition name="confirm-scrim">
+      <div class="confirm-scrim g-scrim" v-if="confirmStore.isActive"></div>
+    </Transition>
+
     <TransitionGroup name="confirm" tag="div">
       <div
-        class="confirm-content flex col"
+        class="confirm-content g-dialog g-glass-strong"
         v-if="confirmStore.isActive && confirmStore.currentOptions"
         role="dialog"
         aria-modal="true"
       >
-        <div class="confirm-info max" style="margin-bottom: 5px">
-          <span class="title text" style="font-weight: 600">{{ confirmStore.currentOptions.message }}</span>
-          <span
-            class="message text"
-            v-if="confirmStore.currentOptions.subMessage"
-            style="margin-top: 10px; display: block; font-size: 0.9em"
-          >
+        <div class="confirm-info">
+          <span class="title">{{ confirmStore.currentOptions.message }}</span>
+          <span class="message g-text-muted" v-if="confirmStore.currentOptions.subMessage">
             {{ confirmStore.currentOptions.subMessage }}
           </span>
         </div>
 
-        <div class="flex row align-center" style="justify-content: end; gap: 10px">
+        <div class="g-dialog-actions">
           <button
             ref="buttonOk"
-            class="confirm-btn usr-btn"
-            :style="{
-              backgroundColor: confirmStore.currentOptions.danger ? 'var(--color-error)' : 'var(--color-primary)',
-            }"
+            class="g-btn"
+            :class="confirmStore.currentOptions.danger ? 'g-btn-danger' : 'g-btn-primary'"
             @click="confirmStore.confirmOk"
           >
             {{ confirmStore.currentOptions.isAlert ? "OK" : "Confirm" }}
@@ -68,7 +66,7 @@ watch(
 
           <button
             ref="buttonCancel"
-            class="cancel-btn usr-btn"
+            class="g-btn"
             @click="confirmStore.confirmCancel"
             v-if="!confirmStore.currentOptions.isAlert"
           >
@@ -81,57 +79,65 @@ watch(
 </template>
 
 <style scoped>
-.confirm-content {
+.confirm-scrim {
   position: fixed;
-  /* inset: 0; */
-  z-index: 1010;
-  border-radius: 8px;
-  padding: 20px;
-  left: 50%;
-  top: 10px;
-  transform: translateX(-50%);
-  border: 1px solid var(--border);
-  width: 300px;
-  /* height: 150px; */
-  gap: 20px;
-  pointer-events: none;
-  background-color: var(--bg-card);
-  opacity: 0.95;
-
-  & > * {
-    pointer-events: auto;
-  }
+  inset: 0;
+  z-index: 1009;
 }
 
-.title,
-.message {
+.confirm-content {
+  position: fixed;
+  z-index: 1010;
+  left: 50%;
+  top: 30%;
+  transform: translate(-50%, -50%);
+}
+
+.confirm-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title {
+  font-weight: 600;
   white-space: pre-line;
 }
 
-.confirm-btn {
-  &:hover,
-  &:focus {
-    border: 2px solid var(--text);
-  }
+.message {
+  font-size: 14px;
+  white-space: pre-line;
 }
 
 /*  */
 
-/* Fade Slide Down Transition */
+.confirm-scrim-enter-active,
+.confirm-scrim-leave-active {
+  transition: opacity v-bind(CONFIRM_LEAVE_TIME + "ms") ease;
+}
+
+.confirm-scrim-enter-from,
+.confirm-scrim-leave-to {
+  opacity: 0;
+}
+
+/* Fade Scale Transition */
 .confirm-enter-active,
 .confirm-leave-active {
-  transition: all v-bind(CONFIRM_LEAVE_TIME + "ms") ease;
+  transition:
+    opacity v-bind(CONFIRM_LEAVE_TIME + "ms") ease,
+    transform v-bind(CONFIRM_LEAVE_TIME + "ms") ease;
 }
 
 .confirm-enter-from,
 .confirm-leave-to {
   opacity: 0;
-  transform: translateX(-50%) translateY(-20px);
+  transform: translate(-50%, -50%) scale(0.95);
 }
 
 .confirm-enter-to,
 .confirm-leave-from {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
+  transform: translate(-50%, -50%) scale(1);
 }
 </style>

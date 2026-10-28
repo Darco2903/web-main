@@ -50,6 +50,7 @@
     --g-shadow-lg: 0 20px 60px rgba(30, 41, 90, 0.2);
 
     --g-selection: rgba(99, 102, 241, 0.25);
+    --g-scrim: rgba(30, 41, 90, 0.12);
     --g-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2355607a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
 }
 
@@ -83,6 +84,7 @@
     --g-shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.55);
 
     --g-selection: rgba(99, 102, 241, 0.45);
+    --g-scrim: rgba(0, 0, 0, 0.45);
     --g-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239aa3b5' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
 }
 
@@ -99,6 +101,19 @@
         --g-surface: var(--g-surface-solid);
         --g-surface-strong: var(--g-surface-solid);
     }
+}
+
+/* set by the theme store while switching theme, see applyTheme in store/theme.ts */
+.theme-switching,
+.theme-switching *,
+.theme-switching *::before,
+.theme-switching *::after {
+    transition: none !important;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: 250ms;
 }
 
 /* Backgrounds */
@@ -158,6 +173,7 @@
 }
 
 .g-card-hover {
+    position: relative;
     cursor: pointer;
     transition:
         transform var(--g-duration),
@@ -168,6 +184,16 @@
         transform: translateY(-3px);
         background: var(--g-surface-hover);
         box-shadow: var(--g-highlight), var(--g-shadow-lg);
+    }
+
+    /* keeps the hover area under the cursor once the card is lifted, otherwise hovering
+       near the bottom edge flickers between hovered and not hovered */
+    &::after {
+        content: "";
+        position: absolute;
+        inset: 0 0 -4px;
+        z-index: -1;
+        border-radius: inherit;
     }
 }
 
@@ -246,8 +272,6 @@
     border: 1px solid var(--g-border);
     background: var(--g-surface);
     box-shadow: var(--g-highlight), var(--g-shadow-sm);
-    backdrop-filter: blur(12px) saturate(var(--g-saturate));
-    -webkit-backdrop-filter: blur(12px) saturate(var(--g-saturate));
     color: var(--g-text);
     font: inherit;
     font-size: 14px;
@@ -262,7 +286,6 @@
         background-color var(--g-duration),
         border-color var(--g-duration),
         box-shadow var(--g-duration),
-        filter var(--g-duration),
         opacity var(--g-duration),
         transform 100ms;
 
@@ -286,25 +309,35 @@
     }
 }
 
+/*
+ * Solid buttons: the hover highlight is a white inset shadow, not filter: brightness(),
+ * toggling a filter re-rasterizes the button and flickers.
+ * Same shadow list in every state so it interpolates.
+ */
 .g-btn-primary,
 .g-btn-brand,
 .g-btn-danger {
+    --btn-glow: rgba(99, 102, 241, 0.35);
+    --btn-tint: rgba(255, 255, 255, 0);
     color: #fff;
-    border-color: rgba(255, 255, 255, 0.2);
+    border-color: transparent;
+    /* the gradient starts under the border, otherwise it repeats in the border area and shows a seam */
+    background-origin: border-box;
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.25),
-        0 4px 16px rgba(99, 102, 241, 0.35);
+        0 4px 16px var(--btn-glow),
+        inset 0 0 0 999px var(--btn-tint);
 
     &:hover {
-        filter: brightness(1.1);
+        --btn-tint: rgba(255, 255, 255, 0.12);
     }
-}
 
-/* the gradient starts under the border, otherwise it repeats in the border area and shows a seam */
-.g-btn-primary,
-.g-btn-brand {
-    border-color: transparent;
-    background-origin: border-box;
+    &:focus-visible {
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.25),
+            var(--g-ring),
+            inset 0 0 0 999px var(--btn-tint);
+    }
 }
 
 .g-btn-primary,
@@ -315,27 +348,21 @@
 
 .g-btn-brand,
 .g-btn-brand:hover {
+    --btn-glow: rgba(197, 0, 127, 0.3);
     background: var(--g-gradient-brand);
     background-origin: border-box;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.25),
-        0 4px 16px rgba(197, 0, 127, 0.3);
 }
 
 .g-btn-danger,
 .g-btn-danger:hover {
+    --btn-glow: rgba(209, 70, 73, 0.35);
     background: var(--color-error);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.25),
-        0 4px 16px rgba(209, 70, 73, 0.35);
 }
 
 .g-btn-ghost {
     background: transparent;
     border-color: transparent;
     box-shadow: none;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
 
     &:hover {
         background: var(--g-hover);
@@ -759,7 +786,7 @@
 }
 
 .g-scrim {
-    background: rgba(10, 12, 18, 0.35);
+    background: var(--g-scrim);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
 }

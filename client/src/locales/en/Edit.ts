@@ -1,6 +1,10 @@
 import type { Edit } from "../types/Edit";
 
 export default {
+    avatar: "Profile Picture",
+    security: "Security",
+    dragDrop: "Drag & Drop",
+    upload: "Upload",
     roundBorder: "Round Border",
     username: "Username",
     changePassword: "Change Password",

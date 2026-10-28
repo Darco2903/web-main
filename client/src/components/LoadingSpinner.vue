@@ -6,7 +6,7 @@ const { loading, color, size, width } = defineProps({
   },
   color: {
     type: String,
-    default: "#eee",
+    default: "var(--color-primary)",
     required: false,
   },
   size: {
@@ -16,35 +16,32 @@ const { loading, color, size, width } = defineProps({
   },
   width: {
     type: String,
-    default: "5px",
+    default: "3px",
     required: false,
   },
 });
 </script>
+
 <template>
   <div class="loading-ring-container">
-    <div class="loading-ring" :loading></div>
+    <span
+      class="loading-ring g-spinner"
+      :loading
+      :style="{ '--size': size, borderWidth: width, borderTopColor: color }"
+    ></span>
   </div>
 </template>
 
 <style scoped>
+.loading-ring-container {
+  display: flex;
+}
+
 .loading-ring {
-  width: v-bind(size);
-  height: v-bind(size);
-  border-radius: 50%;
-  border: v-bind(width) solid;
-  border-color: v-bind(color) transparent v-bind(color) transparent;
-  animation: lds-ring 0.4s infinite linear;
-  /* transition: opacity 0.2s; */
+  transition: opacity var(--g-duration);
 }
 
 .loading-ring[loading="false"] {
   opacity: 0;
-}
-
-@keyframes lds-ring {
-  100% {
-    transform: rotate(360deg);
-  }
 }
 </style>

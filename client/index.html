@@ -12,7 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <script>
-      // Early theme detection to prevent FOUC
+      // Early theme detection to prevent FOUC, colors match --g-bg-base in styles/glass.css
 
       function getCookie(name) {
         return document.cookie
@@ -21,8 +21,8 @@
           ?.split("=")[1];
       }
 
-      const light = "#f9fafb";
-      const dark = "#0f1115";
+      const light = "#eef1f8";
+      const dark = "#0a0c12";
       const theme = localStorage.getItem("theme") || getCookie("theme");
       const preferDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
@@ -36,7 +36,7 @@
     <title>Main Server</title>
   </head>
 
-  <body class="no-transition">
+  <body class="g-backdrop no-transition">
     <div id="app"></div>
 
     <script type="module" src="/src/main.ts"></script>
