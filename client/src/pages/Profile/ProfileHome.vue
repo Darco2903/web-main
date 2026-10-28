@@ -17,7 +17,7 @@ const userStore = useUserStore();
 const { t } = useI18n();
 
 const verifyUrl = AUTH_SERVER_ORIGIN + "/verify-request";
-const userIcon = ref<string>("");
+const userIcon = ref<string | undefined>(undefined);
 const user = ref<UserPublic | User | null>(null);
 const ready = ref<boolean>(false);
 const profileGap = ref<string>(IS_MOBILE ? "20px" : "40px");
@@ -34,7 +34,12 @@ const ownProfile = computed<boolean>(() => {
 });
 
 async function init() {
-  if (!userId.value) {
+  // Clear the previous profile, the page is reused when only the route param changes
+  user.value = null;
+  userIcon.value = undefined;
+
+  const id = userId.value;
+  if (!id) {
     if (location.params.id === "me") {
       console.error("You must be logged in to view your profile");
       errorMessage.value = t("profileHome.loginRequired");
@@ -50,9 +55,14 @@ async function init() {
     document.title = t("profileHome.myProfile");
   } else {
     await ResultAsync.fromPromise(
-      authApi.user.fromId({ params: { userId: userId.value } }),
+      authApi.user.fromId({ params: { userId: id } }),
       (e) => new Error("Failed to load user: " + (e instanceof Error ? e.message : String(e))),
     ).andThen((res) => {
+      // Navigated to another profile while this one was loading
+      if (id !== userId.value) {
+        return err();
+      }
+
       if (res.status === 200) {
         user.value = res.body;
         document.title = t("profileHome.otherProfile", { username: user.value.name });
@@ -76,10 +86,12 @@ async function init() {
     });
   }
 
-  console.log(user.value);
-  if (user.value?.assets.avatar) {
-    userIcon.value = user.value.assets.avatar;
+  if (id !== userId.value) {
+    return;
   }
+
+  console.log(user.value);
+  userIcon.value = user.value?.assets.avatar || undefined;
 
   ready.value = true;
   // console.log("ready", ready.value);
