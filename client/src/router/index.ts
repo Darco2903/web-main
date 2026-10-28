@@ -74,9 +74,8 @@ router.beforeEach(async (to) => {
     const userStore = useUserStore();
     const confirmStore = useConfirmStore();
 
-    if (!userStore.info) {
-        await userStore.init();
-    }
+    // Only requests the first time, logged out visitors don't retry on every navigation
+    await userStore.init();
 
     const perm = to.meta?.permission;
     const user = userStore.info;

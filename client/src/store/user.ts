@@ -3,6 +3,12 @@ import type { ResultAsync } from "neverthrow";
 import { accessTokenExpiresAt, type User } from "@darco2903/auth-api/client";
 import { getUserInfo, refreshAccessToken } from "@api/user";
 
+/**
+ * Shared by every init() call: the session is only loaded once per page load (login and logout
+ * happen on the auth server and come back with a full page load)
+ */
+let initPromise: Promise<boolean> | null = null;
+
 export const useStore = defineStore("user", {
     state: () => ({
         info: null as User | null,
@@ -20,8 +26,8 @@ export const useStore = defineStore("user", {
                     this.info = null;
                 });
         },
-        async init(): Promise<boolean> {
-            return this.refresh()
+        init(): Promise<boolean> {
+            initPromise ??= this.refresh()
                 .andTee(() => {
                     this.autoSessionRefresh();
                 })
@@ -29,6 +35,7 @@ export const useStore = defineStore("user", {
                     () => true,
                     () => false,
                 );
+            return initPromise;
         },
         autoSessionRefresh() {
             const expiresAt = accessTokenExpiresAt();
