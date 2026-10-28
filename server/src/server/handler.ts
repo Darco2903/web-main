@@ -31,6 +31,15 @@ export async function registerRoutes() {
         const indexHtml = injectClientConfig(indexHtmlContent);
 
         app.use(express.static(distPath, { index: false }));
+        // A file express.static didn't find (an old chunk after a deploy...) is a 404, not the app:
+        // the browser would fail to run index.html as a script. App routes never have an extension.
+        app.get("*", (req, res, next) => {
+            if (path.extname(req.path)) {
+                res.sendStatus(404);
+                return;
+            }
+            next();
+        });
         app.get("*", (req, res) => {
             res.setHeader("Cache-Control", "no-cache");
             res.type("html").send(indexHtml);
