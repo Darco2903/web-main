@@ -1,5 +1,6 @@
 @import "./fonts.css";
 @import "./transition.css";
+@import "./glass.css";
 
 :root {
     --color-primary: #6366f1;

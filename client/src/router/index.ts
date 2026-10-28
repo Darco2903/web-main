@@ -10,6 +10,16 @@ const Home = () => import("@pages/Home.vue");
 const ProfileHome = () => import("@pages/Profile/ProfileHome.vue");
 const ProfileEdit = () => import("@pages/Profile/Edit.vue");
 
+const devRoutes: RouteRecordRaw[] = [
+    {
+        path: "/design",
+        component: () => import("@pages/Design.vue"),
+        meta: {
+            title: "Design",
+        },
+    },
+];
+
 const routes: RouteRecordRaw[] = [
     {
         path: "/",
@@ -43,6 +53,9 @@ const routes: RouteRecordRaw[] = [
             },
         ],
     },
+
+    ...(import.meta.env.DEV ? devRoutes : []),
+
     {
         path: "/:catchAll(.*)",
         component: NotFound,
