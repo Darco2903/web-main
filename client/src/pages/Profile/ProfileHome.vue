@@ -142,7 +142,9 @@ onMounted(async () => {
 
         <div class="user-profile-verified" v-if="ownProfile && !(user as User).verified">
           <span>{{ t("profileHome.emailUnverified") }}</span>
-          <a class="verify-link" :href="verifyUrl" target="_blank">{{ t("profileHome.verifyNow") }}</a>
+          <a class="usr-btn" :href="verifyUrl" target="_blank" style="text-decoration: none">
+            {{ t("profileHome.verifyNow") }}
+          </a>
         </div>
       </div>
     </div>
@@ -210,15 +212,6 @@ body[mobile] .user-name {
   font-weight: bold;
   font-size: 1.2em;
   color: var(--color-warning);
-}
-
-.verify-link {
-  text-decoration: none;
-  padding: 10px 12px;
-  border: 2px solid #fff;
-  border-radius: 5px;
-  color: #eee;
-  background-color: #0004;
 }
 
 .user-profile-error-container {

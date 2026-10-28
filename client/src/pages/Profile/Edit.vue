@@ -346,7 +346,7 @@ onMounted(() => {
                 :drag-over="iconDragOver"
               >
                 <div id="image-input-div">
-                  <div id="drag-drop">Drag & Drop</div>
+                  <div class="text" id="drag-drop">Drag & Drop</div>
                   <label class="usr-btn" id="image-input-but" style="transform: translateY(15%)" for="image-input">
                     Upload
                   </label>
@@ -518,7 +518,7 @@ body[mobile] #user-image-content {
   width: 96px;
   height: 96px;
   /* border: 2px dashed #222245; */
-  border: 2px dashed #eee;
+  border: 2px dashed var(--text);
   transition:
     background-color 0.3s ease,
     border 200ms ease;
@@ -544,8 +544,6 @@ body[mobile] #image-input-container {
 #drag-drop {
   font-size: 14px;
   user-select: none;
-  /* color: #222245; */
-  color: #eee;
   transition: color 0.3s ease;
 }
 
