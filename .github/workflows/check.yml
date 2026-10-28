@@ -1,0 +1,36 @@
+name: Check
+
+on:
+  # tags are checked by publish.yml before building the image
+  push:
+    branches: ["**"]
+  workflow_call:
+  workflow_dispatch:
+
+# a newer push on the same branch cancels the running check
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+
+      # version comes from packageManager in package.json
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # vue-tsc on client, tsc --noEmit on server
+      - run: pnpm -r check
+
+      - run: pnpm --filter client build-only

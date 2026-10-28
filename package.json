@@ -11,6 +11,7 @@
     "packageManager": "pnpm@12.15.0",
     "scripts": {
         "build": "pnpm -r build",
+        "check": "pnpm -r check",
         "start": "pnpm --filter server start",
         "dev": "pnpm --filter server dev",
         "clean": "pnpm -r clean"
