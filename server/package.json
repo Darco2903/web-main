@@ -17,7 +17,6 @@
         "clean": "rimraf dist"
     },
     "dependencies": {
-        "@darco2903/web-common": "^0.6.2",
         "dotenv": "^18.0.9",
         "express": "^4.21.2",
         "pino": "^9.8.0"

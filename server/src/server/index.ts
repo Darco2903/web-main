@@ -2,7 +2,6 @@ import { logger } from "../logger.js";
 import { SERVER_LISTEN, SERVER_PORT } from "../config.js";
 import { server } from "./app.js";
 import { registerRoutes } from "./handler.js";
-import "./prototypes.js";
 
 export async function startServer() {
     // Before listening, so no request comes in while the routes are missing

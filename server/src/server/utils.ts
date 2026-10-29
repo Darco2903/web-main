@@ -1,9 +1,3 @@
-import { RequestHandler } from "express";
-
-export function reqHandler(fn: RequestHandler) {
-    return fn;
-}
-
 /**
  * Client IP. Behind a proxy (TRUST_PROXY) it comes from the headers the proxy sets,
  * otherwise anyone could fake it, so only the socket address is used.

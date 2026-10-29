@@ -1,4 +1,3 @@
-import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -9,10 +8,3 @@ export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
 /** The root folder of the project, containing server and client folders */
 export const rootPath = path.resolve(__dirname, "../..");
-
-export async function exists(filePath: string) {
-    return fs.promises
-        .access(filePath, fs.constants.F_OK)
-        .then(() => true)
-        .catch(() => false);
-}
