@@ -178,8 +178,8 @@ importers:
         specifier: ^1.3.1
         version: 1.3.1
       '@darco2903/web-common':
-        specifier: ^0.6.2
-        version: 0.6.4
+        specifier: ^0.7.2
+        version: 0.7.2(@darco2903/secondthought@1.3.1)
       '@ts-rest/core':
         specifier: ^3.52.1
         version: 3.52.1(@types/node@22.20.5)(zod@3.25.76)
@@ -438,8 +438,10 @@ packages:
   '@darco2903/secondthought@1.3.1':
     resolution: {integrity: sha512-V9VInslaMATdTHjju9pNrrduFxW3Qz8us3h1pEkpEFdNTor3fp7nbm+zJS9/+P6r7//6j9SmXp832ruK3mc3rw==}
 
-  '@darco2903/web-common@0.6.4':
-    resolution: {integrity: sha512-hc0sgY79zlbtz0DR7TAFveNhW2ZYaRQXJsovuSqu+timmrqeHaZNEoP1aBLNjtfUfecCBhZw82h9D71/RfZPCg==}
+  '@darco2903/web-common@0.7.2':
+    resolution: {integrity: sha512-ytZHoFbE/q/laxFWLKvectzwKP7gW6w1Hznk7NexS8cfsWRzZmf6Qi9JUbkZXgzi+fBtcXw6wRyhdJjtdzMM8g==}
+    peerDependencies:
+      '@darco2903/secondthought': ^1.3.0
 
   '@esbuild/aix-ppc64@0.28.2':
     resolution: {integrity: sha512-XExcO+dvLKvVtNTibSTBej1NCAbaGhWn9Ww1ZPx80qsahhPFe/8jgWP0IchNe0F3HwkU7n8ejhH8bjonqht8mQ==}
@@ -2279,7 +2281,9 @@ snapshots:
 
   '@darco2903/secondthought@1.3.1': {}
 
-  '@darco2903/web-common@0.6.4': {}
+  '@darco2903/web-common@0.7.2(@darco2903/secondthought@1.3.1)':
+    dependencies:
+      '@darco2903/secondthought': 1.3.1
 
   '@esbuild/aix-ppc64@0.28.2':
     optional: true

@@ -1,5 +1,5 @@
 {
-    "name": "web-server",
+    "name": "web-main",
     "version": "1.0.0",
     "description": "",
     "main": "server/dist/index.js",
