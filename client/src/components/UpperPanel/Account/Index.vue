@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { computed, onMounted, onUnmounted } from "vue";
 import { RouterLink } from "vue-router";
 import { useStore as useUserStore } from "@store/user";
 import { useI18n } from "vue-i18n";
@@ -8,19 +8,23 @@ import { AUTH_SERVER_ORIGIN } from "@mod/config";
 import UserIcon from "@comp/UserIcon.vue";
 import LoginButton from "@comp/UpperPanel/Account/LoginButton.vue";
 
-const SESSION_ANIM_UPDATE_TIME = 100;
-
-let sessionInterval: ReturnType<typeof setInterval> | null = null;
+/** One turn of the avatar ring (1deg every 100ms) */
+const RING_TURN_TIME = 36_000; // in ms
+const RING_DEFAULT_DEG = 135;
 
 const userStore = useUserStore();
 const { t } = useI18n();
 
-const ready = ref<boolean>(false);
-const noSession = ref<boolean>(true);
-const deg = ref<number>(135);
+const noSession = computed<boolean>(() => !userStore.info);
 
-// the avatar ring slowly rotates, its angle is kept across page loads
-const ringGradient = computed(() => `linear-gradient(${deg.value}deg, #00a6ff, #c5007f)`);
+// the avatar ring slowly rotates, its angle is kept across page loads. The rotation is a CSS
+// animation of --ring-angle (see the style), so it doesn't re-render the component every frame.
+const ringGradient = "linear-gradient(var(--ring-angle), #00a6ff, #c5007f)";
+const ringStartDeg = loadRingDeg();
+const ringStartTime = performance.now();
+// a negative delay starts the animation where the last page left it
+const ringDelay = `${(-ringStartDeg / 360) * RING_TURN_TIME}ms`;
+const ringDuration = `${RING_TURN_TIME}ms`;
 
 const logoutURL = computed(() => {
   const url = new URL(AUTH_SERVER_ORIGIN + "/logout");
@@ -28,64 +32,34 @@ const logoutURL = computed(() => {
   return url.href;
 });
 
-function loadSessionDeg() {
-  const sessionDeg = window.localStorage.getItem("session-deg");
-  if (sessionDeg) {
-    deg.value = parseInt(sessionDeg);
-  }
+function loadRingDeg(): number {
+  const deg = parseFloat(window.localStorage.getItem("session-deg") ?? "");
+  return Number.isFinite(deg) ? ((deg % 360) + 360) % 360 : RING_DEFAULT_DEG;
 }
 
-function saveSessionDeg() {
-  window.localStorage.setItem("session-deg", deg.value.toString());
-}
-
-function startSession() {
-  sessionInterval = setInterval(() => {
-    deg.value += 1;
-    if (deg.value >= 360) {
-      deg.value = 0;
-    }
-  }, SESSION_ANIM_UPDATE_TIME);
-}
-
-function stopSession() {
-  if (sessionInterval) {
-    clearInterval(sessionInterval);
-  }
-}
-
-function init() {
-  if (userStore.info) {
-    noSession.value = false;
-  }
+function saveRingDeg() {
+  const elapsed = performance.now() - ringStartTime;
+  const deg = (ringStartDeg + (elapsed / RING_TURN_TIME) * 360) % 360;
+  window.localStorage.setItem("session-deg", Math.round(deg).toString());
 }
 
 onMounted(() => {
   console.log("UserAccount mounted");
-  // console.log("userId", user.value);
 
-  init();
-
-  loadSessionDeg();
-  startSession();
-
-  window.addEventListener("beforeunload", saveSessionDeg);
-
-  ready.value = true;
+  window.addEventListener("beforeunload", saveRingDeg);
 });
 
 onUnmounted(() => {
   console.log("UserAccount unmounted");
 
-  window.removeEventListener("beforeunload", saveSessionDeg);
+  window.removeEventListener("beforeunload", saveRingDeg);
 
-  stopSession();
-  saveSessionDeg();
+  saveRingDeg();
 });
 </script>
 
 <template>
-  <div id="user-account" v-show="ready">
+  <div id="user-account">
     <LoginButton v-if="noSession" />
 
     <div id="user-session" class="g-glass-subtle" :class="{ round: userStore.info?.round_border }" v-else>
@@ -109,7 +83,26 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+/* registered so the angle is interpolated, an unregistered property would jump from 0 to 360deg */
+@property --ring-angle {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 135deg;
+}
+
+@keyframes ring-rotate {
+  from {
+    --ring-angle: 0deg;
+  }
+  to {
+    --ring-angle: 360deg;
+  }
+}
+
 #user-session {
+  animation: ring-rotate v-bind(ringDuration) linear infinite;
+  animation-delay: v-bind(ringDelay);
+
   display: flex;
   align-items: center;
   gap: 6px;
