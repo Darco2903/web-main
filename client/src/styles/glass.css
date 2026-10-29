@@ -267,7 +267,9 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 10px 18px;
+    --btn-py: 10px;
+    --btn-px: 18px;
+    padding: var(--btn-py) var(--btn-px);
     border-radius: var(--g-radius-md);
     border: 1px solid var(--g-border);
     background: var(--g-surface);
@@ -309,24 +311,37 @@
     }
 }
 
+/* registered so the hover tint of solid buttons can transition (plain custom properties switch at once) */
+@property --btn-tint {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: rgba(255, 255, 255, 0);
+}
+
 /*
- * Solid buttons: the hover highlight is a white inset shadow, not filter: brightness(),
- * toggling a filter re-rasterizes the button and flickers.
- * Same shadow list in every state so it interpolates.
+ * Solid buttons: the hover highlight is a white layer painted over the background.
+ * Not filter: brightness(), toggling a filter re-rasterizes the button and flickers,
+ * and not an inset shadow, Firefox clips it slightly differently from the background
+ * at the rounded edges and a fringe shows on hover.
  */
 .g-btn-primary,
 .g-btn-brand,
 .g-btn-danger {
+    --btn-bg: var(--g-gradient-primary);
     --btn-glow: rgba(99, 102, 241, 0.35);
-    --btn-tint: rgba(255, 255, 255, 0);
     color: #fff;
-    border-color: transparent;
-    /* the gradient starts under the border, otherwise it repeats in the border area and shows a seam */
-    background-origin: border-box;
+    /* no border: a transparent border over a gradient shows a seam (Chrome) or a fringe (Firefox)
+       at the edges, the missing 1px is added to the padding to keep the same size as other buttons */
+    border: none;
+    padding: calc(var(--btn-py) + 1px) calc(var(--btn-px) + 1px);
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.25),
-        0 4px 16px var(--btn-glow),
-        inset 0 0 0 999px var(--btn-tint);
+        0 4px 16px var(--btn-glow);
+    transition:
+        --btn-tint var(--g-duration),
+        box-shadow var(--g-duration),
+        opacity var(--g-duration),
+        transform 100ms;
 
     &:hover {
         --btn-tint: rgba(255, 255, 255, 0.12);
@@ -335,28 +350,28 @@
     &:focus-visible {
         box-shadow:
             inset 0 1px 0 rgba(255, 255, 255, 0.25),
-            var(--g-ring),
-            inset 0 0 0 999px var(--btn-tint);
+            var(--g-ring);
     }
 }
 
+/* :hover listed too, .g-btn:hover would replace the background otherwise */
 .g-btn-primary,
-.g-btn-primary:hover {
-    background: var(--g-gradient-primary);
-    background-origin: border-box;
-}
-
+.g-btn-primary:hover,
 .g-btn-brand,
-.g-btn-brand:hover {
-    --btn-glow: rgba(197, 0, 127, 0.3);
-    background: var(--g-gradient-brand);
-    background-origin: border-box;
-}
-
+.g-btn-brand:hover,
 .g-btn-danger,
 .g-btn-danger:hover {
+    background: linear-gradient(var(--btn-tint), var(--btn-tint)), var(--btn-bg);
+}
+
+.g-btn-brand {
+    --btn-bg: var(--g-gradient-brand);
+    --btn-glow: rgba(197, 0, 127, 0.3);
+}
+
+.g-btn-danger {
+    --btn-bg: var(--color-error);
     --btn-glow: rgba(209, 70, 73, 0.35);
-    background: var(--color-error);
 }
 
 .g-btn-ghost {
@@ -370,18 +385,21 @@
 }
 
 .g-btn-sm {
-    padding: 6px 12px;
+    --btn-py: 6px;
+    --btn-px: 12px;
     font-size: 13px;
     border-radius: var(--g-radius-sm);
 }
 
 .g-btn-lg {
-    padding: 14px 24px;
+    --btn-py: 14px;
+    --btn-px: 24px;
     font-size: 16px;
     border-radius: var(--g-radius-lg);
 }
 
 .g-btn-icon {
+    box-sizing: border-box;
     padding: 0;
     width: 40px;
     height: 40px;

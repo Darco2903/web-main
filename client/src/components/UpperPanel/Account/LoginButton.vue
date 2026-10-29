@@ -30,7 +30,7 @@ const loginURL = computed(() => {
 
 const loginStyles = computed(() => {
   return {
-    "background-image": calcLoginGradient(iter.value),
+    "--btn-bg": calcLoginGradient(iter.value),
   };
 });
 
@@ -55,7 +55,7 @@ async function loginUnhover(e: MouseEvent) {
 </script>
 
 <template>
-  <!-- inline background-image overrides the static gradient of g-btn-brand to rotate it on hover -->
+  <!-- --btn-bg replaces the static gradient of g-btn-brand to rotate it on hover, the hover tint stays on top -->
   <a class="user-account-login g-btn g-btn-brand" :href="loginURL" v-on="loginHandlers" :style="loginStyles">{{
     t("loginButton.login")
   }}</a>
