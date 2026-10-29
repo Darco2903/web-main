@@ -83,6 +83,12 @@ async function init() {
         }
         return err();
       }
+    }).orTee((e) => {
+      // Network error: the request itself failed, the HTTP errors above already set their message
+      if (e instanceof Error && id === userId.value) {
+        console.error(e.message);
+        errorMessage.value = t("profileHome.failedToLoadUser");
+      }
     });
   }
 
