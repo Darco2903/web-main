@@ -87,14 +87,14 @@ router.beforeEach(async (to) => {
 
             const url = new URL("/login", AUTH_SERVER_ORIGIN);
             url.searchParams.append("redirect", window.location.origin + to.fullPath);
-            // console.log("Redirecting to", url.href);
             window.location.replace(url.href);
+            // Cancel the navigation, the page must not render while the browser leaves
+            return false;
+        } else if (user.role < perm) {
+            console.log("Permission denied");
+            await confirmStore.alert("You do not have permission to access this page");
+            return { name: "home" };
         }
-        // else if (perm > user.role && !(await api.auth()).result) {
-        //     console.log("Permission denied");
-        //     await confirmStore.alert("You do not have permission to access this page");
-        //     return { name: "Home" };
-        // }
     }
 
     document.title = to.meta.title;
