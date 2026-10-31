@@ -1,4 +1,3 @@
-# platform-independent output (no native deps), so install/build run natively, not under QEMU
 FROM --platform=$BUILDPLATFORM ghcr.io/pnpm/pnpm:latest AS base
 ENV CI=true
 RUN pnpm runtime set node 24 -g

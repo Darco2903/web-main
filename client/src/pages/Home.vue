@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 import { IS_MOBILE } from "@darco2903/web-common";
-import { CDN_SERVER_ORIGIN, MANAGER_SERVER_ORIGIN } from "@mod/config";
+import { CDN_SERVER_ORIGIN, MANAGER_SERVER_ORIGIN, ALTV_SERVER_ORIGIN } from "@mod/config";
 
+import AltvIcon from "@assets/icon-altv.svg";
 import CdnIcon from "@assets/icon-cdn.svg";
 import ManagerIcon from "@assets/icon-manager.svg";
 
@@ -13,6 +14,7 @@ const siteIconSize = IS_MOBILE ? "112px" : "160px";
 const sites = [
   { label: "CDN", url: `${CDN_SERVER_ORIGIN}/app/`, icon: CdnIcon },
   { label: "Server Manager", url: MANAGER_SERVER_ORIGIN, icon: ManagerIcon },
+  { label: "AltV Web", url: ALTV_SERVER_ORIGIN, icon: AltvIcon },
 ];
 </script>
 

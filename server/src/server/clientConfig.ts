@@ -1,5 +1,11 @@
 import type { Plugin } from "vite";
-import { AUTH_SERVER_ORIGIN, CDN_SERVER_ORIGIN, MANAGER_SERVER_ORIGIN, SERVER_ORIGIN } from "../config.js";
+import {
+    AUTH_SERVER_ORIGIN,
+    CDN_SERVER_ORIGIN,
+    MANAGER_SERVER_ORIGIN,
+    ALTV_SERVER_ORIGIN,
+    SERVER_ORIGIN,
+} from "../config.js";
 
 /** Read by client/src/modules/config.ts, keep both in sync */
 const clientConfig = {
@@ -7,6 +13,7 @@ const clientConfig = {
     authServerOrigin: AUTH_SERVER_ORIGIN,
     cdnServerOrigin: CDN_SERVER_ORIGIN,
     managerServerOrigin: MANAGER_SERVER_ORIGIN,
+    altvServerOrigin: ALTV_SERVER_ORIGIN,
 };
 
 // type="application/json" is data, never executed (no CSP nonce needed). Escaping "<" keeps a value from closing the tag.

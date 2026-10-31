@@ -2,7 +2,7 @@ name: web-main
 services:
   web-main:
     build: .
-    image: web-main:latest
+    image: darco2903/web-main:latest
     container_name: web-main
     restart: always
     ports:

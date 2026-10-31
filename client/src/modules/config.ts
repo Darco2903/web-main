@@ -9,6 +9,7 @@ const configSchema = z.object({
     authServerOrigin: z.string().url(),
     cdnServerOrigin: z.string().url(),
     managerServerOrigin: z.string().url(),
+    altvServerOrigin: z.string().url(),
 });
 
 function readConfig() {
@@ -29,3 +30,4 @@ export const SERVER_ORIGIN = config.serverOrigin;
 export const AUTH_SERVER_ORIGIN = config.authServerOrigin;
 export const CDN_SERVER_ORIGIN = config.cdnServerOrigin;
 export const MANAGER_SERVER_ORIGIN = config.managerServerOrigin;
+export const ALTV_SERVER_ORIGIN = config.altvServerOrigin;

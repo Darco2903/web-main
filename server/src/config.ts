@@ -72,6 +72,7 @@ const serverOrigin = requireOrigin("SERVER_ORIGIN");
 const authServerOrigin = requireOrigin("AUTH_SERVER_ORIGIN");
 const cdnServerOrigin = requireOrigin("CDN_SERVER_ORIGIN");
 const managerServerOrigin = requireOrigin("MANAGER_SERVER_ORIGIN");
+const altvServerOrigin = requireOrigin("ALTV_SERVER_ORIGIN");
 
 logger.info("Config OK");
 
@@ -84,3 +85,4 @@ export const SERVER_ORIGIN = serverOrigin;
 export const AUTH_SERVER_ORIGIN = authServerOrigin;
 export const CDN_SERVER_ORIGIN = cdnServerOrigin;
 export const MANAGER_SERVER_ORIGIN = managerServerOrigin;
+export const ALTV_SERVER_ORIGIN = altvServerOrigin;
