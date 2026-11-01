@@ -14,11 +14,6 @@ export default defineConfig({
 
     server: {
         middlewareMode: true,
-        hmr: {
-            host: "localhost",
-            protocol: "ws",
-            port: 8081,
-        },
         allowedHosts: [
             //
             "darco2903.fr",

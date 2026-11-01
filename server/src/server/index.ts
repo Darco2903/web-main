@@ -1,6 +1,6 @@
 import { logger } from "../logger.js";
 import { SERVER_LISTEN, SERVER_PORT } from "../config.js";
-import { server } from "./app.js";
+import { server, vite } from "./app.js";
 import { registerRoutes } from "./handler.js";
 
 export async function startServer() {
@@ -17,12 +17,12 @@ export async function startServer() {
 
 export async function stopServer() {
     await new Promise<void>((resolve, reject) => {
+        vite?.close();
         server.close((err) => {
             if (err) {
                 logger.error(`Error stopping server: ${err.message}`);
                 reject(err);
             } else {
-                logger.info("Server stopped");
                 resolve();
             }
         });

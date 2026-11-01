@@ -1,11 +1,11 @@
 import fs from "fs";
 import path from "path";
 import express from "express";
-import { app } from "./app.js";
+import { app, createViteServer } from "./app.js";
 import { logger } from "../logger.js";
 import { IS_PROD, rootPath } from "../utils.js";
 import { TRUST_PROXY } from "../config.js";
-import { clientConfigPlugin, injectClientConfig } from "./clientConfig.js";
+import { injectClientConfig } from "./clientConfig.js";
 import { getClientIP } from "./utils.js";
 
 export async function registerRoutes() {
@@ -17,13 +17,8 @@ export async function registerRoutes() {
 
     const clientPath = path.resolve(rootPath, "client");
     if (!IS_PROD) {
-        const { createServer: createViteServer } = await import("vite");
-        const vite = await createViteServer({
-            root: clientPath,
-            // Merged with the plugins of client/vite.config.ts
-            plugins: [clientConfigPlugin()],
-        });
-        app.use(vite.middlewares);
+        const vite = await createViteServer(clientPath);
+        app.use(vite!.middlewares);
     } else {
         const distPath = path.resolve(clientPath, "dist");
         // Read once: the config doesn't change while the server runs
