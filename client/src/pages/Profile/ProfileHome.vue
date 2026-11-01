@@ -162,6 +162,13 @@ onMounted(async () => {
             {{ t("profileHome.verifyNow") }}
           </a>
         </div>
+
+        <hr class="g-divider" />
+
+        <div class="user-profile-id">
+          <span class="g-label">{{ t("profileHome.userId") }}</span>
+          <code class="user-profile-id-value g-code">{{ user?.public_id }}</code>
+        </div>
       </div>
     </div>
 
@@ -237,6 +244,12 @@ body[mobile] .user-name {
 .user-profile-verified-text {
   flex: 1;
   font-weight: 600;
+}
+
+.user-profile-id-value {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .user-profile-error-container {

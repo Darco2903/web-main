@@ -8,6 +8,7 @@ export default {
     editProfile: "Editer le profil",
     emailUnverified: "Email Non Verifié",
     verifyNow: "Vérifier Maintenant",
+    userId: "ID Utilisateur",
     loginRequired: "Vous devez être connecté pour voir votre profil",
     noUserId: "Aucun ID Utilisateur.",
     invalidUserId: "ID Utilisateur Invalide.",

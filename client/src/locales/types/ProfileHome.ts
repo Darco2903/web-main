@@ -4,6 +4,7 @@ export type ProfileHome = {
     editProfile: string;
     emailUnverified: string;
     verifyNow: string;
+    userId: string;
     loginRequired: string;
     noUserId: string;
     invalidUserId: string;
