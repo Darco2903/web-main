@@ -4,6 +4,7 @@ import {
     CDN_SERVER_ORIGIN,
     MANAGER_SERVER_ORIGIN,
     ALTV_SERVER_ORIGIN,
+    STATUS_SERVER_ORIGIN,
     SERVER_ORIGIN,
 } from "../config.js";
 
@@ -14,6 +15,7 @@ const clientConfig = {
     cdnServerOrigin: CDN_SERVER_ORIGIN,
     managerServerOrigin: MANAGER_SERVER_ORIGIN,
     altvServerOrigin: ALTV_SERVER_ORIGIN,
+    statusServerOrigin: STATUS_SERVER_ORIGIN,
 };
 
 // type="application/json" is data, never executed (no CSP nonce needed). Escaping "<" keeps a value from closing the tag.

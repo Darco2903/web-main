@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import type { ResultAsync } from "neverthrow";
-import { accessTokenExpiresAt, type User } from "@darco2903/auth-api/client";
+import { accessTokenExpiresAt, UserRole, type User } from "@darco2903/auth-api/client";
 import { getUserInfo, refreshAccessToken } from "@api/user";
 
 /**
@@ -77,6 +77,12 @@ export const useStore = defineStore("user", {
                 return `${url}?t=${this.refreshTimestamp}`;
             }
             return undefined;
+        },
+        getRole(): number {
+            return this.info?.role ?? 0;
+        },
+        isAdmin(): boolean {
+            return this.getRole() >= UserRole.Admin;
         },
     },
 });

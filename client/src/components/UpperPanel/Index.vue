@@ -1,18 +1,35 @@
 <script setup lang="ts">
 import { RouterLink } from "vue-router";
+import { useStore as useUserStore } from "@store/user";
+import { STATUS_SERVER_ORIGIN } from "@mod/config";
 
 import ThemeSwitcher from "@comp/UpperPanel/ThemeSwitcher.vue";
 import UserAccount from "@comp/UpperPanel/Account/Index.vue";
 
 // as an <img>: inline, its gradient id would clash with the one in icon-cdn.svg
 import mainIconUrl from "@assets/icon-main.svg?url";
+
+const userStore = useUserStore();
 </script>
 
 <template>
   <header id="upper-panel" class="g-navbar g-glass">
-    <RouterLink to="/" class="logo" aria-label="Home">
-      <img :src="mainIconUrl" alt="" />
-    </RouterLink>
+    <div class="flex row align-center" style="gap: 24px">
+      <RouterLink to="/" class="logo" aria-label="Home">
+        <img :src="mainIconUrl" alt="" />
+      </RouterLink>
+
+      <nav class="flex row" style="gap: 4px">
+        <a
+          :href="STATUS_SERVER_ORIGIN"
+          class="g-btn g-btn-ghost g-btn-sm"
+          v-show="userStore.isAdmin() || true"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Status</a
+        >
+      </nav>
+    </div>
 
     <div class="upper-panel-right">
       <ThemeSwitcher />
