@@ -4,4 +4,4 @@ packages:
 allowBuilds:
   esbuild: false
 minimumReleaseAgeExclude:
-  - "@darco2903/cdn-api@1.5.1"
+  - "@darco2903/cdn-api@1.7.0"
