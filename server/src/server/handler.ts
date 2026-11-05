@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import express from "express";
+import { health } from "@darco2903/pulse";
 import { app, createViteServer } from "./app.js";
 import { logger } from "../logger.js";
 import { IS_PROD, rootPath } from "../utils.js";
@@ -9,6 +10,13 @@ import { injectClientConfig } from "./clientConfig.js";
 import { getClientIP } from "./utils.js";
 
 export async function registerRoutes() {
+    // The root package.json has the app version, server/package.json doesn't
+    const packageJsonPath = path.resolve(rootPath, "package.json");
+    const packageJson = await fs.promises.readFile(packageJsonPath, "utf8");
+    const { version } = JSON.parse(packageJson);
+    // First, so the Docker healthcheck doesn't fill the logs and the catch-all routes don't answer it
+    app.use(health({ version, logger }));
+
     app.use((req, res, next) => {
         const clientIP = getClientIP(req.headers, req.socket.remoteAddress, TRUST_PROXY);
         logger.info(`${req.method.padEnd(6, " ")} ${clientIP} ${req.url}`);
