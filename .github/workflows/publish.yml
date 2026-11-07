@@ -56,3 +56,30 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Install cloudflared
+        run: |
+          curl -fsSL -o cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+          sudo dpkg -i cloudflared.deb
+
+      - name: SSH key and pinned host key
+        env:
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          mkdir -m 700 ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          # From the server: cat /etc/ssh/ssh_host_ed25519_key.pub
+          echo "ssh.darco2903.fr ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL2MKnVHBrf1RLwbGikOq5h1uIw9PJR6opJBRcFm7cQd root@ubuntu20-04" > ~/.ssh/known_hosts
+
+      # The forced command on the server does the deploy, nothing to send
+      - name: Deploy
+        run: |
+          ssh -T -o BatchMode=yes \
+            -o ProxyCommand="cloudflared access ssh --hostname %h" \
+            deploy@ssh.darco2903.fr
