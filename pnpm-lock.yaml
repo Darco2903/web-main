@@ -239,8 +239,8 @@ importers:
   server:
     dependencies:
       '@darco2903/pulse':
-        specifier: ^1.0.0
-        version: 1.0.0
+        specifier: ^1.1.0
+        version: 1.1.0
       dotenv:
         specifier: ^18.0.9
         version: 18.0.9
@@ -438,8 +438,8 @@ packages:
       '@ts-rest/core': ^3.52.1
       zod: ^3.25.76
 
-  '@darco2903/pulse@1.0.0':
-    resolution: {integrity: sha512-eH2T3oxIHD4LXASnmjiEBM8CKBfxcsJY3pnRCwjZfofOfCWuCL+DO1mGx3Du/SgZ9ZAxkJ9E5n3e+P7k5lYP0A==}
+  '@darco2903/pulse@1.1.0':
+    resolution: {integrity: sha512-FVkefrifJfslV7fQUhbwGrkb07weXt8kGAExo2XwfmBc9RAfC6cZML/wMw+q3oqMq6K/5nQ5Jps22/6chlWhSA==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -2304,7 +2304,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@darco2903/pulse@1.0.0': {}
+  '@darco2903/pulse@1.1.0': {}
 
   '@darco2903/secondthought@1.3.1': {}
 

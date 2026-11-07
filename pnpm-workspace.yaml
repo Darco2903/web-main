@@ -5,4 +5,4 @@ allowBuilds:
   esbuild: false
 minimumReleaseAgeExclude:
   - "@darco2903/cdn-api@1.7.0"
-  - "@darco2903/pulse@1.0.0"
+  - "@darco2903/pulse@1.1.0"
