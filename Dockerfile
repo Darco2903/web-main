@@ -31,8 +31,7 @@ COPY --from=build /app/package.json /app/
 COPY --from=build /app/server/package.json /app/server/
 # Shown by /health. Last, so a new commit doesn't rebuild the layers above
 ARG GIT_COMMIT
-ARG BUILD_TIME
-ENV GIT_COMMIT=$GIT_COMMIT BUILD_TIME=$BUILD_TIME
+ENV GIT_COMMIT=$GIT_COMMIT
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s \
     CMD ["node", "server/node_modules/@darco2903/pulse/dist/healthcheck.js"]

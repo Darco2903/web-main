@@ -42,9 +42,14 @@ jobs:
             type=semver,pattern={{major}}
             type=sha
 
+      # Shown by /health
+      - id: build-info
+        run: echo "commit=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
       - uses: docker/build-push-action@v7
         with:
           context: .
+          build-args: GIT_COMMIT=${{ steps.build-info.outputs.commit }}
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}

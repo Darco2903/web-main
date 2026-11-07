@@ -89,13 +89,13 @@ Runs on a VPS with Docker.
 
 1. Copy `.env.example` to `.env` and fill it in, with `SERVER_LISTEN=0.0.0.0` and `SERVER_PORT=8080` (the port published in [`compose.yml`](./compose.yml)). Put the SSL certificates in `ssl/`, they are mounted read-only.
 
-2. Start it, with the commit and build time shown by `/health`
+2. Start it, with the commit shown by `/health`
 
    ```bash
-   GIT_COMMIT=$(git rev-parse --short HEAD) BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) docker compose up -d --build
+   GIT_COMMIT=$(git rev-parse --short HEAD) docker compose up -d --build
    ```
 
-`GET /health` gives the version, commit, build time and uptime, and is used by the Docker healthcheck (`docker ps` shows the container as healthy or not).
+`GET /health` gives the version, commit and uptime, and is used by the Docker healthcheck (`docker ps` shows the container as healthy or not).
 
 ---
 

@@ -6,7 +6,6 @@ services:
       # Shown by /health, see Deployment in README.md
       args:
         GIT_COMMIT: ${GIT_COMMIT:-}
-        BUILD_TIME: ${BUILD_TIME:-}
     image: darco2903/web-main:latest
     container_name: web-main
     restart: always
